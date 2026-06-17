@@ -1,6 +1,7 @@
 extends Node3D
 
 const CELL_SIZE: float = 2.0
+const HEALING_TEMPLE_TILE: String = "O"
 
 const DungeonThemeDataScript = preload("res://scripts/dungeon/DungeonThemeData.gd")
 const FloorDatabaseScript = preload("res://scripts/dungeon/FloorDatabase.gd")
@@ -10,10 +11,20 @@ const DungeonSaveControllerScript = preload("res://scripts/dungeon/DungeonSaveCo
 const PARTY_CREATION_SCENE_PATH: String = "res://scenes/PartyCreation.tscn"
 const MAIN_MENU_SCENE_PATH: String = "res://scenes/MainMenu.tscn"
 
+
+# ------------------------------------------------------------
+# RÉFÉRENCES DE NŒUDS
+# ------------------------------------------------------------
+
 @onready var player: GridPlayer = $Player
 @onready var game_ui: GameUI = $GameUI
 @onready var combat_manager = $CombatManager
 @onready var dungeon_renderer = $DungeonRenderer
+
+
+# ------------------------------------------------------------
+# ÉTAT DU DONJON
+# ------------------------------------------------------------
 
 var discovered_ability_ids: Array[String] = []
 var ability_discovery_locations: Dictionary = {}
@@ -22,17 +33,24 @@ var discovered_map_cells: Dictionary = {}
 var current_floor_theme = null
 var current_floor_id: int = 1
 var current_floor_data = null
-
 var layout: Array[String] = []
 var stairs_down_cell: Vector2i = Vector2i(-1, -1)
 
-var party: Array = []
 
+# ------------------------------------------------------------
+# ÉTAT DU GROUPE ET DES CONTRÔLEURS
+# ------------------------------------------------------------
+
+var party: Array = []
 var selected_combat_command: int = 0
 
 var input_controller = null
 var save_controller = null
 
+
+# ------------------------------------------------------------
+# INITIALISATION
+# ------------------------------------------------------------
 
 func _ready() -> void:
 	randomize()
@@ -58,6 +76,7 @@ func _ready() -> void:
 	connect_in_game_menu_signals()
 
 	AudioManager.play_dungeon_music(current_floor_id)
+
 	refresh_ui()
 
 
@@ -320,13 +339,11 @@ func refresh_ui() -> void:
 
 func move_forward() -> void:
 	var target: Vector2i = player.get_forward_cell()
-
 	try_move_to_cell(target)
 
 
 func move_backward() -> void:
 	var target: Vector2i = player.get_backward_cell()
-
 	try_move_to_cell(target)
 
 
@@ -345,8 +362,9 @@ func try_move_to_cell(target: Vector2i) -> void:
 
 	var found_discovery: bool = check_ability_discovery()
 	var found_stairs: bool = check_stairs()
+	var found_temple: bool = check_healing_temple()
 
-	if not found_discovery and not found_stairs:
+	if not found_discovery and not found_stairs and not found_temple:
 		if combat_manager != null:
 			combat_manager.check_random_encounter(party)
 
@@ -370,7 +388,6 @@ func set_layout_tile(cell: Vector2i, new_tile: String) -> void:
 		return
 
 	var row: String = layout[cell.y]
-
 	var before: String = row.substr(0, cell.x)
 	var after: String = row.substr(cell.x + 1)
 
@@ -406,6 +423,38 @@ func check_stairs() -> bool:
 		combat_manager.battle_log = "Un escalier descend vers l'étage inférieur."
 
 	return true
+
+
+# ------------------------------------------------------------
+# TEMPLE DE GUÉRISON
+# ------------------------------------------------------------
+
+# Vérifie si le joueur vient d'entrer sur une case de temple.
+# Si oui, restaure le groupe et indique au déplacement qu'aucune rencontre aléatoire
+# ne doit être déclenchée sur cette case.
+func check_healing_temple() -> bool:
+	if get_layout_tile(player.grid_cell) != HEALING_TEMPLE_TILE:
+		return false
+
+	restore_party_at_temple()
+
+	if combat_manager != null:
+		combat_manager.battle_log = "Le groupe se recueille au temple.\nTous les PV et PM sont restaurés."
+
+	AudioManager.play_sfx("heal")
+
+	return true
+
+
+# Restaure complètement tous les membres du groupe.
+# Cette version restaure aussi les héros tombés à 0 PV.
+func restore_party_at_temple() -> void:
+	for hero in party:
+		if hero == null:
+			continue
+
+		hero.hp = hero.max_hp
+		hero.mp = hero.max_mp
 
 
 # ------------------------------------------------------------

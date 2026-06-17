@@ -1,14 +1,23 @@
 extends Node3D
+
 class_name DungeonRenderer
 
 const DungeonThemeDataScript = preload("res://scripts/dungeon/DungeonThemeData.gd")
 
+
+# ------------------------------------------------------------
+# ÉTAT DU RENDERER
+# ------------------------------------------------------------
+
 var cell_size: float = 2.0
-
 var generated_root: Node3D = null
-
 var current_layout: Array[String] = []
 var current_theme = null
+
+
+# ------------------------------------------------------------
+# MATÉRIAUX DU DONJON
+# ------------------------------------------------------------
 
 var floor_material: StandardMaterial3D
 var floor_patch_material_a: StandardMaterial3D
@@ -21,7 +30,6 @@ var ceiling_patch_material: StandardMaterial3D
 
 var wall_material: StandardMaterial3D
 var brick_line_material: StandardMaterial3D
-
 var rune_material: StandardMaterial3D
 
 var door_material: StandardMaterial3D
@@ -29,10 +37,25 @@ var door_frame_material: StandardMaterial3D
 var door_line_material: StandardMaterial3D
 var door_handle_material: StandardMaterial3D
 
+var temple_stone_material: StandardMaterial3D
+var temple_water_material: StandardMaterial3D
+var temple_light_material: StandardMaterial3D
+
+
+# ------------------------------------------------------------
+# OBJETS GÉNÉRÉS
+# ------------------------------------------------------------
+
 var ability_discovery_markers: Dictionary = {}
 var door_visuals: Dictionary = {}
 
 
+# ------------------------------------------------------------
+# CONSTRUCTION GÉNÉRALE DU DONJON
+# ------------------------------------------------------------
+
+# Reconstruit toute la géométrie du donjon à partir du layout ASCII :
+# murs, sols, plafonds, portes, marqueurs de découverte et cases spéciales.
 func build_dungeon(
 	layout: Array[String],
 	ability_discovery_locations: Dictionary,
@@ -70,22 +93,30 @@ func build_dungeon(
 
 				if tile == "D":
 					create_closed_door_tile(Vector2i(x, y))
-
 				elif tile == "d":
 					create_open_door_tile(Vector2i(x, y))
+				elif tile == "O":
+					create_healing_temple_tile(Vector2i(x, y))
 
 	create_ability_discovery_markers(ability_discovery_locations)
 
 
+# Supprime l'ancien donjon généré avant d'en reconstruire un nouveau.
 func clear_dungeon() -> void:
 	ability_discovery_markers.clear()
 	door_visuals.clear()
 
 	if generated_root != null:
 		generated_root.queue_free()
-		generated_root = null
+
+	generated_root = null
 
 
+# ------------------------------------------------------------
+# MATÉRIAUX ET LUMIÈRE
+# ------------------------------------------------------------
+
+# Crée tous les matériaux utilisés par le rendu du donjon.
 func create_materials() -> void:
 	floor_material = create_material(current_theme.floor_color)
 	floor_patch_material_a = create_material(current_theme.floor_patch_color_a)
@@ -98,7 +129,6 @@ func create_materials() -> void:
 
 	wall_material = create_material(current_theme.wall_color)
 	brick_line_material = create_material(current_theme.brick_line_color)
-
 	rune_material = create_material(current_theme.rune_color)
 
 	door_material = create_material(current_theme.door_color)
@@ -106,21 +136,30 @@ func create_materials() -> void:
 	door_line_material = create_material(current_theme.door_line_color)
 	door_handle_material = create_material(current_theme.door_handle_color)
 
+	temple_stone_material = create_material(Color(0.46, 0.42, 0.36, 1.0))
+	temple_water_material = create_material(Color(0.18, 0.55, 0.82, 1.0))
+	temple_light_material = create_material(Color(0.45, 0.95, 1.0, 1.0))
+
 
 func create_material(color: Color) -> StandardMaterial3D:
 	var material: StandardMaterial3D = StandardMaterial3D.new()
 	material.albedo_color = color
+
 	return material
 
 
+# Crée la lumière directionnelle principale du donjon.
 func create_light() -> void:
 	var light: DirectionalLight3D = DirectionalLight3D.new()
 	light.name = "DungeonLight"
 	light.rotation_degrees = Vector3(-60.0, 30.0, 0.0)
 	light.light_energy = current_theme.light_energy
+
 	generated_root.add_child(light)
 
 
+# Crée une boîte 3D générique.
+# Sert de brique de base pour les murs, sols, portes, autels et décorations.
 func create_box(
 	box_name: String,
 	box_size: Vector3,
@@ -389,7 +428,6 @@ func create_wall_brick_face_east(x: int, y: int) -> void:
 func create_horizontal_brick_lines_x(wall_x: float, wall_z: float) -> void:
 	var line_depth: float = 0.025
 	var line_height: float = 0.035
-
 	var y_values: Array[float] = [
 		0.0,
 		0.5,
@@ -408,7 +446,6 @@ func create_horizontal_brick_lines_x(wall_x: float, wall_z: float) -> void:
 func create_horizontal_brick_lines_z(wall_x: float, wall_z: float) -> void:
 	var line_depth: float = 0.025
 	var line_height: float = 0.035
-
 	var y_values: Array[float] = [
 		0.0,
 		0.5,
@@ -428,7 +465,6 @@ func create_vertical_brick_lines_x(wall_x: float, wall_z: float) -> void:
 	var line_width: float = 0.035
 	var line_depth: float = 0.025
 	var row_height: float = 0.42
-
 	var row_centers: Array[float] = [
 		-0.25,
 		0.25,
@@ -466,7 +502,6 @@ func create_vertical_brick_lines_z(wall_x: float, wall_z: float) -> void:
 	var line_width: float = 0.035
 	var line_depth: float = 0.025
 	var row_height: float = 0.42
-
 	var row_centers: Array[float] = [
 		-0.25,
 		0.25,
@@ -504,6 +539,7 @@ func create_vertical_brick_lines_z(wall_x: float, wall_z: float) -> void:
 # PORTES
 # ------------------------------------------------------------
 
+# Crée le nœud racine d'une porte et remplace l'ancien visuel de porte si nécessaire.
 func create_door_visual_root(cell: Vector2i) -> Node3D:
 	clear_door_visual(cell)
 
@@ -511,7 +547,6 @@ func create_door_visual_root(cell: Vector2i) -> Node3D:
 	root.name = "Door_" + str(cell.x) + "_" + str(cell.y)
 
 	generated_root.add_child(root)
-
 	door_visuals[cell] = root
 
 	return root
@@ -529,6 +564,7 @@ func clear_door_visual(cell: Vector2i) -> void:
 	door_visuals.erase(cell)
 
 
+# Remplace le visuel d'une porte fermée par son visuel ouvert.
 func set_door_open(cell: Vector2i) -> void:
 	create_open_door_tile(cell)
 
@@ -536,7 +572,6 @@ func set_door_open(cell: Vector2i) -> void:
 func get_door_orientation(cell: Vector2i) -> String:
 	var left_is_wall: bool = is_wall_cell(Vector2i(cell.x - 1, cell.y))
 	var right_is_wall: bool = is_wall_cell(Vector2i(cell.x + 1, cell.y))
-
 	var north_is_wall: bool = is_wall_cell(Vector2i(cell.x, cell.y - 1))
 	var south_is_wall: bool = is_wall_cell(Vector2i(cell.x, cell.y + 1))
 
@@ -781,6 +816,81 @@ func create_open_door_tile(cell: Vector2i) -> void:
 
 
 # ------------------------------------------------------------
+# TEMPLE DE GUÉRISON
+# ------------------------------------------------------------
+
+# Crée un petit autel/fontaine sur une case spéciale "O".
+# Le modèle est généré en code pour éviter d'ajouter un asset externe à cette étape.
+func create_healing_temple_tile(cell: Vector2i) -> void:
+	var root: Node3D = Node3D.new()
+	root.name = "HealingTemple_" + str(cell.x) + "_" + str(cell.y)
+	root.position = Vector3(
+		float(cell.x) * cell_size,
+		current_theme.floor_y + 0.08,
+		float(cell.y) * cell_size
+	)
+
+	generated_root.add_child(root)
+
+	create_box(
+		"TempleBase",
+		Vector3(1.15, 0.18, 1.15),
+		Vector3(0.0, 0.09, 0.0),
+		temple_stone_material,
+		root
+	)
+
+	create_box(
+		"TempleAltar",
+		Vector3(0.75, 0.35, 0.75),
+		Vector3(0.0, 0.35, 0.0),
+		temple_stone_material,
+		root
+	)
+
+	create_box(
+		"TempleWater",
+		Vector3(0.52, 0.04, 0.52),
+		Vector3(0.0, 0.55, 0.0),
+		temple_water_material,
+		root
+	)
+
+	create_box(
+		"TempleLight",
+		Vector3(0.25, 0.25, 0.25),
+		Vector3(0.0, 0.82, 0.0),
+		temple_light_material,
+		root
+	)
+
+	create_box(
+		"TemplePillarLeft",
+		Vector3(0.16, 0.55, 0.16),
+		Vector3(-0.42, 0.38, -0.42),
+		temple_stone_material,
+		root
+	)
+
+	create_box(
+		"TemplePillarRight",
+		Vector3(0.16, 0.55, 0.16),
+		Vector3(0.42, 0.38, -0.42),
+		temple_stone_material,
+		root
+	)
+
+	var glow: OmniLight3D = OmniLight3D.new()
+	glow.name = "TempleGlow"
+	glow.position = Vector3(0.0, 1.0, 0.0)
+	glow.light_color = Color(0.45, 0.95, 1.0, 1.0)
+	glow.light_energy = 0.65
+	glow.omni_range = 2.3
+
+	root.add_child(glow)
+
+
+# ------------------------------------------------------------
 # MARQUEURS DE DÉCOUVERTE
 # ------------------------------------------------------------
 
@@ -791,7 +901,6 @@ func create_ability_discovery_markers(
 
 	for cell_key in ability_discovery_locations.keys():
 		var cell: Vector2i = cell_key
-
 		var marker_position: Vector3 = Vector3(
 			float(cell.x) * cell_size,
 			current_theme.floor_y + 0.09,
