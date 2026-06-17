@@ -1,22 +1,37 @@
 extends Panel
+
 class_name AutoMapUI
 
 const VISIBLE_RADIUS_X: int = 7
 const VISIBLE_RADIUS_Y: int = 5
 
+
+# ------------------------------------------------------------
+# RÉFÉRENCES UI
+# ------------------------------------------------------------
+
 var title_label: Label = null
 var map_grid: GridContainer = null
 var info_label: Label = null
 
-var ui_built: bool = false
 
+# ------------------------------------------------------------
+# ÉTAT UI
+# ------------------------------------------------------------
+
+var ui_built: bool = false
 var cell_pixel_size: int = 10
 
+
+# ------------------------------------------------------------
+# INITIALISATION
+# ------------------------------------------------------------
 
 func _ready() -> void:
 	build_ui()
 
 
+# Construit l'interface de l'automap une seule fois.
 func build_ui() -> void:
 	if ui_built:
 		return
@@ -69,6 +84,11 @@ func build_ui() -> void:
 	box.add_child(info_label)
 
 
+# ------------------------------------------------------------
+# MISE À JOUR DE LA CARTE
+# ------------------------------------------------------------
+
+# Reconstruit la portion visible de l'automap autour du joueur.
 func update_map(
 	layout: Array[String],
 	discovered_cells: Dictionary,
@@ -76,7 +96,6 @@ func update_map(
 	facing_name: String
 ) -> void:
 	ensure_ui_ready()
-
 	clear_container(map_grid)
 
 	if layout.is_empty():
@@ -86,18 +105,16 @@ func update_map(
 
 	var start_x: int = player_position.x - VISIBLE_RADIUS_X
 	var end_x: int = player_position.x + VISIBLE_RADIUS_X
-
 	var start_y: int = player_position.y - VISIBLE_RADIUS_Y
 	var end_y: int = player_position.y + VISIBLE_RADIUS_Y
-
 	var visible_width: int = end_x - start_x + 1
+
 	map_grid.columns = visible_width
 
 	for y in range(start_y, end_y + 1):
 		for x in range(start_x, end_x + 1):
 			var cell: Vector2i = Vector2i(x, y)
 			var tile: String = get_layout_tile(layout, cell)
-
 			var is_player_cell: bool = cell == player_position
 			var is_discovered: bool = discovered_cells.has(cell)
 			var is_outside_map: bool = not is_inside_layout(layout, cell)
@@ -116,11 +133,17 @@ func update_map(
 
 	var info: String = ""
 	info += "Pos : " + str(player_position.x) + ", " + str(player_position.y)
-	info += "  " + facing_name
+	info += " " + facing_name
 
 	info_label.text = info
 
 
+# ------------------------------------------------------------
+# CELLULES DE L'AUTOMAP
+# ------------------------------------------------------------
+
+# Crée une cellule visuelle de l'automap selon le contenu de la case :
+# mur, porte, escalier, temple, joueur ou zone non découverte.
 func create_map_cell(
 	tile: String,
 	is_discovered: bool,
@@ -137,47 +160,44 @@ func create_map_cell(
 		background_color = Color(0.010, 0.008, 0.006, 1.0)
 		border_color = Color(0.010, 0.008, 0.006, 1.0)
 		symbol = ""
-
 	elif is_player_cell:
 		background_color = Color(0.18, 0.12, 0.045, 1.0)
 		border_color = Color(1.0, 0.78, 0.22, 1.0)
 		text_color = Color(1.0, 0.92, 0.42)
 		symbol = get_player_symbol(facing_name)
-
 	elif not is_discovered:
 		background_color = Color(0.018, 0.014, 0.012, 1.0)
 		border_color = Color(0.025, 0.020, 0.016, 1.0)
 		symbol = ""
-
 	elif tile == "#":
 		background_color = Color(0.22, 0.22, 0.23, 1.0)
 		border_color = Color(0.08, 0.08, 0.09, 1.0)
 		symbol = ""
-
 	elif tile == "D":
 		background_color = Color(0.34, 0.18, 0.07, 1.0)
 		border_color = Color(0.85, 0.58, 0.20, 1.0)
 		text_color = Color(1.0, 0.82, 0.36)
 		symbol = "D"
-
 	elif tile == "d":
 		background_color = Color(0.22, 0.12, 0.05, 1.0)
 		border_color = Color(0.55, 0.34, 0.12, 1.0)
 		text_color = Color(0.95, 0.78, 0.38)
 		symbol = "/"
-
 	elif tile == ">":
 		background_color = Color(0.09, 0.06, 0.035, 1.0)
 		border_color = Color(0.50, 0.36, 0.12, 1.0)
 		text_color = Color(0.95, 0.78, 0.38)
 		symbol = ">"
-
 	elif tile == "<":
 		background_color = Color(0.09, 0.06, 0.035, 1.0)
 		border_color = Color(0.50, 0.36, 0.12, 1.0)
 		text_color = Color(0.95, 0.78, 0.38)
 		symbol = "<"
-
+	elif tile == "O":
+		background_color = Color(0.035, 0.09, 0.08, 1.0)
+		border_color = Color(0.35, 0.85, 0.75, 1.0)
+		text_color = Color(0.75, 1.0, 0.92, 1.0)
+		symbol = "O"
 	else:
 		background_color = Color(0.08, 0.055, 0.035, 1.0)
 		border_color = Color(0.12, 0.08, 0.045, 1.0)
@@ -202,10 +222,15 @@ func create_map_cell(
 	label.set_anchors_preset(Control.PRESET_FULL_RECT)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+
 	panel.add_child(label)
 
 	return panel
 
+
+# ------------------------------------------------------------
+# SYMBOLE DU JOUEUR
+# ------------------------------------------------------------
 
 func get_player_symbol(facing_name: String) -> String:
 	var lower_name: String = facing_name.to_lower()
@@ -225,6 +250,10 @@ func get_player_symbol(facing_name: String) -> String:
 	return "@"
 
 
+# ------------------------------------------------------------
+# LECTURE DU LAYOUT
+# ------------------------------------------------------------
+
 func is_inside_layout(layout: Array[String], cell: Vector2i) -> bool:
 	if cell.y < 0 or cell.y >= layout.size():
 		return false
@@ -241,6 +270,10 @@ func get_layout_tile(layout: Array[String], cell: Vector2i) -> String:
 
 	return layout[cell.y].substr(cell.x, 1)
 
+
+# ------------------------------------------------------------
+# OUTILS UI
+# ------------------------------------------------------------
 
 func create_panel_style(
 	background_color: Color,
@@ -269,6 +302,7 @@ func create_label(
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", font_color)
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+
 	return label
 
 
