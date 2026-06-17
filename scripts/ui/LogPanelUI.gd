@@ -1,0 +1,279 @@
+extends Panel
+class_name LogPanelUI
+
+const LOG_ALL: String = "all"
+const LOG_JOURNAL: String = "journal"
+const LOG_COMBAT: String = "combat"
+const LOG_SYSTEM: String = "system"
+
+var tabs_container: HBoxContainer = null
+var log_text: RichTextLabel = null
+
+var log_tab_buttons: Dictionary = {}
+var selected_log_channel: String = LOG_JOURNAL
+var log_entries: Array = []
+var last_message_by_channel: Dictionary = {}
+
+var ui_built: bool = false
+
+
+func _ready() -> void:
+	build_ui()
+
+
+func build_ui() -> void:
+	if ui_built:
+		return
+
+	ui_built = true
+
+	add_theme_stylebox_override(
+		"panel",
+		create_panel_style(
+			Color(0.075, 0.045, 0.025, 1.0),
+			Color(0.30, 0.18, 0.08, 1.0),
+			2
+		)
+	)
+
+	var log_box: VBoxContainer = VBoxContainer.new()
+	log_box.set_anchors_preset(Control.PRESET_FULL_RECT)
+	log_box.offset_left = 8
+	log_box.offset_top = 6
+	log_box.offset_right = -8
+	log_box.offset_bottom = -8
+	log_box.add_theme_constant_override("separation", 6)
+	add_child(log_box)
+
+	tabs_container = HBoxContainer.new()
+	tabs_container.name = "LogTabs"
+	tabs_container.custom_minimum_size = Vector2(0, 28)
+	tabs_container.add_theme_constant_override("separation", 5)
+	log_box.add_child(tabs_container)
+
+	add_log_tab_button(LOG_ALL, "Tous")
+	add_log_tab_button(LOG_JOURNAL, "Journal")
+	add_log_tab_button(LOG_COMBAT, "Combat")
+	add_log_tab_button(LOG_SYSTEM, "Système")
+
+	log_text = RichTextLabel.new()
+	log_text.name = "LogText"
+	log_text.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	log_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	log_text.bbcode_enabled = false
+	log_text.scroll_following = true
+	log_text.fit_content = false
+
+	log_text.add_theme_font_size_override("normal_font_size", 16)
+	log_text.add_theme_color_override("default_color", Color(0.94, 0.86, 0.68))
+	log_text.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.75))
+	log_text.add_theme_constant_override("shadow_offset_x", 1)
+	log_text.add_theme_constant_override("shadow_offset_y", 1)
+
+	log_box.add_child(log_text)
+
+	update_log_tab_buttons()
+	update_log_display()
+
+
+func add_log_tab_button(channel: String, button_text: String) -> void:
+	var button: Button = Button.new()
+	button.text = button_text
+	button.toggle_mode = true
+	button.focus_mode = Control.FOCUS_NONE
+	button.custom_minimum_size = Vector2(82, 24)
+	button.add_theme_font_size_override("font_size", 13)
+
+	apply_button_style(button)
+
+	button.pressed.connect(_on_log_tab_pressed.bind(channel))
+
+	tabs_container.add_child(button)
+	log_tab_buttons[channel] = button
+
+
+func _on_log_tab_pressed(channel: String) -> void:
+	set_log_channel(channel)
+
+
+func set_log_channel(channel: String) -> void:
+	selected_log_channel = channel
+	update_log_tab_buttons()
+	update_log_display()
+
+
+func update_log_tab_buttons() -> void:
+	for channel in log_tab_buttons.keys():
+		var button: Button = log_tab_buttons[channel]
+
+		if button != null:
+			button.button_pressed = channel == selected_log_channel
+
+
+func add_system_message(message: String) -> void:
+	add_log_message(LOG_SYSTEM, message)
+
+
+func add_journal_message(message: String) -> void:
+	add_log_message(LOG_JOURNAL, message)
+
+
+func add_combat_message(message: String) -> void:
+	add_log_message(LOG_COMBAT, message)
+
+
+func add_log_message(channel: String, message: String) -> void:
+	var clean_message: String = message.strip_edges()
+
+	if clean_message == "":
+		return
+
+	if last_message_by_channel.has(channel):
+		if last_message_by_channel[channel] == clean_message:
+			return
+
+	last_message_by_channel[channel] = clean_message
+
+	log_entries.append({
+		"channel": channel,
+		"message": clean_message
+	})
+
+	while log_entries.size() > 120:
+		log_entries.remove_at(0)
+
+	update_log_display()
+
+
+func update_log_display() -> void:
+	if log_text == null:
+		return
+
+	var text: String = build_visible_log_text()
+
+	if text == "":
+		text = "Aucun message."
+
+	log_text.text = text
+
+
+func build_visible_log_text() -> String:
+	var result: String = ""
+	var added_count: int = 0
+
+	for entry in log_entries:
+		var channel: String = entry["channel"]
+		var message: String = entry["message"]
+
+		if selected_log_channel != LOG_ALL:
+			if channel != selected_log_channel:
+				continue
+
+		if added_count > 0:
+			result += "\n\n"
+
+		if selected_log_channel == LOG_ALL:
+			result += get_log_prefix(channel) + " "
+
+		result += message
+		added_count += 1
+
+	return result
+
+
+func get_log_prefix(channel: String) -> String:
+	if channel == LOG_JOURNAL:
+		return "[Journal]"
+
+	if channel == LOG_COMBAT:
+		return "[Combat]"
+
+	if channel == LOG_SYSTEM:
+		return "[Système]"
+
+	return "[Info]"
+
+
+func detect_log_channel(message: String, default_channel: String) -> String:
+	var lower_text: String = message.to_lower()
+
+	if lower_text.contains("attaque"):
+		return LOG_COMBAT
+
+	if lower_text.contains("dégâts"):
+		return LOG_COMBAT
+
+	if lower_text.contains("combat"):
+		return LOG_COMBAT
+
+	if lower_text.contains("vaincu"):
+		return LOG_COMBAT
+
+	if lower_text.contains("exp"):
+		return LOG_COMBAT
+
+	if lower_text.contains("lance"):
+		return LOG_COMBAT
+
+	if lower_text.contains("soin"):
+		return LOG_COMBAT
+
+	if lower_text.contains("tour de"):
+		return LOG_COMBAT
+
+	if lower_text.contains("apparaît"):
+		return LOG_COMBAT
+
+	if lower_text.contains("découvre"):
+		return LOG_JOURNAL
+
+	if lower_text.contains("trouvez"):
+		return LOG_JOURNAL
+
+	if lower_text.contains("rune"):
+		return LOG_JOURNAL
+
+	if lower_text.contains("donjon"):
+		return LOG_JOURNAL
+
+	return default_channel
+
+
+func create_panel_style(
+	background_color: Color,
+	border_color: Color,
+	border_width: int
+) -> StyleBoxFlat:
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = background_color
+	style.border_color = border_color
+	style.set_border_width_all(border_width)
+	style.corner_radius_top_left = 2
+	style.corner_radius_top_right = 2
+	style.corner_radius_bottom_left = 2
+	style.corner_radius_bottom_right = 2
+
+	return style
+
+
+func apply_button_style(button: Button) -> void:
+	var normal_style: StyleBoxFlat = StyleBoxFlat.new()
+	normal_style.bg_color = Color(0.11, 0.07, 0.04, 1.0)
+	normal_style.border_color = Color(0.30, 0.18, 0.08, 1.0)
+	normal_style.set_border_width_all(1)
+
+	var pressed_style: StyleBoxFlat = StyleBoxFlat.new()
+	pressed_style.bg_color = Color(0.28, 0.16, 0.06, 1.0)
+	pressed_style.border_color = Color(0.95, 0.72, 0.28, 1.0)
+	pressed_style.set_border_width_all(2)
+
+	var hover_style: StyleBoxFlat = StyleBoxFlat.new()
+	hover_style.bg_color = Color(0.18, 0.10, 0.05, 1.0)
+	hover_style.border_color = Color(0.55, 0.34, 0.13, 1.0)
+	hover_style.set_border_width_all(1)
+
+	button.add_theme_stylebox_override("normal", normal_style)
+	button.add_theme_stylebox_override("pressed", pressed_style)
+	button.add_theme_stylebox_override("hover", hover_style)
+	button.add_theme_color_override("font_color", Color(0.90, 0.80, 0.58))
+	button.add_theme_color_override("font_pressed_color", Color(1.0, 0.92, 0.48))
