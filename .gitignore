@@ -1,0 +1,23 @@
+# Godot cache
+.godot/
+
+# Temporary files
+*.tmp
+*.bak
+
+# Exports
+build/
+dist/
+export/
+*.exe
+*.pck
+*.zip
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Old/private assets
+assets/audio/old/
+assets/audio/private/
+assets/audio/copyrighted/
