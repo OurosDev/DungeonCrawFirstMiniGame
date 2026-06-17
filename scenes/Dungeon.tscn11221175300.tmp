@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://doj1iilchqgxv"]
+
+[ext_resource type="Script" uid="uid://b8l1t4itbux0" path="res://scenes/GameUI.gd" id="1_5njy5"]
+[ext_resource type="Script" uid="uid://bokdi1qmasb8n" path="res://scenes/Dungeon.gd" id="1_ejrmu"]
+[ext_resource type="Script" uid="uid://djct2a0sxeons" path="res://scenes/GridPlayer.gd" id="3_1v1rp"]
+[ext_resource type="Script" uid="uid://svjyfj6ue1ev" path="res://scenes/CombatManager.gd" id="4_m25rw"]
+
+[node name="Dungeon" type="Node3D" unique_id=817999074]
+script = ExtResource("1_ejrmu")
+
+[node name="Player" type="Node3D" parent="." unique_id=280906881]
+script = ExtResource("3_1v1rp")
+
+[node name="Camera3D" type="Camera3D" parent="Player" unique_id=1212093396]
+
+[node name="GameUI" type="CanvasLayer" parent="." unique_id=134451081]
+script = ExtResource("1_5njy5")
+
+[node name="CombatManager" type="Node" parent="." unique_id=2044406437]
+script = ExtResource("4_m25rw")
