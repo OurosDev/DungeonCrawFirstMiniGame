@@ -87,7 +87,33 @@ fichiers de test temporaires
 
 ---
 
-## 6. Règles visuelles du projet
+## 6. Préparation documentaire des releases
+
+Lors de la préparation d’une future release, proposer aussi les mises à jour documentaires nécessaires.
+
+À vérifier systématiquement :
+
+- ajouter ou mettre à jour le fichier `CHANGELOG/vX.Y.md` correspondant à la release ;
+- mettre à jour `CHANGELOG/README.md` pour référencer la nouvelle version ;
+- mettre à jour `ROADMAP.md` si la version stable actuelle, la prochaine direction ou les priorités changent ;
+- mettre à jour `TECHNICAL_DEBT.md` si une dette technique est ajoutée, résolue ou reclassée ;
+- mettre à jour `FLOOR_DESIGN.md` si les règles de construction d’étage ou la nomenclature changent ;
+- mettre à jour `FLOOR_VISUALIZER.md` si les layouts, symboles ou variantes de planification changent ;
+- mettre à jour ce fichier si les règles de collaboration changent.
+
+Lors d’une préparation de release, distinguer clairement :
+
+```text
+Fichiers gameplay / scripts
+Fichiers documentation
+Fichiers temporaires à ne pas pousser
+```
+
+Ne pas pousser les `README_PACK.md` générés localement, sauf décision explicite.
+
+---
+
+## 7. Règles visuelles du projet
 
 - Style : dungeon crawler rétro inspiré de *Swords and Serpents* NES.
 - Les contours blancs autour des portraits ou personnages ne sont pas voulus.
@@ -96,7 +122,7 @@ fichiers de test temporaires
 
 ---
 
-## 7. Règles de release
+## 8. Règles de release
 
 - Le user fait une sauvegarde zip locale du projet à chaque release.
 - Les releases doivent rester petites et testables.
@@ -106,7 +132,7 @@ fichiers de test temporaires
 
 ---
 
-## 8. Points de vigilance spécifiques
+## 9. Points de vigilance spécifiques
 
 - Les anciennes sauvegardes peuvent conserver d’anciens layouts mémorisés.
 - Pour tester un changement de layout, utiliser une nouvelle partie ou réinitialiser la sauvegarde de test.
@@ -117,7 +143,7 @@ fichiers de test temporaires
 
 ---
 
-## 9. Dernière base stable connue
+## 10. Dernière base stable connue
 
 ```text
 v0.7.1 — Boss du gardien et retour titre après K.O.
