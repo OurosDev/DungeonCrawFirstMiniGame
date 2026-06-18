@@ -4,181 +4,206 @@ Visualisation des layouts du donjon.
 
 Ce fichier sert à relire les étages plus facilement que dans le layout ASCII brut, notamment avant d’ajouter ou déplacer des coffres `C`, des messages `M`, des combats fixes `F`, des boss `X`, des portes verrouillées `L` ou d’autres cases spéciales.
 
-> Note : ce fichier conserve une grille lisible dans l’aperçu Markdown. Les murs sont remplacés par des carrés `■` et les cases de sol / couloir sont volontairement laissées vides.
+> Source de vérité gameplay : `scripts/dungeon/FloorDatabase.gd`.
 >
-> Synchronisation : état régénéré depuis `scripts/dungeon/FloorDatabase.gd` après `v0.8.2`, avec la correction confirmée de la porte `D` de l’étage 1 en `Vector2i(26, 13)`.
+> Synchronisation : état régénéré depuis `FloorDatabase.gd` après `v0.8.2`, avec la correction confirmée de la porte `D` de l’étage 1 en `Vector2i(26, 13)`.
+>
+> Convention visuelle : les murs `#` sont affichés en `■`, les sols `.` sont volontairement laissés vides, et les symboles spéciaux restent visibles dans la grille.
 
 ---
 
 ## Légende
 
-| Symbole logique | Affichage dans la grille | Rôle |
+| Symbole affiché | Source layout | Signification |
 |---|---|---|
-| `#` | carré `■` | Mur |
-| `.` | cellule vide | Sol / couloir |
+| `■` | `#` | Mur |
+| cellule vide | `.` | Sol / couloir |
 | `D` | `D` | Porte fermée |
-| `d` | `d` | Porte ouverte runtime |
-| `>` | `>` | Escalier descendant |
-| `<` | `<` | Escalier montant |
-| `O` | `O` | Temple |
+| `O` | `O` | Temple de guérison |
 | `B` | `B` | Boutique |
 | `C` | `C` | Coffre |
-| `M` | `M` | Message / PNJ neutre / indication |
-| `F` | `F` | Combat fixe non-boss |
-| `X` | `X` | Boss / rencontre majeure |
-| `P` | `P` | Piège |
-| `E` | `E` | Événement |
-| `R` | `R` | Rune / sort visible |
+| `M` | `M` | Message / indication |
 | `L` | `L` | Porte verrouillée |
-| `S` | `S` | Passage secret |
+| `X` | `X` | Boss / rencontre majeure |
+| `>` | `>` | Escalier descendant |
+| `<` | `<` | Escalier montant |
 
 ---
 
-## 1. État actuel en jeu
+## État actuel en jeu
 
-Cette section reflète strictement les layouts actuellement implémentés dans `scripts/dungeon/FloorDatabase.gd`. Ne pas y placer les variantes prévues pour les versions futures.
+Cette section doit correspondre strictement aux layouts de `FloorDatabase.gd`.
 
 ### Étage 1 — Galeries de terre sombre
 
-Dimensions : **31 × 21**.
+- Dimensions : `31 x 21`.
+- Départ : `Vector2i(1, 1)`.
+- Escalier descendant actif : `Vector2i(23, 17)`.
+- Découverte de sort : `Vector2i(29, 13)` — `spell_ice_shard`.
+- Correction confirmée : porte `D` replacée en `Vector2i(26, 13)`.
 
-Y\X 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 Y
-0■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■0
-1■  M■C■                     DO■1
-2■■■ ■ ■ ■■ ■■ ■■■■■■■■■■■■■■■■■2
-3■ ■ ■ ■     ■       ■         ■3
-4■ ■ ■ ■■■ ■■■■■■■■■ ■ ■■■■■■  ■4
-5■ ■ ■     ■         ■   ■     ■5
-6■ ■ ■ ■D■■■ ■■■ ■■■■■■■ ■ ■■■■■6
-7■ ■   ■   ■   ■ ■     ■ ■     ■7
-8■ ■■■ ■■■ ■■■ ■■■ ■ ■■■ ■■■■■ ■8
-9■     ■     ■   ■ ■        C■ ■9
-10■ ■ ■ ■■■■■ ■■■ ■ ■■■■■■■■■■■ ■10
-11■ ■ ■     ■ ■   ■   ■     ■   ■11
-12■ ■■■■■■■ ■ ■   ■ ■ ■ ■■■ ■ ■■■12
-13■         ■         ■   ■ D ■ ■13
-14■ ■■■■■■■■■■■■■■■■■ ■■■ ■■■ ■ ■14
-15■ ■           DB■   ■   ■   ■ ■15
-16■ ■ ■■■■■ ■■■ ■■■ ■ ■ ■■■ ■ ■ ■16
-17■ ■ ■   ■         ■ ■ ■>■ ■ ■ ■17
-18■ ■ ■ ■■■ ■■ ■■■■ ■ ■ ■D■M  ■ ■18
-19■   ■          C■   D ■   ■   ■19
-20■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■20
-Y\X 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 Y
+| y \ x | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | y |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| 0 | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | 0 |
+| 1 | ■ |  |  | M | ■ | C | ■ |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | D | O | ■ | 1 |
+| 2 | ■ | ■ | ■ |  | ■ |  | ■ |  | ■ | ■ |  | ■ | ■ |  | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | 2 |
+| 3 | ■ |  | ■ |  | ■ |  | ■ |  |  |  |  |  | ■ |  |  |  |  |  |  |  | ■ |  |  |  |  |  |  |  |  |  | ■ | 3 |
+| 4 | ■ |  | ■ |  | ■ |  | ■ | ■ | ■ |  | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ |  | ■ |  | ■ | ■ | ■ | ■ | ■ | ■ |  |  | ■ | 4 |
+| 5 | ■ |  | ■ |  | ■ |  |  |  |  |  | ■ |  |  |  |  |  |  |  |  |  | ■ |  |  |  | ■ |  |  |  |  |  | ■ | 5 |
+| 6 | ■ |  | ■ |  | ■ |  | ■ | D | ■ | ■ | ■ |  | ■ | ■ | ■ |  | ■ | ■ | ■ | ■ | ■ | ■ | ■ |  | ■ |  | ■ | ■ | ■ | ■ | ■ | 6 |
+| 7 | ■ |  | ■ |  |  |  | ■ |  |  |  | ■ |  |  |  | ■ |  | ■ |  |  |  |  |  | ■ |  | ■ |  |  |  |  |  | ■ | 7 |
+| 8 | ■ |  | ■ | ■ | ■ |  | ■ | ■ | ■ |  | ■ | ■ | ■ |  | ■ | ■ | ■ |  | ■ |  | ■ | ■ | ■ |  | ■ | ■ | ■ | ■ | ■ |  | ■ | 8 |
+| 9 | ■ |  |  |  |  |  | ■ |  |  |  |  |  | ■ |  |  |  | ■ |  | ■ |  |  |  |  |  |  |  |  | C | ■ |  | ■ | 9 |
+| 10 | ■ |  | ■ |  | ■ |  | ■ | ■ | ■ | ■ | ■ |  | ■ | ■ | ■ |  | ■ |  | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ |  | ■ | 10 |
+| 11 | ■ |  | ■ |  | ■ |  |  |  |  |  | ■ |  | ■ |  |  |  | ■ |  |  |  | ■ |  |  |  |  |  | ■ |  |  |  | ■ | 11 |
+| 12 | ■ |  | ■ | ■ | ■ | ■ | ■ | ■ | ■ |  | ■ |  | ■ |  |  |  | ■ |  | ■ |  | ■ |  | ■ | ■ | ■ |  | ■ |  | ■ | ■ | ■ | 12 |
+| 13 | ■ |  |  |  |  |  |  |  |  |  | ■ |  |  |  |  |  |  |  |  |  | ■ |  |  |  | ■ |  | D |  | ■ |  | ■ | 13 |
+| 14 | ■ |  | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ |  | ■ | ■ | ■ |  | ■ | ■ | ■ |  | ■ |  | ■ | 14 |
+| 15 | ■ |  | ■ |  |  |  |  |  |  |  |  |  |  |  | D | B | ■ |  |  |  | ■ |  |  |  | ■ |  |  |  | ■ |  | ■ | 15 |
+| 16 | ■ |  | ■ |  | ■ | ■ | ■ | ■ | ■ |  | ■ | ■ | ■ |  | ■ | ■ | ■ |  | ■ |  | ■ |  | ■ | ■ | ■ |  | ■ |  | ■ |  | ■ | 16 |
+| 17 | ■ |  | ■ |  | ■ |  |  |  | ■ |  |  |  |  |  |  |  |  |  | ■ |  | ■ |  | ■ | &gt; | ■ |  | ■ |  | ■ |  | ■ | 17 |
+| 18 | ■ |  | ■ |  | ■ |  | ■ | ■ | ■ |  | ■ | ■ |  | ■ | ■ | ■ | ■ |  | ■ |  | ■ |  | ■ | D | ■ | M |  |  | ■ |  | ■ | 18 |
+| 19 | ■ |  |  |  | ■ |  |  |  |  |  |  |  |  |  |  | C | ■ |  |  |  | D |  | ■ |  |  |  | ■ |  |  |  | ■ | 19 |
+| 20 | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | 20 |
+| y \ x | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | y |
 
-#### Cases spéciales — étage 1
+#### Cases spéciales — Étage 1
 
-| Symbole | Coordonnée | Rôle | Note |
-|---|---|---|---|
-| `M` | `Vector2i(3, 1)` | Message / PNJ neutre / indication | Message : indice sur les coffres. |
-| `C` | `Vector2i(5, 1)` | Coffre | Coffre : +25 or. |
-| `D` | `Vector2i(28, 1)` | Porte fermée | Porte d’accès au temple. |
-| `O` | `Vector2i(29, 1)` | Temple | Temple de guérison. |
-| `D` | `Vector2i(7, 6)` | Porte fermée | Porte simple. |
-| `C` | `Vector2i(27, 9)` | Coffre | Coffre : `small_shield`. |
-| `D` | `Vector2i(26, 13)` | Porte fermée | Porte fermée corrigée/replacée dans le layout réel. |
-| `D` | `Vector2i(14, 15)` | Porte fermée | Porte d’accès boutique. |
-| `B` | `Vector2i(15, 15)` | Boutique | Boutique. |
-| `>` | `Vector2i(23, 17)` | Escalier descendant | Transition active vers l’étage 2. |
-| `D` | `Vector2i(23, 18)` | Porte fermée | Porte simple près de l’escalier. |
-| `M` | `Vector2i(25, 18)` | Message / PNJ neutre / indication | Message : avertissement avant l’étage 2. |
-| `C` | `Vector2i(15, 19)` | Coffre | Coffre : `tarnished_ring`. |
-| `D` | `Vector2i(20, 19)` | Porte fermée | Porte simple. |
+| Symbole | Coordonnée | Type |
+|---|---:|---|
+| `M` | `Vector2i(3, 1)` | Message / indication |
+| `C` | `Vector2i(5, 1)` | Coffre |
+| `D` | `Vector2i(28, 1)` | Porte fermée |
+| `O` | `Vector2i(29, 1)` | Temple de guérison |
+| `D` | `Vector2i(7, 6)` | Porte fermée |
+| `C` | `Vector2i(27, 9)` | Coffre |
+| `D` | `Vector2i(26, 13)` | Porte fermée |
+| `D` | `Vector2i(14, 15)` | Porte fermée |
+| `B` | `Vector2i(15, 15)` | Boutique |
+| `>` | `Vector2i(23, 17)` | Escalier descendant |
+| `D` | `Vector2i(23, 18)` | Porte fermée |
+| `M` | `Vector2i(25, 18)` | Message / indication |
+| `C` | `Vector2i(15, 19)` | Coffre |
+| `D` | `Vector2i(20, 19)` | Porte fermée |
 
-#### Données liées — étage 1
+#### Coffres — Étage 1
 
-| Élément | Coordonnée | Note |
-|---|---|---|
-| Départ | `Vector2i(1, 1)` | Point de départ de l’étage 1. |
-| Escalier descendant actif | `Vector2i(23, 17)` | Transition vers l’étage 2. |
-| Découverte de sort | `Vector2i(29, 13)` | `spell_ice_shard`, définie par table de données, pas par symbole visible dans le layout. |
+| Coordonnée | Contenu | Description |
+|---:|---|---|
+| `Vector2i(5, 1)` | `25` or | Petit coffre caché dans les premières galeries. |
+| `Vector2i(15, 19)` | `tarnished_ring` | Coffre ancien placé dans une impasse profonde. |
+| `Vector2i(27, 9)` | `small_shield` | Coffre utile pour préparer la descente. |
+
+#### Messages — Étage 1
+
+| Coordonnée | Texte |
+|---:|---|
+| `Vector2i(3, 1)` | Une inscription gravée indique : les vieux coffres gardent parfois plus que de l'or. |
+| `Vector2i(25, 18)` | L'air venu d'en bas est plus froid. Préparez-vous avant de descendre. |
 
 ---
 
 ### Étage 2 — Cryptes de pierre froide
 
-Dimensions : **31 × 21**.
+- Dimensions : `31 x 21`.
+- Départ : `Vector2i(23, 17)`.
+- Escalier montant / retour vers l’étage 1 : `Vector2i(23, 17)`.
+- Escalier descendant futur derrière le boss : `Vector2i(5, 1)`.
+- Porte verrouillée du gardien : `Vector2i(2, 1)`.
 
-Y\X 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 Y
-0■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■0
-1■ML X>■         ■     ■       ■1
-2■ ■■■■■ ■■■■■■■ ■ ■■■ ■ ■■■■■ ■2
-3■   ■   ■       ■   ■ ■ ■     ■3
-4■■■ ■ ■ ■ ■■■■■■■ ■ ■ ■ ■ ■■■ ■4
-5■   ■ ■ ■ ■ DB■     ■ ■ ■   ■ ■5
-6■ ■■■ ■■■ ■ ■■■■■■■ ■ ■ ■■■ ■ ■6
-7■   ■       ■       ■ ■ ■C  ■ ■7
-8■ ■ ■■■■■■■■■ ■■■■■■■ ■ ■■■ ■ ■8
-9■ ■   ■   ■   ■      ■    ■   ■9
-10■ ■ ■ ■ ■ ■■■ ■ ■■■ ■■■ ■ ■■■ ■10
-11■  M■   ■   ■ ■           ■ ■ ■11
-12■■■ ■■■■■ ■ ■■■ ■■■ ■■■■■■■ ■ ■12
-13■C■   ■   ■   ■   ■ ■       ■ ■13
-14■ ■■■■■ ■ ■■■ ■■■ ■■■ ■ ■ ■ ■ ■14
-15■ ■ DO■   ■    C■     ■ ■ ■   ■15
-16■ ■ ■■■■■ ■ ■■■■■■■■■■■ ■ ■■■ ■16
-17■ ■   ■   ■          M■<■ ■   ■17
-18■ ■■■ ■ ■ ■■■■■ ■ ■■■■■■■ ■ ■ ■18
-19■       ■       ■             ■19
-20■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■20
-Y\X 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 Y
+| y \ x | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | y |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| 0 | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | 0 |
+| 1 | ■ | M | L |  | X | &gt; | ■ |  |  |  |  |  |  |  |  |  | ■ |  |  |  |  |  | ■ |  |  |  |  |  |  |  | ■ | 1 |
+| 2 | ■ |  | ■ | ■ | ■ | ■ | ■ |  | ■ | ■ | ■ | ■ | ■ | ■ | ■ |  | ■ |  | ■ | ■ | ■ |  | ■ |  | ■ | ■ | ■ | ■ | ■ |  | ■ | 2 |
+| 3 | ■ |  |  |  | ■ |  |  |  | ■ |  |  |  |  |  |  |  | ■ |  |  |  | ■ |  | ■ |  | ■ |  |  |  |  |  | ■ | 3 |
+| 4 | ■ | ■ | ■ |  | ■ |  | ■ |  | ■ |  | ■ | ■ | ■ | ■ | ■ | ■ | ■ |  | ■ |  | ■ |  | ■ |  | ■ |  | ■ | ■ | ■ |  | ■ | 4 |
+| 5 | ■ |  |  |  | ■ |  | ■ |  | ■ |  | ■ |  | D | B | ■ |  |  |  |  |  | ■ |  | ■ |  | ■ |  |  |  | ■ |  | ■ | 5 |
+| 6 | ■ |  | ■ | ■ | ■ |  | ■ | ■ | ■ |  | ■ |  | ■ | ■ | ■ | ■ | ■ | ■ | ■ |  | ■ |  | ■ |  | ■ | ■ | ■ |  | ■ |  | ■ | 6 |
+| 7 | ■ |  |  |  | ■ |  |  |  |  |  |  |  | ■ |  |  |  |  |  |  |  | ■ |  | ■ |  | ■ | C |  |  | ■ |  | ■ | 7 |
+| 8 | ■ |  | ■ |  | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ |  | ■ | ■ | ■ | ■ | ■ | ■ | ■ |  | ■ |  | ■ | ■ | ■ |  | ■ |  | ■ | 8 |
+| 9 | ■ |  | ■ |  |  |  | ■ |  |  |  | ■ |  |  |  | ■ |  |  |  |  |  |  | ■ |  |  |  |  | ■ |  |  |  | ■ | 9 |
+| 10 | ■ |  | ■ |  | ■ |  | ■ |  | ■ |  | ■ | ■ | ■ |  | ■ |  | ■ | ■ | ■ |  | ■ | ■ | ■ |  | ■ |  | ■ | ■ | ■ |  | ■ | 10 |
+| 11 | ■ |  |  | M | ■ |  |  |  | ■ |  |  |  | ■ |  | ■ |  |  |  |  |  |  |  |  |  |  |  | ■ |  | ■ |  | ■ | 11 |
+| 12 | ■ | ■ | ■ |  | ■ | ■ | ■ | ■ | ■ |  | ■ |  | ■ | ■ | ■ |  | ■ | ■ | ■ |  | ■ | ■ | ■ | ■ | ■ | ■ | ■ |  | ■ |  | ■ | 12 |
+| 13 | ■ | C | ■ |  |  |  | ■ |  |  |  | ■ |  |  |  | ■ |  |  |  | ■ |  | ■ |  |  |  |  |  |  |  | ■ |  | ■ | 13 |
+| 14 | ■ |  | ■ | ■ | ■ | ■ | ■ |  | ■ |  | ■ | ■ | ■ |  | ■ | ■ | ■ |  | ■ | ■ | ■ |  | ■ |  | ■ |  | ■ |  | ■ |  | ■ | 14 |
+| 15 | ■ |  | ■ |  | D | O | ■ |  |  |  | ■ |  |  |  |  | C | ■ |  |  |  |  |  | ■ |  | ■ |  | ■ |  |  |  | ■ | 15 |
+| 16 | ■ |  | ■ |  | ■ | ■ | ■ | ■ | ■ |  | ■ |  | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ |  | ■ |  | ■ | ■ | ■ |  | ■ | 16 |
+| 17 | ■ |  | ■ |  |  |  | ■ |  |  |  | ■ |  |  |  |  |  |  |  |  |  |  | M | ■ | &lt; | ■ |  | ■ |  |  |  | ■ | 17 |
+| 18 | ■ |  | ■ | ■ | ■ |  | ■ |  | ■ |  | ■ | ■ | ■ | ■ | ■ |  | ■ |  | ■ | ■ | ■ | ■ | ■ | ■ | ■ |  | ■ |  | ■ |  | ■ | 18 |
+| 19 | ■ |  |  |  |  |  |  |  | ■ |  |  |  |  |  |  |  | ■ |  |  |  |  |  |  |  |  |  |  |  |  |  | ■ | 19 |
+| 20 | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | 20 |
+| y \ x | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | y |
 
-#### Cases spéciales — étage 2
+#### Cases spéciales — Étage 2
 
-| Symbole | Coordonnée | Rôle | Note |
-|---|---|---|---|
-| `M` | `Vector2i(1, 1)` | Message / PNJ neutre / indication | Message : avertissement boss. |
-| `L` | `Vector2i(2, 1)` | Porte verrouillée | Porte verrouillée liée à la Clé du gardien. |
-| `X` | `Vector2i(4, 1)` | Boss / rencontre majeure | Boss actif : `gardien_boss_etage_2`. |
-| `>` | `Vector2i(5, 1)` | Escalier descendant | Escalier descendant futur derrière le boss. |
-| `D` | `Vector2i(12, 5)` | Porte fermée | Porte d’accès boutique. |
-| `B` | `Vector2i(13, 5)` | Boutique | Boutique. |
-| `C` | `Vector2i(25, 7)` | Coffre | Coffre : +50 or. |
-| `M` | `Vector2i(3, 11)` | Message / PNJ neutre / indication | Message : indice vers la clé / impasse. |
-| `C` | `Vector2i(1, 13)` | Coffre | Coffre : Clé du gardien. |
-| `D` | `Vector2i(4, 15)` | Porte fermée | Porte d’accès temple. |
-| `O` | `Vector2i(5, 15)` | Temple | Temple de guérison. |
-| `C` | `Vector2i(15, 15)` | Coffre | Coffre : `reinforced_leather`. |
-| `M` | `Vector2i(21, 17)` | Message / PNJ neutre / indication | Message : direction générale vers l’ouest. |
-| `<` | `Vector2i(23, 17)` | Escalier montant | Escalier montant actif vers l’étage 1. |
+| Symbole | Coordonnée | Type |
+|---|---:|---|
+| `M` | `Vector2i(1, 1)` | Message / indication |
+| `L` | `Vector2i(2, 1)` | Porte verrouillée |
+| `X` | `Vector2i(4, 1)` | Boss / rencontre majeure |
+| `>` | `Vector2i(5, 1)` | Escalier descendant |
+| `D` | `Vector2i(12, 5)` | Porte fermée |
+| `B` | `Vector2i(13, 5)` | Boutique |
+| `C` | `Vector2i(25, 7)` | Coffre |
+| `M` | `Vector2i(3, 11)` | Message / indication |
+| `C` | `Vector2i(1, 13)` | Coffre |
+| `D` | `Vector2i(4, 15)` | Porte fermée |
+| `O` | `Vector2i(5, 15)` | Temple de guérison |
+| `C` | `Vector2i(15, 15)` | Coffre |
+| `M` | `Vector2i(21, 17)` | Message / indication |
+| `<` | `Vector2i(23, 17)` | Escalier montant |
 
-#### Données liées — étage 2
+#### Coffres — Étage 2
 
-| Élément | Coordonnée | Note |
-|---|---|---|
-| Départ / escalier montant | `Vector2i(23, 17)` | Retour vers l’étage 1. |
-| Escalier descendant futur | `Vector2i(5, 1)` | Placé derrière le boss, destination future. |
-| Coffre clé | `Vector2i(1, 13)` | Contient `boss_door_key_floor_2`. |
-| Porte verrouillée boss | `Vector2i(2, 1)` | Consomme `boss_door_key_floor_2` à l’ouverture. |
-| Boss | `Vector2i(4, 1)` | Déclenche `gardien_boss_etage_2`, puis disparaît après victoire. |
+| Coordonnée | Contenu | Description |
+|---:|---|---|
+| `Vector2i(1, 13)` | `boss_door_key_floor_2` | Coffre important lié à la porte du gardien. |
+| `Vector2i(15, 15)` | `reinforced_leather` | Coffre d'équipement au cœur des cryptes. |
+| `Vector2i(25, 7)` | `50` or | Cache d'or dans une impasse secondaire. |
+
+#### Messages — Étage 2
+
+| Coordonnée | Texte |
+|---:|---|
+| `Vector2i(21, 17)` | Des traces anciennes mènent vers l'ouest. Quelque chose semble garder les profondeurs. |
+| `Vector2i(3, 11)` | Une voix lointaine murmure : la voie du gardien ne s'ouvre qu'à ceux qui fouillent les impasses. |
+| `Vector2i(1, 1)` | Une présence puissante se tient derrière cette porte. Ce passage n'est pas encore prêt. |
+
+#### Porte verrouillée — Étage 2
+
+| Coordonnée | Clé requise | Message verrouillé | Message d'ouverture |
+|---:|---|---|---|
+| `Vector2i(2, 1)` | `boss_door_key_floor_2` | La porte du gardien est verrouillée. Il manque une clé ancienne. | La clé du gardien tourne dans la serrure. La porte s'ouvre, et la clé disparaît. |
+
+#### Boss — Étage 2
+
+| Coordonnée | Boss | Note |
+|---:|---|---|
+| `Vector2i(4, 1)` | `gardien_boss_etage_2` | Boss du gardien ; devient généralement `.` après victoire. |
 
 ---
 
-## 2. Variantes de planification
+## Variantes non implémentées / notes de planification
 
-Cette section sert à tester les modifications de layout avant de les coder dans `FloorDatabase.gd`.
+Aucune variante de layout non implémentée n’est active dans ce fichier pour le moment.
 
-Pour le moment, aucune variante active n’est conservée dans ce document.
-
-Règles pour ajouter une future variante :
-
-- conserver le même format de grille que la section actuelle ;
-- indiquer clairement que la variante ne reflète pas encore l’état en jeu ;
-- lister toutes les coordonnées ajoutées ou modifiées ;
-- ne pas remplacer la section `État actuel en jeu` par une variante ;
-- reconstruire la section actuelle depuis `FloorDatabase.gd` après intégration réelle dans les scripts.
+Les variantes futures doivent rester séparées de la section `État actuel en jeu` afin de ne pas les confondre avec le layout réellement présent dans `FloorDatabase.gd`.
 
 ---
 
-## 3. Règle de maintenance
+## Checklist de maintenance
 
-`FloorDatabase.gd` est la source gameplay réelle.
+Avant de modifier ce fichier :
 
-Ce fichier doit être mis à jour lorsque :
-
-- un symbole est ajouté, déplacé ou retiré dans un layout ;
-- une coordonnée spéciale change ;
-- un coffre, message, boss, escalier ou lieu spécial est ajouté ;
-- une variante de planification devient l’état réel du jeu.
-
-La première section doit toujours représenter le jeu tel qu’il est réellement implémenté.
+```text
+[ ] Lire ASSISTANT_WORKFLOW.md.
+[ ] Lire docs/dungeon/FLOOR_DESIGN.md.
+[ ] Vérifier scripts/dungeon/FloorDatabase.gd sur main.
+[ ] Reconstruire la section État actuel en jeu depuis FloorDatabase.gd.
+[ ] Conserver le format tableau / grille.
+[ ] Conserver les coordonnées x/y autour des grilles.
+[ ] Ne pas remplacer les grilles par du texte monospacé.
+[ ] Garder les variantes dans une section séparée.
+```
