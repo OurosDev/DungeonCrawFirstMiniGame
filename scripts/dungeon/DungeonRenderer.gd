@@ -54,6 +54,10 @@ var shop_wood_material: StandardMaterial3D
 var shop_cloth_material: StandardMaterial3D
 var shop_gold_material: StandardMaterial3D
 
+var boss_marker_material: StandardMaterial3D
+var boss_glow_material: StandardMaterial3D
+var stair_marker_material: StandardMaterial3D
+
 
 # ------------------------------------------------------------
 # OBJETS GÉNÉRÉS
@@ -112,6 +116,10 @@ func build_dungeon(
 					create_healing_temple_tile(Vector2i(x, y))
 				elif tile == "B":
 					create_shop_tile(Vector2i(x, y))
+				elif tile == "X":
+					create_boss_marker_tile(Vector2i(x, y))
+				elif tile == ">" or tile == "<":
+					create_stair_marker_tile(Vector2i(x, y), tile)
 
 	create_ability_discovery_markers(ability_discovery_locations)
 
@@ -158,6 +166,10 @@ func create_materials() -> void:
 	shop_wood_material = create_material(Color(0.34, 0.19, 0.08, 1.0))
 	shop_cloth_material = create_material(Color(0.42, 0.10, 0.07, 1.0))
 	shop_gold_material = create_material(Color(0.95, 0.68, 0.18, 1.0))
+
+	boss_marker_material = create_material(Color(0.30, 0.03, 0.03, 1.0))
+	boss_glow_material = create_material(Color(0.95, 0.10, 0.05, 1.0))
+	stair_marker_material = create_material(Color(0.50, 0.36, 0.12, 1.0))
 
 
 func create_material(color: Color) -> StandardMaterial3D:
@@ -982,6 +994,106 @@ func create_shop_tile(cell: Vector2i) -> void:
 	glow.light_color = Color(1.0, 0.62, 0.28, 1.0)
 	glow.light_energy = 0.38
 	glow.omni_range = 2.0
+
+	root.add_child(glow)
+
+
+
+# ------------------------------------------------------------
+# ESCALIERS
+# ------------------------------------------------------------
+
+# Crée un marqueur très simple pour rendre les escaliers visibles en 3D.
+# Le symbole reste surtout porté par l'automap, mais le sol indique maintenant
+# visuellement qu'une case de transition existe.
+func create_stair_marker_tile(cell: Vector2i, stair_symbol: String) -> void:
+	var root: Node3D = Node3D.new()
+	root.name = "StairMarker_" + str(cell.x) + "_" + str(cell.y)
+	root.position = Vector3(
+		float(cell.x) * cell_size,
+		current_theme.floor_y + 0.09,
+		float(cell.y) * cell_size
+	)
+
+	generated_root.add_child(root)
+
+	var direction_offset: float = 0.18
+
+	if stair_symbol == "<":
+		direction_offset = -0.18
+
+	create_box(
+		"StairSlabA",
+		Vector3(0.90, 0.06, 0.22),
+		Vector3(0.0, 0.03, -0.28 + direction_offset),
+		stair_marker_material,
+		root
+	)
+
+	create_box(
+		"StairSlabB",
+		Vector3(0.70, 0.06, 0.22),
+		Vector3(0.0, 0.08, 0.0 + direction_offset),
+		stair_marker_material,
+		root
+	)
+
+	create_box(
+		"StairSlabC",
+		Vector3(0.50, 0.06, 0.22),
+		Vector3(0.0, 0.13, 0.28 + direction_offset),
+		stair_marker_material,
+		root
+	)
+
+
+# ------------------------------------------------------------
+# BOSS / RENCONTRE MAJEURE
+# ------------------------------------------------------------
+
+# Crée un marqueur temporaire pour la case X.
+# Le vrai boss sera ajouté plus tard, mais la zone est déjà lisible en jeu.
+func create_boss_marker_tile(cell: Vector2i) -> void:
+	var root: Node3D = Node3D.new()
+	root.name = "BossMarker_" + str(cell.x) + "_" + str(cell.y)
+	root.position = Vector3(
+		float(cell.x) * cell_size,
+		current_theme.floor_y + 0.08,
+		float(cell.y) * cell_size
+	)
+
+	generated_root.add_child(root)
+
+	create_box(
+		"BossBase",
+		Vector3(0.80, 0.10, 0.80),
+		Vector3(0.0, 0.05, 0.0),
+		boss_marker_material,
+		root
+	)
+
+	create_box(
+		"BossObelisk",
+		Vector3(0.32, 0.90, 0.32),
+		Vector3(0.0, 0.52, 0.0),
+		boss_marker_material,
+		root
+	)
+
+	create_box(
+		"BossGlow",
+		Vector3(0.42, 0.08, 0.42),
+		Vector3(0.0, 1.02, 0.0),
+		boss_glow_material,
+		root
+	)
+
+	var glow: OmniLight3D = OmniLight3D.new()
+	glow.name = "BossMarkerGlow"
+	glow.position = Vector3(0.0, 0.95, 0.0)
+	glow.light_color = Color(0.95, 0.10, 0.05, 1.0)
+	glow.light_energy = 0.35
+	glow.omni_range = 1.8
 
 	root.add_child(glow)
 

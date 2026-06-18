@@ -3,10 +3,17 @@ extends Node3D
 const CELL_SIZE: float = 2.0
 const HEALING_TEMPLE_TILE: String = "O"
 const SHOP_TILE: String = "B"
+const BOSS_TILE: String = "X"
+const STAIRS_UP_TILE: String = "<"
+
 const SHOP_DISCOVERY_MESSAGE: String = "Un marchand s'est installé dans une alcôve.\nAppuyez sur Échap pour accéder à la boutique dans le menu."
+const INACTIVE_STAIRS_MESSAGE: String = "Un escalier descend plus profondément, mais le passage n'est pas encore accessible."
+const STAIRS_UP_MESSAGE: String = "Un escalier remonte vers l'étage supérieur.\nLa remontée sera ajoutée plus tard."
+const BOSS_PLACEHOLDER_MESSAGE: String = "Une présence menaçante bloque cette zone.\nLe boss de cet étage sera ajouté plus tard."
 
 const DungeonThemeDataScript = preload("res://scripts/dungeon/DungeonThemeData.gd")
 const FloorDatabaseScript = preload("res://scripts/dungeon/FloorDatabase.gd")
+const MonsterDatabaseScript = preload("res://scripts/monsters/MonsterDatabase.gd")
 const DungeonInputControllerScript = preload("res://scripts/dungeon/DungeonInputController.gd")
 const DungeonSaveControllerScript = preload("res://scripts/dungeon/DungeonSaveController.gd")
 
@@ -37,6 +44,7 @@ var current_floor_id: int = 1
 var current_floor_data = null
 var layout: Array[String] = []
 var stairs_down_cell: Vector2i = Vector2i(-1, -1)
+var stairs_up_cell: Vector2i = Vector2i(-1, -1)
 
 
 # ------------------------------------------------------------
@@ -148,6 +156,7 @@ func load_floor(floor_id: int) -> void:
 
 	layout = current_floor_data.layout.duplicate()
 	stairs_down_cell = current_floor_data.stairs_down_cell
+	stairs_up_cell = current_floor_data.stairs_up_cell
 
 	ability_discovery_locations.clear()
 	discovered_map_cells.clear()
@@ -369,12 +378,12 @@ func try_move_to_cell(target: Vector2i) -> void:
 	var found_stairs: bool = check_stairs()
 	var found_temple: bool = check_healing_temple()
 	var found_shop: bool = check_shop()
+	var found_boss_marker: bool = check_boss_marker()
 
 	GameSession.set_shop_available(is_shop_cell(player.grid_cell))
 
-	if not found_discovery and not found_stairs and not found_temple and not found_shop:
-		if combat_manager != null:
-			combat_manager.check_random_encounter(party)
+	if not found_discovery and not found_stairs and not found_temple and not found_shop and not found_boss_marker:
+		check_random_encounter_for_current_floor()
 
 	if combat_manager != null:
 		if combat_manager.in_combat:
@@ -424,13 +433,72 @@ func turn_right() -> void:
 
 
 func check_stairs() -> bool:
-	if player.grid_cell != stairs_down_cell:
-		return false
+	if player.grid_cell == stairs_down_cell:
+		return check_stairs_down()
 
-	if combat_manager != null:
-		combat_manager.battle_log = "Un escalier descend vers l'étage inférieur."
+	if player.grid_cell == stairs_up_cell:
+		return check_stairs_up()
+
+	return false
+
+
+# Gère l'escalier descendant.
+# Si l'étage suivant existe, la transition est immédiate.
+# Sinon, l'escalier reste un élément visuel / futur et bloque les rencontres.
+func check_stairs_down() -> bool:
+	var next_floor_id: int = current_floor_id + 1
+
+	if not FloorDatabaseScript.has_floor(next_floor_id):
+		if combat_manager != null:
+			combat_manager.battle_log = INACTIVE_STAIRS_MESSAGE
+
+		return true
+
+	transition_to_floor(
+		next_floor_id,
+		"Le groupe descend vers l'étage " + str(next_floor_id) + "."
+	)
 
 	return true
+
+
+# Garde l'escalier montant comme lieu sûr.
+# La vraie remontée sera ajoutée quand la persistance multi-étages sera définie.
+func check_stairs_up() -> bool:
+	if combat_manager != null:
+		combat_manager.battle_log = STAIRS_UP_MESSAGE
+
+	return true
+
+
+# Charge un nouvel étage en conservant le groupe, l'inventaire, l'or et l'équipement.
+func transition_to_floor(next_floor_id: int, transition_message: String) -> void:
+	GameSession.current_floor_id = next_floor_id
+	load_floor(next_floor_id)
+	GameSession.set_shop_available(is_shop_cell(player.grid_cell))
+
+	if combat_manager != null:
+		combat_manager.battle_log = transition_message
+
+
+# Lance une rencontre aléatoire en utilisant la table de l'étage courant.
+func check_random_encounter_for_current_floor() -> void:
+	if combat_manager == null:
+		return
+
+	if combat_manager.in_combat:
+		return
+
+	if party.is_empty():
+		return
+
+	var encounter_chance: float = float(combat_manager.random_encounter_chance)
+
+	if randf() > encounter_chance:
+		return
+
+	var enemy = MonsterDatabaseScript.get_random_encounter_monster(current_floor_id)
+	combat_manager.start_battle(party, enemy)
 
 
 # ------------------------------------------------------------
@@ -483,6 +551,22 @@ func check_shop() -> bool:
 
 func is_shop_cell(cell: Vector2i) -> bool:
 	return get_layout_tile(cell) == SHOP_TILE
+
+
+# ------------------------------------------------------------
+# BOSS / RENCONTRE MAJEURE TEMPORAIRE
+# ------------------------------------------------------------
+
+# Reconnaît le symbole X comme zone majeure de l'étage.
+# Le vrai combat de boss sera ajouté plus tard ; pour l'instant la case est sûre.
+func check_boss_marker() -> bool:
+	if get_layout_tile(player.grid_cell) != BOSS_TILE:
+		return false
+
+	if combat_manager != null:
+		combat_manager.battle_log = BOSS_PLACEHOLDER_MESSAGE
+
+	return true
 
 
 # ------------------------------------------------------------
@@ -563,8 +647,9 @@ func debug_teleport_to_cell(target_cell: Vector2i) -> Dictionary:
 	var found_stairs: bool = check_stairs()
 	var found_temple: bool = check_healing_temple()
 	var found_shop: bool = check_shop()
+	var found_boss_marker: bool = check_boss_marker()
 
-	if not found_discovery and not found_stairs and not found_temple and not found_shop:
+	if not found_discovery and not found_stairs and not found_temple and not found_shop and not found_boss_marker:
 		if combat_manager != null:
 			combat_manager.battle_log = "Téléportation de test vers " + str(target_cell) + "."
 
