@@ -3,6 +3,7 @@ extends Node3D
 const CELL_SIZE: float = 2.0
 const HEALING_TEMPLE_TILE: String = "O"
 const SHOP_TILE: String = "B"
+const SHOP_DISCOVERY_MESSAGE: String = "Un marchand s'est installé dans une alcôve.\nAppuyez sur Échap pour accéder à la boutique dans le menu."
 
 const DungeonThemeDataScript = preload("res://scripts/dungeon/DungeonThemeData.gd")
 const FloorDatabaseScript = preload("res://scripts/dungeon/FloorDatabase.gd")
@@ -75,6 +76,8 @@ func _ready() -> void:
 		combat_manager.party = party
 
 	connect_in_game_menu_signals()
+
+	GameSession.set_shop_available(is_shop_cell(player.grid_cell))
 
 	AudioManager.play_dungeon_music(current_floor_id)
 
@@ -367,6 +370,8 @@ func try_move_to_cell(target: Vector2i) -> void:
 	var found_temple: bool = check_healing_temple()
 	var found_shop: bool = check_shop()
 
+	GameSession.set_shop_available(is_shop_cell(player.grid_cell))
+
 	if not found_discovery and not found_stairs and not found_temple and not found_shop:
 		if combat_manager != null:
 			combat_manager.check_random_encounter(party)
@@ -471,7 +476,7 @@ func check_shop() -> bool:
 		return false
 
 	if combat_manager != null:
-		combat_manager.battle_log = "Un marchand s'est installé dans une alcôve.\nOuvrez le menu d'aventure pour accéder à la boutique."
+		combat_manager.battle_log = SHOP_DISCOVERY_MESSAGE
 
 	return true
 
