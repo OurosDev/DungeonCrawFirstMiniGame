@@ -112,6 +112,50 @@ func ensure_stat_blocks() -> void:
 	if stats == null:
 		stats = base_stats.create_copy()
 
+	import_manually_assigned_stats_if_needed()
+
+
+# Corrige le cas où un ancien écran crée un héros en assignant seulement "stats".
+# Depuis l'ajout de l'équipement, "base_stats" doit contenir le roll permanent,
+# et "stats" doit rester la valeur finale calculée avec les bonus équipés.
+func import_manually_assigned_stats_if_needed() -> void:
+	if base_stats == null or stats == null:
+		return
+
+	if not is_default_stat_block(base_stats):
+		return
+
+	if is_default_stat_block(stats):
+		return
+
+	if has_any_equipped_item():
+		return
+
+	base_stats = stats.create_copy()
+
+
+func is_default_stat_block(stat_block) -> bool:
+	if stat_block == null:
+		return true
+
+	return (
+		int(stat_block.strength) == 1
+		and int(stat_block.agility) == 1
+		and int(stat_block.endurance) == 1
+		and int(stat_block.magic_power) == 1
+	)
+
+
+func has_any_equipped_item() -> bool:
+	if equipped_items == null or not (equipped_items is Dictionary):
+		return false
+
+	for slot_id in equipped_items.keys():
+		if str(equipped_items.get(slot_id, "")) != "":
+			return true
+
+	return false
+
 
 func ensure_equipment() -> void:
 	if equipped_items == null or not (equipped_items is Dictionary):
