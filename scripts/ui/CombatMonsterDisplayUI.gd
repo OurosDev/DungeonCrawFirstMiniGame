@@ -3,13 +3,23 @@ class_name CombatMonsterDisplayUI
 
 # ------------------------------------------------------------
 # DÉPENDANCES VISUELLES
-# Charge les sprites de monstres et les portraits utilisés comme placeholders.
+# Charge les sprites définitifs des monstres.
 # ------------------------------------------------------------
-
-const PortraitVisualDatabaseScript = preload("res://scripts/characters/PortraitVisualDatabase.gd")
 
 const ZOMBIE_IDLE_01 = preload("res://assets/monsters/zombie/zombie_idle_01.png")
 const ZOMBIE_IDLE_02 = preload("res://assets/monsters/zombie/zombie_idle_02.png")
+
+const GOBELIN_IDLE_01 = preload("res://assets/monsters/gobelin/gobelin_idle_01.png")
+const GOBELIN_IDLE_02 = preload("res://assets/monsters/gobelin/gobelin_idle_02.png")
+
+const CHAUVE_SOURIS_IDLE_01 = preload("res://assets/monsters/chauve_souris/chauve_souris_idle_01.png")
+const CHAUVE_SOURIS_IDLE_02 = preload("res://assets/monsters/chauve_souris/chauve_souris_idle_02.png")
+
+const TROLL_IDLE_01 = preload("res://assets/monsters/troll/troll_idle_01.png")
+const TROLL_IDLE_02 = preload("res://assets/monsters/troll/troll_idle_02.png")
+
+const GARDIEN_IDLE_01 = preload("res://assets/monsters/gardien/gardien_idle_01.png")
+const GARDIEN_IDLE_02 = preload("res://assets/monsters/gardien/gardien_idle_02.png")
 
 
 # ------------------------------------------------------------
@@ -17,11 +27,17 @@ const ZOMBIE_IDLE_02 = preload("res://assets/monsters/zombie/zombie_idle_02.png"
 # Contrôle la taille et la position du monstre dans la vue de combat.
 # ------------------------------------------------------------
 
-const MONSTER_TARGET_HEIGHT: float = 400.0
+const DEFAULT_VISUAL_ID: String = "zombie"
+
+const DEFAULT_MONSTER_TARGET_HEIGHT: float = 400.0
+const BAT_TARGET_HEIGHT: float = 330.0
+const LARGE_MONSTER_TARGET_HEIGHT: float = 430.0
+
 const MONSTER_HORIZONTAL_OFFSET: float = 350.0
 const MONSTER_VERTICAL_OFFSET: float = 220.0
 
-const DEFAULT_VISUAL_ID: String = "zombie"
+const DEFAULT_FRAME_DURATION: float = 0.45
+const BAT_FRAME_DURATION: float = 0.32
 
 
 # ------------------------------------------------------------
@@ -43,7 +59,7 @@ var current_visual_id: String = DEFAULT_VISUAL_ID
 var idle_frames: Array[Texture2D] = []
 var current_frame_index: int = 0
 var frame_timer: float = 0.0
-var frame_duration: float = 0.45
+var frame_duration: float = DEFAULT_FRAME_DURATION
 
 var idle_time: float = 0.0
 
@@ -55,6 +71,11 @@ var attack_duration: float = 0.24
 
 var ui_built: bool = false
 
+
+# ------------------------------------------------------------
+# INITIALISATION
+# Prépare l’interface au chargement du nœud.
+# ------------------------------------------------------------
 
 func _ready() -> void:
 	build_ui()
@@ -85,6 +106,7 @@ func build_ui() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	idle_frames = get_idle_frames_for_visual_id(DEFAULT_VISUAL_ID)
+	frame_duration = get_frame_duration_for_visual_id(DEFAULT_VISUAL_ID)
 
 	monster_material = create_flash_material()
 
@@ -101,6 +123,7 @@ func build_ui() -> void:
 	visible = false
 
 
+# Crée le shader utilisé pour le flash blanc quand un monstre est touché.
 func create_flash_material() -> ShaderMaterial:
 	var shader: Shader = Shader.new()
 
@@ -163,6 +186,7 @@ func hide_monster() -> void:
 		monster_material.set_shader_parameter("flash_amount", 0.0)
 
 
+# Change les frames utilisées par le monstre affiché.
 func set_monster_visual(visual_id: String) -> void:
 	if visual_id == "":
 		visual_id = DEFAULT_VISUAL_ID
@@ -172,10 +196,12 @@ func set_monster_visual(visual_id: String) -> void:
 
 	current_visual_id = visual_id
 	idle_frames = get_idle_frames_for_visual_id(current_visual_id)
+	frame_duration = get_frame_duration_for_visual_id(current_visual_id)
 
 	if idle_frames.is_empty():
 		current_visual_id = DEFAULT_VISUAL_ID
 		idle_frames = get_idle_frames_for_visual_id(DEFAULT_VISUAL_ID)
+		frame_duration = get_frame_duration_for_visual_id(DEFAULT_VISUAL_ID)
 
 	current_frame_index = 0
 
@@ -251,25 +277,25 @@ func normalize_monster_name_to_visual_id(monster_name: String) -> String:
 
 
 # ------------------------------------------------------------
-# FRAMES ET PLACEHOLDERS
-# Associe chaque monstre à ses sprites temporaires ou définitifs.
+# FRAMES MONSTRES
+# Associe chaque monstre à ses deux frames idle définitives.
 # ------------------------------------------------------------
 
 func get_idle_frames_for_visual_id(visual_id: String) -> Array[Texture2D]:
 	if visual_id == "zombie":
 		return get_zombie_idle_frames()
 
-	if visual_id == "chauve_souris":
-		return get_portrait_idle_frames_for_job("Mage")
-
 	if visual_id == "gobelin":
-		return get_portrait_idle_frames_for_job("Voleuse")
+		return get_gobelin_idle_frames()
+
+	if visual_id == "chauve_souris":
+		return get_chauve_souris_idle_frames()
 
 	if visual_id == "troll":
-		return get_portrait_idle_frames_for_job("Guerrier")
+		return get_troll_idle_frames()
 
 	if visual_id == "gardien":
-		return get_portrait_idle_frames_for_job("Prêtresse")
+		return get_gardien_idle_frames()
 
 	return get_zombie_idle_frames()
 
@@ -281,30 +307,54 @@ func get_zombie_idle_frames() -> Array[Texture2D]:
 	]
 
 
-func get_portrait_idle_frames_for_job(job_name: String) -> Array[Texture2D]:
-	var frames: Array[Texture2D] = []
+func get_gobelin_idle_frames() -> Array[Texture2D]:
+	return [
+		GOBELIN_IDLE_01,
+		GOBELIN_IDLE_02
+	]
 
-	var portrait_data = PortraitVisualDatabaseScript.get_portrait_for_class(job_name)
 
-	if portrait_data == null:
-		return get_zombie_idle_frames()
+func get_chauve_souris_idle_frames() -> Array[Texture2D]:
+	return [
+		CHAUVE_SOURIS_IDLE_01,
+		CHAUVE_SOURIS_IDLE_02
+	]
 
-	if not object_has_property(portrait_data, "idle_frames"):
-		return get_zombie_idle_frames()
 
-	var raw_frames = portrait_data.get("idle_frames")
+func get_troll_idle_frames() -> Array[Texture2D]:
+	return [
+		TROLL_IDLE_01,
+		TROLL_IDLE_02
+	]
 
-	if not (raw_frames is Array):
-		return get_zombie_idle_frames()
 
-	for frame in raw_frames:
-		if frame is Texture2D:
-			frames.append(frame)
+func get_gardien_idle_frames() -> Array[Texture2D]:
+	return [
+		GARDIEN_IDLE_01,
+		GARDIEN_IDLE_02
+	]
 
-	if frames.is_empty():
-		return get_zombie_idle_frames()
 
-	return frames
+# ------------------------------------------------------------
+# PARAMÈTRES PAR MONSTRE
+# Ajuste légèrement le rythme et la taille selon la silhouette.
+# ------------------------------------------------------------
+
+func get_frame_duration_for_visual_id(visual_id: String) -> float:
+	if visual_id == "chauve_souris":
+		return BAT_FRAME_DURATION
+
+	return DEFAULT_FRAME_DURATION
+
+
+func get_target_height_for_visual_id(visual_id: String) -> float:
+	if visual_id == "chauve_souris":
+		return BAT_TARGET_HEIGHT
+
+	if visual_id == "troll" or visual_id == "gardien":
+		return LARGE_MONSTER_TARGET_HEIGHT
+
+	return DEFAULT_MONSTER_TARGET_HEIGHT
 
 
 # ------------------------------------------------------------
@@ -444,7 +494,9 @@ func get_base_sprite_scale() -> float:
 	if texture_size.y <= 0.0:
 		return 1.0
 
-	return MONSTER_TARGET_HEIGHT / texture_size.y
+	var target_height: float = get_target_height_for_visual_id(current_visual_id)
+
+	return target_height / texture_size.y
 
 
 # ------------------------------------------------------------
@@ -456,6 +508,12 @@ func get_string_property(target, property_name: String, default_value: String = 
 	if target == null:
 		return default_value
 
+	if target is Dictionary:
+		if target.has(property_name):
+			return str(target[property_name])
+
+		return default_value
+
 	if not object_has_property(target, property_name):
 		return default_value
 
@@ -465,6 +523,9 @@ func get_string_property(target, property_name: String, default_value: String = 
 func object_has_property(target, property_name: String) -> bool:
 	if target == null:
 		return false
+
+	if target is Dictionary:
+		return target.has(property_name)
 
 	var property_list: Array = target.get_property_list()
 
