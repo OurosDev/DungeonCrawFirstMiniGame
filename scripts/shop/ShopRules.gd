@@ -57,5 +57,14 @@ static func get_buy_price(item_id: String) -> int:
 
 
 # Indique si un objet peut être proposé à la vente.
+# Les objets de quête restent invendables même si leur sell_value est modifié par erreur.
 static func can_sell_item(item_id: String) -> bool:
-	return get_sell_price(item_id) > 0
+	var normalized_item_id: String = item_id.strip_edges().to_lower()
+
+	if normalized_item_id == "":
+		return false
+
+	if ItemDatabase.is_quest_item(normalized_item_id):
+		return false
+
+	return get_sell_price(normalized_item_id) > 0
