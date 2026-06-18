@@ -1,4 +1,5 @@
 extends Control
+
 class_name PartyStatusUI
 
 # ------------------------------------------------------------
@@ -21,9 +22,9 @@ const HERO_PANEL_GAP: float = 10.0
 const PORTRAIT_FRAME_SIZE: Vector2 = Vector2(190.0, 190.0)
 const PORTRAIT_FRAME_PADDING: float = -12.0
 const PORTRAIT_FRAME_BORDER_WIDTH: int = 2
-
 const PORTRAIT_FRAME_BACKGROUND_COLOR: Color = Color(0.025, 0.018, 0.014, 1.0)
 const PORTRAIT_FRAME_BORDER_COLOR: Color = Color(0.46, 0.29, 0.12, 1.0)
+
 const BAR_HEIGHT: float = 15.0
 
 
@@ -75,6 +76,10 @@ var last_hero_hp_by_key: Dictionary = {}
 var pending_damage_keys: Dictionary = {}
 
 
+# ------------------------------------------------------------
+# INITIALISATION
+# ------------------------------------------------------------
+
 func _ready() -> void:
 	build_ui()
 
@@ -100,17 +105,14 @@ func build_ui() -> void:
 func build_left_column() -> void:
 	left_hero_column = VBoxContainer.new()
 	left_hero_column.name = "LeftHeroColumn"
-
 	left_hero_column.anchor_left = 0.0
 	left_hero_column.anchor_top = 0.0
 	left_hero_column.anchor_right = 0.0
 	left_hero_column.anchor_bottom = 1.0
-
 	left_hero_column.offset_left = OUTER_MARGIN
 	left_hero_column.offset_top = OUTER_MARGIN
 	left_hero_column.offset_right = OUTER_MARGIN + SIDE_WIDTH
 	left_hero_column.offset_bottom = -OUTER_MARGIN
-
 	left_hero_column.add_theme_constant_override("separation", int(HERO_PANEL_GAP))
 	left_hero_column.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
@@ -120,17 +122,14 @@ func build_left_column() -> void:
 func build_right_column() -> void:
 	right_hero_column = VBoxContainer.new()
 	right_hero_column.name = "RightHeroColumn"
-
 	right_hero_column.anchor_left = 1.0
 	right_hero_column.anchor_top = 0.0
 	right_hero_column.anchor_right = 1.0
 	right_hero_column.anchor_bottom = 1.0
-
 	right_hero_column.offset_left = -OUTER_MARGIN - SIDE_WIDTH
 	right_hero_column.offset_top = OUTER_MARGIN
 	right_hero_column.offset_right = -OUTER_MARGIN
 	right_hero_column.offset_bottom = -OUTER_MARGIN
-
 	right_hero_column.add_theme_constant_override("separation", int(HERO_PANEL_GAP))
 	right_hero_column.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
@@ -142,6 +141,9 @@ func build_right_column() -> void:
 # Reconstruit les panneaux héros et déclenche les feedbacks visuels.
 # ------------------------------------------------------------
 
+# Reconstruit les panneaux héros.
+# Les états visuels sont suivis par slot d'équipe, et non par nom de héros,
+# afin d'éviter les collisions quand plusieurs héros ont le même nom.
 func update_party(
 	party: Array,
 	active_hero,
@@ -156,29 +158,27 @@ func update_party(
 		return
 
 	var newly_damaged_keys: Dictionary = detect_new_damage(party)
-	var active_hero_key: String = get_hero_key(active_hero)
-	var dodge_feedback_key: String = get_hero_key(dodge_feedback_hero)
+	var active_hero_key: String = get_hero_key_from_party_slot(active_hero, party)
+	var dodge_feedback_key: String = get_hero_key_from_party_slot(dodge_feedback_hero, party)
 
 	clear_container(left_hero_column)
 	clear_container(right_hero_column)
 
 	for i in range(4):
 		var hero = null
-		var hero_key: String = ""
+		var hero_key: String = get_party_slot_key(i)
 		var should_flash_damage: bool = false
 		var should_show_damage_portrait: bool = false
 		var should_flash_dodge: bool = false
 
 		if i < party.size():
 			hero = party[i]
-			hero_key = get_hero_key(hero)
 
-			if hero_key != "":
-				should_flash_damage = newly_damaged_keys.has(hero_key)
-				should_show_damage_portrait = pending_damage_keys.has(hero_key)
+			should_flash_damage = newly_damaged_keys.has(hero_key)
+			should_show_damage_portrait = pending_damage_keys.has(hero_key)
 
-				if dodge_feedback_key != "":
-					should_flash_dodge = hero_key == dodge_feedback_key
+			if dodge_feedback_key != "":
+				should_flash_dodge = hero_key == dodge_feedback_key
 
 		var hero_panel: Panel = create_hero_panel(
 			hero,
@@ -195,18 +195,20 @@ func update_party(
 			right_hero_column.add_child(hero_panel)
 
 
+# Détecte les pertes de PV depuis la dernière mise à jour UI.
+# Le suivi utilise le slot d'équipe pour que deux héros portant le même nom
+# ne partagent pas le même état de dégâts.
 func detect_new_damage(party: Array) -> Dictionary:
 	var newly_damaged_keys: Dictionary = {}
 	var current_keys: Dictionary = {}
 
-	for hero in party:
+	for i in range(party.size()):
+		var hero = party[i]
+
 		if hero == null:
 			continue
 
-		var hero_key: String = get_hero_key(hero)
-
-		if hero_key == "":
-			continue
+		var hero_key: String = get_party_slot_key(i)
 
 		current_keys[hero_key] = true
 
@@ -260,7 +262,8 @@ func create_hero_panel(
 	should_flash_dodge: bool
 ) -> Panel:
 	var is_empty: bool = hero == null
-	var hero_key: String = get_hero_key(hero)
+	var hero_key: String = get_party_slot_key(index)
+
 	var is_dead: bool = false
 
 	if not is_empty:
@@ -317,6 +320,7 @@ func create_hero_panel(
 	content.add_theme_constant_override("separation", 6)
 	content.alignment = BoxContainer.ALIGNMENT_BEGIN
 	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
 	panel.add_child(content)
 
 	if is_empty:
@@ -353,6 +357,7 @@ func fill_empty_panel(
 	)
 
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
 	content.add_child(name_label)
 
 	var empty_label: Label = create_label(
@@ -362,6 +367,7 @@ func fill_empty_panel(
 	)
 
 	empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
 	content.add_child(empty_label)
 
 	add_centered_spacer(content)
@@ -396,13 +402,14 @@ func fill_hero_info(
 	top_box.custom_minimum_size = Vector2(0, 54)
 	top_box.add_theme_constant_override("separation", 2)
 	top_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
 	content.add_child(top_box)
 
 	var name_label: Label = create_label(
-	hero_name,
-	20,
-	name_color
-)
+		hero_name,
+		20,
+		name_color
+	)
 
 	name_label.custom_minimum_size = Vector2(0, 32)
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -410,6 +417,7 @@ func fill_hero_info(
 	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	name_label.clip_text = false
+
 	top_box.add_child(name_label)
 
 	var class_level_text: String = hero_class + " Niv. " + str(level)
@@ -438,6 +446,7 @@ func fill_hero_info(
 	portrait_area.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	portrait_area.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	portrait_area.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
 	content.add_child(portrait_area)
 
 	var portrait_holder: Control = create_portrait_holder(
@@ -461,6 +470,7 @@ func fill_hero_info(
 	bars_box.size_flags_vertical = Control.SIZE_SHRINK_END
 	bars_box.add_theme_constant_override("separation", 5)
 	bars_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
 	content.add_child(bars_box)
 
 	var hp_bar: ProgressBar = create_bar(
@@ -516,18 +526,16 @@ func create_portrait_holder(
 
 	var portrait = HeroPortraitUIScript.new()
 	portrait.name = "HeroPortrait"
-
 	portrait.anchor_left = 0.0
 	portrait.anchor_top = 0.0
 	portrait.anchor_right = 1.0
 	portrait.anchor_bottom = 1.0
-
 	portrait.offset_left = PORTRAIT_FRAME_PADDING
 	portrait.offset_top = PORTRAIT_FRAME_PADDING
 	portrait.offset_right = -PORTRAIT_FRAME_PADDING
 	portrait.offset_bottom = -PORTRAIT_FRAME_PADDING
-
 	portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
 	holder.add_child(portrait)
 
 	if portrait.has_method("setup_for_hero"):
@@ -547,6 +555,7 @@ func add_damage_flash(panel: Panel) -> void:
 	flash_overlay.color = DAMAGE_FLASH_COLOR
 	flash_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	flash_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
 	panel.add_child(flash_overlay)
 
 	var tween: Tween = panel.create_tween()
@@ -581,6 +590,7 @@ func add_dodge_flash(panel: Panel) -> void:
 	flash_frame.set_anchors_preset(Control.PRESET_FULL_RECT)
 	flash_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	flash_frame.modulate = DODGE_FLASH_COLOR
+
 	panel.add_child(flash_frame)
 
 	var style: StyleBoxFlat = StyleBoxFlat.new()
@@ -630,8 +640,8 @@ func create_panel(
 	border_width: int
 ) -> Panel:
 	var panel: Panel = Panel.new()
-
 	var style: StyleBoxFlat = StyleBoxFlat.new()
+
 	style.bg_color = background_color
 	style.border_color = border_color
 	style.set_border_width_all(border_width)
@@ -651,7 +661,6 @@ func create_label(
 	font_color: Color
 ) -> Label:
 	var label: Label = Label.new()
-
 	label.text = text
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", font_color)
@@ -666,7 +675,6 @@ func create_bar(
 	background_color: Color
 ) -> ProgressBar:
 	var bar: ProgressBar = ProgressBar.new()
-
 	bar.custom_minimum_size = Vector2(0, BAR_HEIGHT)
 	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bar.show_percentage = false
@@ -698,6 +706,7 @@ func create_bar(
 func add_centered_spacer(content: VBoxContainer) -> void:
 	var spacer: Control = Control.new()
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+
 	content.add_child(spacer)
 
 
@@ -705,6 +714,25 @@ func add_centered_spacer(content: VBoxContainer) -> void:
 # ÉTAT DES HÉROS
 # Lit les informations nécessaires aux panneaux de statut.
 # ------------------------------------------------------------
+
+# Retourne une clé stable basée sur la position du héros dans l'équipe.
+# Cela évite les collisions entre plusieurs héros ayant le même nom.
+func get_party_slot_key(index: int) -> String:
+	return "party_slot_" + str(index)
+
+
+# Retrouve la clé de slot correspondant à un héros donné.
+# Utilisé pour savoir quel panneau doit être marqué comme actif ou en esquive.
+func get_hero_key_from_party_slot(hero, party: Array) -> String:
+	if hero == null:
+		return ""
+
+	for i in range(party.size()):
+		if party[i] == hero:
+			return get_party_slot_key(i)
+
+	return get_hero_key(hero)
+
 
 func get_hero_display_name(hero) -> String:
 	if hero == null:
@@ -736,6 +764,8 @@ func is_hero_alive(hero) -> bool:
 	return get_int_property(hero, "hp", 0) > 0
 
 
+# Conserve une clé de secours basée sur le nom ou l'instance.
+# La logique principale de l'UI utilise désormais les slots d'équipe.
 func get_hero_key(hero) -> String:
 	if hero == null:
 		return ""
