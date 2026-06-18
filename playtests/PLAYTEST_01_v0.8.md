@@ -18,9 +18,9 @@ Première session de playtest externe sur la version `v0.8`.
 
 La session a d’abord révélé des crashs natifs Windows sur la machine du testeur, notamment devant un coffre et lors du chargement d’une sauvegarde. Ces crashs n’ont pas été reproduits sur la machine de développement.
 
-Après investigation, l’incident est considéré comme réglé par procédure : les builds Windows de playtest doivent utiliser le renderer `Compatibility / OpenGL`.
+Après investigation, l’incident est considéré comme réglé par procédure : les builds Windows de playtest doivent utiliser le renderer `Compatibility / OpenGL`. La version `Compatibility / OpenGL` fonctionne chez le testeur.
 
-La version `Compatibility / OpenGL` fonctionne chez le testeur. Le playtest peut donc continuer pour récolter du ressenti, des suggestions et d’éventuels bugs non bloquants.
+Le playtest peut donc continuer pour récolter du ressenti, des suggestions et d’éventuels bugs non bloquants.
 
 ---
 
@@ -111,14 +111,36 @@ Classer le problème comme contrainte de renderer / export playtest.
 
 ## 5. Confort / polish
 
-Point déjà connu côté développeur avant compilation finale des retours :
+### C.1 — Scaling de fenêtre
+
+Statut : corrigé pour `v0.8.1`  
+Version d’origine : `v0.8`  
+Fichier concerné : `project.godot`
+
+Problème initial :
 
 ```text
-Le redimensionnement de fenêtre peut casser les proportions visuelles.
-Objectif v0.8.1 : scaling global proportionnel / effet zoom du jeu complet.
+Le redimensionnement de fenêtre pouvait casser les proportions visuelles.
+Une première correction avec stretch viewport conservait les proportions, mais réduisait la lisibilité des textes en 1080p.
 ```
 
-À compléter avec les retours du testeur.
+Solution retenue :
+
+```ini
+window/stretch/mode="canvas_items"
+window/stretch/aspect="keep"
+window/stretch/scale=1.0
+window/stretch/scale_mode="fractional"
+```
+
+Résultat validé :
+
+```text
+L’interface s’adapte correctement.
+Les proportions restent bonnes.
+Les textes restent lisibles en résolution élevée.
+Aucun script n’a été nécessaire pour ce point.
+```
 
 ---
 
@@ -161,6 +183,7 @@ Décisions déjà retenues :
 - Les builds .exe / .pck / .zip restent locales et ne sont pas poussées dans le repo.
 - Les logs complets restent hors repo.
 - Les fichiers de playtest peuvent utiliser des résumés nettoyés / réécrits des logs.
+- Le scaling de fenêtre retenu pour v0.8.1 utilise canvas_items + keep.
 ```
 
 ---
@@ -174,26 +197,28 @@ Décisions actuelles :
 - Ne pas modifier immédiatement la sauvegarde pour le crash P0.2.
 - Ne pas considérer OneDrive comme cause principale après le crash Vulkan hors OneDrive.
 - Ne pas distribuer D3D12 / Vulkan aux testeurs modestes sauf test technique volontaire.
+- Ne pas conserver le stretch viewport, car il réduit trop la lisibilité des textes en 1080p.
 ```
 
 ---
 
 ## 10. Résolution finale
 
-État actuel : incident renderer considéré comme réglé.
+État actuel : incident renderer considéré comme réglé ; scaling de fenêtre corrigé côté `v0.8.1`.
 
 ```text
 Correctif appliqué : changement de renderer pour les builds de playtest Windows
 Renderer validé : Compatibility / OpenGL
+Scaling validé : canvas_items + keep
 Version concernée : v0.8 playtest local
-Version de documentation prévue : v0.8.1 si une release de stabilisation est créée
+Version de documentation prévue : v0.8.1
 Résultat après nouveau test : build Compatibility / OpenGL fonctionnelle chez le testeur
 ```
 
 À compléter après compilation finale des retours :
 
 ```text
-Fichiers modifiés :
+Fichiers modifiés : project.godot, CHANGELOG/README.md, CHANGELOG/v0.8.1.md, playtests/PLAYTEST_01_v0.8.md
 Lien changelog :
 Lien release :
 Retours restants :

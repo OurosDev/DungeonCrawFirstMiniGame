@@ -12,7 +12,7 @@ config_version=5
 
 config/name="SaS"
 run/main_scene="uid://be38611o1mo3b"
-config/features=PackedStringArray("4.6", "Forward Plus")
+config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
@@ -20,6 +20,15 @@ config/icon="res://icon.svg"
 GameSession="*uid://cnj1m2seun4t"
 SaveManager="*uid://wep4eeiykf26"
 AudioManager="*uid://bb7xniax30boo"
+
+[display]
+
+window/size/viewport_width=1152
+window/size/viewport_height=648
+window/stretch/mode="canvas_items"
+window/stretch/aspect="keep"
+window/stretch/scale=1.0
+window/stretch/scale_mode="fractional"
 
 [input]
 

@@ -20,8 +20,9 @@ Ce dossier conserve l’historique des versions.
 | `v0.6` | Transition vers l’étage 2 | Stable de progression |
 | `v0.6.1` | Stabilisation multi-étages | Stable multi-étages |
 | `v0.7` | Coffres, indices et clé du gardien | Stable contenu donjon |
-| `v0.7.1` | Boss du gardien et retour titre après K.O. | Base stable actuelle |
+| `v0.7.1` | Boss du gardien et retour titre après K.O. | Stable boucle complète |
 | `v0.8` | Prise en main souris et clavier AZERTY | Stable contrôles |
+| `v0.8.1` | Stabilisation playtest et scaling fenêtre | Correctif stabilité / affichage |
 
 ---
 
