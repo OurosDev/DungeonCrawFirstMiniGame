@@ -2,6 +2,12 @@ extends RefCounted
 class_name DungeonSaveController
 
 
+# ------------------------------------------------------------
+# SAUVEGARDE
+# Centralise les demandes de sauvegarde depuis le donjon.
+# ------------------------------------------------------------
+
+# Demande une sauvegarde si le donjon est dans un état valide.
 func request_save(dungeon) -> Dictionary:
 	var result: Dictionary = {}
 	result["success"] = false
@@ -33,6 +39,12 @@ func request_save(dungeon) -> Dictionary:
 	return result
 
 
+# ------------------------------------------------------------
+# CHARGEMENT
+# Applique les données préparées dans GameSession à la scène Dungeon.
+# ------------------------------------------------------------
+
+# Restaure la position du joueur et reconstruit le rendu après chargement.
 func apply_loaded_game_data(dungeon) -> void:
 	if dungeon == null:
 		return
@@ -42,9 +54,19 @@ func apply_loaded_game_data(dungeon) -> void:
 
 	var save_data: Dictionary = GameSession.pending_save_data
 
-	apply_saved_layout(dungeon, save_data)
+	# Les sauvegardes récentes restaurent les layouts via GameSession.floor_states
+	# pendant load_floor(). Ce fallback garde la compatibilité avec les anciennes.
+	if not GameSession.has_floor_state(dungeon.current_floor_id):
+		apply_saved_layout(dungeon, save_data)
+		restore_discovered_map_cells(dungeon, save_data.get("discovered_map_cells", []))
+
 	apply_saved_player_cell(dungeon, save_data)
-	restore_discovered_map_cells(dungeon, save_data.get("discovered_map_cells", []))
+
+	if dungeon.has_method("discover_around_player"):
+		dungeon.discover_around_player()
+
+	if dungeon.has_method("store_current_floor_state"):
+		dungeon.store_current_floor_state()
 
 	dungeon.build_current_floor()
 
@@ -59,10 +81,9 @@ func apply_saved_layout(dungeon, save_data: Dictionary) -> void:
 		return
 
 	dungeon.layout.clear()
-
 	var saved_layout = save_data["layout"]
 
-	if not (saved_layout is Array):
+	if not saved_layout is Array:
 		return
 
 	for row in saved_layout:
@@ -75,7 +96,7 @@ func apply_saved_player_cell(dungeon, save_data: Dictionary) -> void:
 
 	var player_cell_data = save_data["player_cell"]
 
-	if not (player_cell_data is Dictionary):
+	if not player_cell_data is Dictionary:
 		return
 
 	if dungeon.player == null:
@@ -87,11 +108,11 @@ func apply_saved_player_cell(dungeon, save_data: Dictionary) -> void:
 func restore_discovered_map_cells(dungeon, serialized_cells) -> void:
 	dungeon.discovered_map_cells.clear()
 
-	if not (serialized_cells is Array):
+	if not serialized_cells is Array:
 		return
 
 	for cell_data in serialized_cells:
-		if not (cell_data is Dictionary):
+		if not cell_data is Dictionary:
 			continue
 
 		var cell: Vector2i = dictionary_to_vector2i(cell_data)

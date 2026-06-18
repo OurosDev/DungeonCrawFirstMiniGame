@@ -8,7 +8,7 @@ const STAIRS_UP_TILE: String = "<"
 
 const SHOP_DISCOVERY_MESSAGE: String = "Un marchand s'est installé dans une alcôve.\nAppuyez sur Échap pour accéder à la boutique dans le menu."
 const INACTIVE_STAIRS_MESSAGE: String = "Un escalier descend plus profondément, mais le passage n'est pas encore accessible."
-const STAIRS_UP_MESSAGE: String = "Un escalier remonte vers l'étage supérieur.\nLa remontée sera ajoutée plus tard."
+const STAIRS_UP_MESSAGE: String = "Le groupe remonte vers l'étage supérieur."
 const BOSS_PLACEHOLDER_MESSAGE: String = "Une présence menaçante bloque cette zone.\nLe boss de cet étage sera ajouté plus tard."
 
 const DungeonThemeDataScript = preload("res://scripts/dungeon/DungeonThemeData.gd")
@@ -150,8 +150,12 @@ func on_in_game_menu_quit_requested() -> void:
 # ÉTAGE / THÈME / RENDU
 # ------------------------------------------------------------
 
-func load_floor(floor_id: int) -> void:
+func load_floor(
+	floor_id: int,
+	spawn_cell: Vector2i = Vector2i(-1, -1)
+) -> void:
 	current_floor_id = floor_id
+	GameSession.current_floor_id = current_floor_id
 	current_floor_data = FloorDatabaseScript.get_floor_data(current_floor_id)
 
 	layout = current_floor_data.layout.duplicate()
@@ -161,11 +165,16 @@ func load_floor(floor_id: int) -> void:
 	ability_discovery_locations.clear()
 	discovered_map_cells.clear()
 
-	player.move_to_cell(current_floor_data.player_start_cell)
-
 	current_floor_theme = create_current_floor_theme()
-
 	setup_ability_discoveries()
+	apply_floor_state_from_session(current_floor_id)
+
+	var target_spawn_cell: Vector2i = spawn_cell
+
+	if not is_inside_map(target_spawn_cell) or not is_walkable(target_spawn_cell):
+		target_spawn_cell = current_floor_data.player_start_cell
+
+	player.move_to_cell(target_spawn_cell)
 	build_current_floor()
 
 	if game_ui != null:
@@ -200,6 +209,82 @@ func build_current_floor() -> void:
 		CELL_SIZE,
 		current_floor_theme
 	)
+
+
+# ------------------------------------------------------------
+# ÉTATS D'ÉTAGE
+# Sauvegarde en session les portes ouvertes et cellules découvertes par étage.
+# ------------------------------------------------------------
+
+# Stocke l'état de l'étage courant avant une transition ou une sauvegarde.
+func store_current_floor_state() -> void:
+	if current_floor_id <= 0:
+		return
+
+	GameSession.set_floor_state(current_floor_id, create_current_floor_state())
+
+
+# Produit un état sérialisable pour la session et la sauvegarde.
+func create_current_floor_state() -> Dictionary:
+	return {
+		"layout": layout.duplicate(),
+		"discovered_map_cells": serialize_discovered_map_cells(discovered_map_cells)
+	}
+
+
+# Restaure l'état mémorisé d'un étage si le joueur y est déjà passé.
+func apply_floor_state_from_session(floor_id: int) -> void:
+	var floor_state: Dictionary = GameSession.get_floor_state(floor_id)
+
+	if floor_state.is_empty():
+		return
+
+	apply_floor_state(floor_state)
+
+
+func apply_floor_state(floor_state: Dictionary) -> void:
+	if floor_state.has("layout"):
+		var saved_layout = floor_state["layout"]
+
+		if saved_layout is Array:
+			layout.clear()
+
+			for row in saved_layout:
+				layout.append(str(row))
+
+	if floor_state.has("discovered_map_cells"):
+		restore_discovered_map_cells(floor_state["discovered_map_cells"])
+
+
+func serialize_discovered_map_cells(cells: Dictionary) -> Array:
+	var serialized_cells: Array = []
+
+	for cell in cells.keys():
+		if cell is Vector2i:
+			serialized_cells.append({
+				"x": cell.x,
+				"y": cell.y
+			})
+
+	return serialized_cells
+
+
+func restore_discovered_map_cells(serialized_cells) -> void:
+	discovered_map_cells.clear()
+
+	if not serialized_cells is Array:
+		return
+
+	for cell_data in serialized_cells:
+		if not cell_data is Dictionary:
+			continue
+
+		var cell: Vector2i = Vector2i(
+			int(cell_data.get("x", 0)),
+			int(cell_data.get("y", 0))
+		)
+
+		discovered_map_cells[cell] = true
 
 
 # ------------------------------------------------------------
@@ -462,19 +547,38 @@ func check_stairs_down() -> bool:
 	return true
 
 
-# Garde l'escalier montant comme lieu sûr.
-# La vraie remontée sera ajoutée quand la persistance multi-étages sera définie.
+# Gère l'escalier montant.
+# Le joueur revient sur l'escalier descendant de l'étage précédent.
 func check_stairs_up() -> bool:
-	if combat_manager != null:
-		combat_manager.battle_log = STAIRS_UP_MESSAGE
+	var previous_floor_id: int = current_floor_id - 1
+
+	if previous_floor_id < 1 or not FloorDatabaseScript.has_floor(previous_floor_id):
+		if combat_manager != null:
+			combat_manager.battle_log = STAIRS_UP_MESSAGE
+
+		return true
+
+	var previous_floor_data = FloorDatabaseScript.get_floor_data(previous_floor_id)
+	var destination_cell: Vector2i = previous_floor_data.stairs_down_cell
+
+	transition_to_floor(
+		previous_floor_id,
+		"Le groupe remonte vers l'étage " + str(previous_floor_id) + ".",
+		destination_cell
+	)
 
 	return true
 
 
 # Charge un nouvel étage en conservant le groupe, l'inventaire, l'or et l'équipement.
-func transition_to_floor(next_floor_id: int, transition_message: String) -> void:
+func transition_to_floor(
+	next_floor_id: int,
+	transition_message: String,
+	destination_cell: Vector2i = Vector2i(-1, -1)
+) -> void:
+	store_current_floor_state()
 	GameSession.current_floor_id = next_floor_id
-	load_floor(next_floor_id)
+	load_floor(next_floor_id, destination_cell)
 	GameSession.set_shop_available(is_shop_cell(player.grid_cell))
 
 	if combat_manager != null:
