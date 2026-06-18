@@ -1,49 +1,84 @@
-# Feuille de route du projet — Dungeon Crawler rétro Godot
+# Feuille de route du projet — DungeonCrawFirstMiniGame
 
 ## 1. Objectif général du projet
 
 Créer un dungeon crawler rétro en vue subjective, inspiré de l’esprit old-school :
 
-* exploration case par case ;
-* groupe de quatre héros ;
-* combats au tour par tour ;
-* progression par étage ;
-* danger parfois injuste ;
-* outils de récupération, de préparation et de gestion pour compenser la difficulté.
+- exploration case par case ;
+- groupe de quatre héros ;
+- combats au tour par tour ;
+- progression par étage ;
+- danger parfois injuste ;
+- outils de récupération, de préparation et de gestion pour compenser cette difficulté.
 
 Le projet doit rester simple, lisible et modulaire.
-Les systèmes doivent être ajoutés progressivement, sans rendre les scripts principaux trop lourds.
+
+Les systèmes doivent être ajoutés progressivement, sans rendre les scripts principaux trop lourds.  
+Les grosses fonctionnalités doivent être validées par étapes, avec des releases servant de points de retour stables.
 
 ---
 
-## 2. État actuel du projet
+## 2. Version actuelle et logique de versioning
 
-### 2.1 Version stable actuelle
+### 2.1 Version de continuation actuelle
 
-Version stable actuelle :
+Version actuelle à utiliser comme base de travail :
 
-* `v0.2`
+```text
+v0.5.1
+```
 
-La version `v0.1` reste le point de retour stable avant l’ajout du temple de guérison.
+Cette version corrige le bug critique où les statistiques des héros pouvaient retomber à `1 / 1 / 1 / 1` après la création d’équipe ou le chargement, à cause de l’interaction entre `base_stats`, `stats` et le système d’équipement.
 
-La version `v0.2` ajoute notamment :
+### 2.2 Releases importantes
 
-* temple de guérison ;
-* amélioration du comportement audio combat / exploration ;
-* correction du bug d’affichage avec plusieurs héros identiques ;
-* sprites dédiés pour les monstres de l’étage 1.
+```text
+v0.1 = base stable initiale
+v0.2 = temple + audio amélioré + sprites monstres + correction portraits
+v0.3 = inventaire minimal fonctionnel
+v0.4 = équipement de base stable
+v0.5-unstable-shop = première boutique de vente + or + FLOOR_DESIGN + outil dev téléportation
+v0.5.1 = hotfix stats héros, base actuelle corrigée
+```
+
+### 2.3 Règle de versioning
+
+Ne pas considérer que `v1.0` arrive automatiquement après `v0.9`.
+
+Le projet peut continuer en versions pré-1.0 :
+
+```text
+v0.6
+v0.7
+v0.8
+v0.9
+v0.10
+v0.11
+...
+```
+
+`v1.0` doit rester réservé à une version vraiment complète, avec une boucle de jeu solide, plusieurs étages, une progression claire, un système économique stabilisé, une gestion de la défaite, et un niveau de polish minimum.
+
+Pour les corrections ou extensions mineures d’un système déjà posé :
+
+```text
+v0.5.1
+v0.5.2
+v0.6.1
+...
+```
 
 ---
 
-### 2.2 Structure générale en place
+## 3. Structure générale du projet
 
 Le projet possède actuellement trois grandes scènes principales :
 
-* `MainMenu.tscn`
-* `PartyCreation.tscn`
-* `Dungeon.tscn`
+- `MainMenu.tscn`
+- `PartyCreation.tscn`
+- `Dungeon.tscn`
 
-La scène `Dungeon.tscn` est le cœur du jeu en exploration et combat.
+La scène `Dungeon.tscn` est le cœur du jeu en exploration et combat.  
 Elle orchestre les systèmes principaux sans tout gérer directement.
 
 Structure attendue de la scène Donjon :
@@ -57,147 +92,215 @@ CombatManager
 DungeonRenderer
 ```
 
+Le dépôt contient aussi maintenant un document de conception d’étage :
+
+```text
+FLOOR_DESIGN.md
+```
+
+Ce document définit les normes de layout ASCII, les symboles utilisés, les symboles réservés, et les règles à suivre avant d’ajouter un nouveau type de case.
+
 ---
 
-## 3. Systèmes fonctionnels actuellement
+## 4. Systèmes fonctionnels actuellement
 
-### 3.1 Menu principal
+### 4.1 Menu principal
 
 Le menu principal est fonctionnel.
 
 Fonctions présentes :
 
-* Nouvelle partie ;
-* Charger ;
-* Options ;
-* Quitter ;
-* musique de titre ;
-* réglages audio.
+- Nouvelle partie ;
+- Charger ;
+- Options ;
+- Quitter ;
+- musique de titre ;
+- réglages audio.
 
 Le menu peut lancer une nouvelle partie, charger une sauvegarde existante et modifier les volumes.
 
 ---
 
-### 3.2 Création du groupe
+### 4.2 Création du groupe
 
 La création de groupe est fonctionnelle.
 
 Fonctions présentes :
 
-* création de 4 héros ;
-* choix de classe ;
-* reroll des statistiques ;
-* validation progressive du groupe ;
-* retour au menu principal.
+- création de 4 héros ;
+- choix de classe ;
+- reroll des statistiques ;
+- validation progressive du groupe ;
+- retour au menu principal.
 
 Classes actuelles :
 
-* Guerrier ;
-* Voleuse ;
-* Mage ;
-* Prêtresse.
+- Guerrier ;
+- Voleuse ;
+- Mage ;
+- Prêtresse.
 
 Statistiques actuelles :
 
-* Force ;
-* Agilité ;
-* Endurance ;
-* Magie.
+- Force ;
+- Agilité ;
+- Endurance ;
+- Magie.
 
 Rôle actuel des statistiques :
 
-* Force → dégâts physiques ;
-* Agilité → ordre des tours ;
-* Endurance → points de vie ;
-* Magie → points de magie et puissance des sorts.
+- Force → dégâts physiques ;
+- Agilité → ordre des tours ;
+- Endurance → points de vie ;
+- Magie → points de magie et puissance des sorts.
+
+Depuis `v0.5.1`, les stats issues du roll de création sont correctement conservées comme statistiques de base, même avec le système d’équipement.
 
 ---
 
-### 3.3 Session de jeu
+### 4.3 Session de jeu
 
 `GameSession.gd` fonctionne comme passerelle entre les scènes.
 
 Fonctions présentes :
 
-* stocker le groupe ;
-* stocker l’étage courant ;
-* préparer une nouvelle partie ;
-* transporter les données de sauvegarde chargée.
+- stocker le groupe ;
+- stocker l’étage courant ;
+- stocker l’inventaire courant ;
+- stocker l’or du groupe ;
+- préparer une nouvelle partie ;
+- transporter les données de sauvegarde chargée.
 
 ---
 
-### 3.4 Sauvegarde et chargement
+### 4.4 Sauvegarde et chargement
 
 Le système de sauvegarde est fonctionnel.
 
 Données sauvegardées actuellement :
 
-* groupe ;
-* noms des héros ;
-* classes ;
-* niveaux ;
-* EXP ;
-* statistiques ;
-* HP / MP ;
-* étage courant ;
-* position du joueur ;
-* layout de l’étage ;
-* portes ouvertes ;
-* cellules découvertes de l’automap.
+- groupe ;
+- noms des héros ;
+- classes ;
+- niveaux ;
+- EXP ;
+- statistiques de base ;
+- statistiques finales recalculées ;
+- équipement porté ;
+- HP / MP ;
+- étage courant ;
+- position du joueur ;
+- layout de l’étage ;
+- portes ouvertes ;
+- cellules découvertes de l’automap ;
+- inventaire ;
+- or du groupe.
 
 Restrictions déjà en place :
 
-* sauvegarde impossible pendant un combat.
+- sauvegarde impossible pendant un combat.
 
-La logique a été clarifiée :
+La logique générale :
 
-* `SaveManager.gd` → lit et écrit le fichier JSON ;
-* `DungeonSaveController.gd` → demande une sauvegarde et applique les données chargées au donjon ;
-* `Dungeon.gd` → appelle simplement le contrôleur.
+- `SaveManager.gd` → lit et écrit le fichier JSON ;
+- `DungeonSaveController.gd` → demande une sauvegarde et applique les données chargées au donjon ;
+- `Dungeon.gd` → appelle simplement le contrôleur.
 
 À prévoir plus tard :
 
-* sauvegarde de l’inventaire ;
-* sauvegarde de l’équipement ;
-* sauvegarde de certains états d’étage si nécessaire.
+- sauvegarde des coffres ouverts ;
+- sauvegarde des rencontres fixes vaincues ;
+- sauvegarde des événements uniques déclenchés ;
+- sauvegarde des portes verrouillées ouvertes ;
+- sauvegarde des passages secrets découverts.
 
 ---
 
-### 3.5 Donjon et exploration
+### 4.5 Donjon et exploration
 
 L’exploration est fonctionnelle.
 
 Fonctions présentes :
 
-* déplacement case par case ;
-* rotation gauche / droite ;
-* portes fermées ;
-* ouverture automatique des portes ;
-* portes ouvertes conservées dans la sauvegarde ;
-* escaliers détectés ;
-* rencontres aléatoires ;
-* temple de guérison.
+- déplacement case par case ;
+- rotation gauche / droite ;
+- portes fermées ;
+- ouverture automatique des portes ;
+- portes ouvertes conservées dans la sauvegarde ;
+- escaliers détectés ;
+- rencontres aléatoires ;
+- temple de guérison ;
+- boutique de vente ;
+- outil temporaire de téléportation pour le développement.
 
-Le rendu du donjon est déjà en place :
+Le rendu du donjon est en place :
 
-* murs en briques ;
-* sol / plafond ;
-* portes fermées ;
-* portes ouvertes ;
-* brouillard de profondeur ;
-* thème visuel d’étage ;
-* rendu spécifique du temple de guérison.
+- murs en briques ;
+- sol / plafond ;
+- portes fermées ;
+- portes ouvertes ;
+- brouillard de profondeur ;
+- thème visuel d’étage ;
+- rendu spécifique du temple de guérison ;
+- rendu spécifique de la boutique.
 
 Le rendu est géré par :
 
-* `DungeonRenderer.gd`
-* `DungeonThemeData.gd`
-* `FloorData.gd`
-* `FloorDatabase.gd`
+- `DungeonRenderer.gd`
+- `DungeonThemeData.gd`
+- `FloorData.gd`
+- `FloorDatabase.gd`
 
 ---
 
-### 3.6 Temple de guérison
+### 4.6 Normes de conception des étages
+
+Le projet possède maintenant :
+
+```text
+FLOOR_DESIGN.md
+```
+
+Ce document sert de référence avant d’ajouter de nouveaux symboles dans les layouts ASCII.
+
+Symboles actuellement utilisés :
+
+```text
+#  mur
+.  sol
+D  porte fermée
+d  porte ouverte runtime
+>  escalier descendant
+<  escalier montant prévu / partiellement pris en charge
+O  temple de guérison
+B  boutique
+```
+
+Symboles réservés ou prévus :
+
+```text
+C  coffre
+P  piège
+E  événement
+M  rencontre fixe
+R  rune / découverte magique visible
+L  porte verrouillée
+S  passage secret
+```
+
+Règle importante :
+
+Tout nouveau symbole doit être ajouté à `FLOOR_DESIGN.md`, puis intégré dans les systèmes concernés :
+
+- `FloorDatabase.gd`
+- `Dungeon.gd`
+- `DungeonRenderer.gd`
+- `AutoMapUI.gd`
+- `SaveManager.gd` si l’état doit persister.
+
+---
+
+### 4.7 Temple de guérison
 
 Le temple de guérison est fonctionnel depuis `v0.2`.
 
@@ -209,171 +312,275 @@ O
 
 Comportement actuel :
 
-* restaure tous les PV et PM du groupe ;
-* gratuit ;
-* réutilisable ;
-* ne déclenche pas de rencontre aléatoire sur sa case ;
-* visible dans la vue donjon ;
-* visible sur l’automap.
+- restaure tous les PV et PM du groupe ;
+- gratuit ;
+- réutilisable ;
+- ne déclenche pas de rencontre aléatoire sur sa case ;
+- visible dans la vue donjon ;
+- visible sur l’automap ;
+- rendu orienté vers l’ouest sur l’étage actuel.
 
 Fichiers concernés :
 
-* `FloorDatabase.gd`
-* `Dungeon.gd`
-* `DungeonRenderer.gd`
-* `AutoMapUI.gd`
+- `FloorDatabase.gd`
+- `Dungeon.gd`
+- `DungeonRenderer.gd`
+- `AutoMapUI.gd`
 
 Évolution possible plus tard :
 
-* temple à usage limité ;
-* coût en offrande ;
-* restauration partielle ;
-* temple différent selon l’étage ;
-* sauvegarde d’un état “déjà utilisé” si le design change.
+- temple à usage limité ;
+- coût en offrande ;
+- restauration partielle ;
+- temple différent selon l’étage ;
+- sauvegarde d’un état “déjà utilisé” si le design change.
 
-Priorité actuelle : faible, système fonctionnel.
+Priorité actuelle : faible.
 
 ---
 
-### 3.7 Automap
+### 4.8 Boutique de vente
 
-L’automap est fonctionnelle en version locale.
+La première boutique est fonctionnelle depuis `v0.5-unstable-shop`.
+
+Symbole utilisé dans le layout :
+
+```text
+B
+```
+
+Comportement actuel :
+
+- case marchable ;
+- ne déclenche pas de rencontre aléatoire ;
+- visible sur l’automap ;
+- rendue en 3D comme un petit comptoir de marchand ;
+- orientée vers l’ouest sur l’étage actuel ;
+- donne accès au menu Boutique uniquement quand le joueur est sur la case `B`.
+
+Fonctions actuelles :
+
+- vendre des objets de l’inventaire ;
+- gagner de l’or selon la valeur de vente définie dans `ItemDatabase.gd` ;
+- sauvegarder et charger l’or ;
+- afficher l’or dans l’inventaire.
+
+Limites actuelles :
+
+- pas encore d’achat ;
+- pas encore d’inventaire marchand ;
+- pas encore de stock limité ;
+- pas encore de services de boutique ;
+- système encore considéré comme récent / à stabiliser.
+
+Priorité actuelle : moyenne à élevée.
+
+Prochaine évolution naturelle :
+
+```text
+v0.5.2 ou v0.6 selon l’ampleur :
+- ajout de l’achat d’objets basiques ;
+- inventaire marchand simple ;
+- prix d’achat basé sur sell_value × multiplicateur ;
+- refus d’achat si inventaire plein ;
+- garder les objets rares hors boutique.
+```
+
+---
+
+### 4.9 Automap
+
+L’automap est fonctionnelle.
 
 Fonctions présentes :
 
-* découverte progressive ;
-* affichage centré sur le joueur ;
-* murs ;
-* portes fermées ;
-* portes ouvertes ;
-* escaliers ;
-* temple de guérison ;
-* orientation du joueur.
+- découverte progressive ;
+- affichage centré sur le joueur ;
+- murs ;
+- portes fermées ;
+- portes ouvertes ;
+- escaliers ;
+- temple de guérison ;
+- boutique ;
+- orientation du joueur.
 
 La carte découverte est sauvegardée et restaurée.
 
 ---
 
-### 3.8 Interface de jeu
+### 4.10 Interface de jeu
 
 L’interface principale est fonctionnelle.
 
 Éléments présents :
 
-* vue donjon centrale ;
-* panneaux des héros ;
-* portraits des classes ;
-* barres HP / MP ;
-* journal ;
-* commandes de combat ;
-* automap ;
-* menu d’aventure.
+- vue donjon centrale ;
+- panneaux des héros ;
+- portraits des classes ;
+- barres HP / MP ;
+- journal ;
+- commandes de combat ;
+- automap ;
+- menu d’aventure.
 
 Choix d’interface déjà actés :
 
-* HP / MP affichés sous forme de barres dans l’interface principale ;
-* pas de chiffres HP / MP pendant le combat ;
-* la classe n’est pas affichée en permanence dans les panneaux ;
-* les portraits communiquent la classe.
+- HP / MP affichés sous forme de barres dans l’interface principale ;
+- pas de chiffres HP / MP pendant le combat ;
+- la classe n’est pas affichée en permanence dans les panneaux ;
+- les portraits communiquent la classe ;
+- les menus internes doivent éviter les titres redondants quand le contexte est déjà clair.
 
 Correction importante depuis `v0.2` :
 
-* les héros sont identifiés visuellement par emplacement de groupe ;
-* cela évite les bugs quand plusieurs héros identiques ou de même classe sont présents dans l’équipe.
+- les héros sont identifiés visuellement par emplacement de groupe ;
+- cela évite les bugs quand plusieurs héros identiques ou de même classe sont présents dans l’équipe.
 
 ---
 
-### 3.9 Menu d’aventure
+### 4.11 Menu d’aventure
 
 Le menu d’aventure est fonctionnel.
 
 Commandes actuelles :
 
-* Inventaire ;
-* Grimoire ;
-* Statut ;
-* Menu.
+- Inventaire ;
+- Grimoire ;
+- Statut ;
+- Boutique si le joueur est sur une case boutique ;
+- Menu.
 
 Sous-menu système :
 
-* Sauvegarder ;
-* Options ;
-* Quitter ;
-* Retour.
+- Sauvegarder ;
+- Options ;
+- Quitter ;
+- Retour.
 
 État actuel :
 
-* Sauvegarde fonctionnelle ;
-* Options audio fonctionnelles ;
-* Quitter fonctionnel ;
-* Inventaire placeholder ;
-* Grimoire placeholder ;
-* Statut fonctionnel.
+- Sauvegarde fonctionnelle ;
+- Options audio fonctionnelles ;
+- Quitter fonctionnel ;
+- Inventaire fonctionnel ;
+- Statut fonctionnel ;
+- Équipement fonctionnel depuis Statut ;
+- Boutique de vente fonctionnelle sur case `B` ;
+- Grimoire placeholder.
 
 Le menu est désactivé pendant les combats.
 
+Le titre `MENU D’AVENTURE` a été retiré pour libérer de l’espace et alléger l’interface.
+
 ---
 
-### 3.10 Audio
+### 4.12 Outil temporaire de développement — Téléportation
+
+Un outil temporaire de téléportation existe pour faciliter les tests.
+
+Accès :
+
+```text
+Menu d’aventure → bouton T en haut à gauche
+```
+
+Fonction :
+
+- ouvre un panneau de saisie X / Y ;
+- préremplit la position actuelle ;
+- téléporte le groupe sur une case valide ;
+- refuse les coordonnées hors carte ;
+- refuse les cases non marchables ;
+- refuse l’utilisation pendant un combat ;
+- ne déclenche pas de rencontre aléatoire lors de la téléportation.
+
+Ce système est uniquement destiné au développement.
+
+Pour le désactiver rapidement :
+
+```gdscript
+const DEV_TELEPORT_ENABLED: bool = false
+```
+
+dans `InGameMenuPanelUI.gd`.
+
+Pour le supprimer complètement avant une version finale :
+
+- retirer le bloc de téléportation temporaire dans `InGameMenuPanelUI.gd` ;
+- retirer le bloc de téléportation temporaire dans `Dungeon.gd` ;
+- retirer les connexions / signaux liés à cette commande ;
+- vérifier que le bouton `T` n’apparaît plus dans le menu ;
+- tester une nouvelle partie et un chargement après suppression.
+
+Priorité :
+
+- garder tant que les tests de donjon sont fréquents ;
+- supprimer avant toute release considérée comme proche d’une version finale ou publique propre.
+
+---
+
+### 4.13 Audio
 
 Le système audio est fonctionnel.
 
 Fonctions présentes :
 
-* musique de titre ;
-* musique d’exploration ;
-* musique de combat ;
-* crossfade ;
-* volume musique sauvegardé ;
-* volume SFX sauvegardé ;
-* sons d’attaque ;
-* sons de sort ;
-* sons de soin ;
-* sons de pas ;
-* son de sauvegarde ;
-* son de fuite.
+- musique de titre ;
+- musique d’exploration ;
+- musique de combat ;
+- crossfade ;
+- volume musique sauvegardé ;
+- volume SFX sauvegardé ;
+- sons d’attaque ;
+- sons de sort ;
+- sons de soin ;
+- sons de pas ;
+- son de sauvegarde ;
+- son de fuite.
 
 Amélioration depuis `v0.2` :
 
-* les musiques d’exploration et de combat peuvent démarrer à une mesure aléatoire ;
-* cela évite que les thèmes recommencent toujours au début après une transition combat / exploration ;
-* la musique de titre conserve son démarrage au début.
+- les musiques d’exploration et de combat peuvent démarrer à une mesure aléatoire ;
+- cela évite que les thèmes recommencent toujours au début après une transition combat / exploration ;
+- la musique de titre conserve son démarrage au début.
 
-Priorité actuelle : faible, système satisfaisant pour le prototype.
+Priorité actuelle : faible.
 
 ---
 
-### 3.11 Combat
+### 4.14 Combat
 
 Le combat est fonctionnel.
 
 Fonctions présentes :
 
-* rencontres aléatoires ;
-* combat au tour par tour ;
-* ordre des tours selon l’Agilité ;
-* attaque physique ;
-* magie offensive ;
-* soin ;
-* fuite ;
-* riposte ennemie ;
-* victoire ;
-* défaite ;
-* EXP ;
-* drops affichés dans le journal.
+- rencontres aléatoires ;
+- combat au tour par tour ;
+- ordre des tours selon l’Agilité ;
+- attaque physique ;
+- magie offensive ;
+- soin ;
+- fuite ;
+- riposte ennemie ;
+- victoire ;
+- défaite ;
+- EXP ;
+- drops ;
+- ajout des drops à l’inventaire ;
+- interaction indirecte avec l’équipement via les stats finales des héros.
 
 Commandes actuelles :
 
-* Attaquer ;
-* Magie ;
-* Soin ;
-* Fuir.
+- Attaquer ;
+- Magie ;
+- Soin ;
+- Fuir.
 
 Il n’y a pas de commande Défendre, par choix de design.
 
 ---
 
-### 3.12 Rythme visuel des dégâts
+### 4.15 Rythme visuel des dégâts
 
 Le rythme des dégâts a été amélioré.
 
@@ -392,81 +599,90 @@ Cela rend le combat plus lisible et évite que le prochain héros actif soit aff
 
 Correction importante :
 
-* l’état visuel des héros est maintenant suivi par slot de groupe ;
-* cela corrige le bug des groupes composés de plusieurs héros identiques.
+- l’état visuel des héros est suivi par slot de groupe ;
+- cela corrige le bug des groupes composés de plusieurs héros identiques.
 
 ---
 
-### 3.13 Refactor combat déjà effectué
+### 4.16 Refactor combat déjà effectué
 
-Le combat est maintenant mieux séparé.
+Le combat est mieux séparé qu’au départ.
 
 Structure actuelle :
 
-* `CombatManager.gd` → orchestre le combat ;
-* `CombatTurnOrder.gd` → gère l’ordre des tours ;
-* `CombatRewards.gd` → gère EXP et drops ;
-* `MonsterDatabase.gd` → gère les monstres et la table de rencontre ;
-* `MonsterData.gd` → représente les données d’un monstre.
+- `CombatManager.gd` → orchestre le combat ;
+- `CombatTurnOrder.gd` → gère l’ordre des tours ;
+- `CombatRewards.gd` → gère EXP et drops ;
+- `MonsterDatabase.gd` → gère les monstres et la table de rencontre ;
+- `MonsterData.gd` → représente les données d’un monstre.
+
+À extraire plus tard si nécessaire :
+
+- `CombatActions.gd`
+- `CombatTargeting.gd`
+- `CombatAbilityResolver.gd`
+
+Priorité actuelle : moyenne, mais pas urgente.
 
 ---
 
-### 3.14 Monstres actuels
+### 4.17 Monstres actuels
 
 Liste actuelle des monstres de l’étage 1 :
 
-* Zombie ;
-* Chauve-souris ;
-* Gobelin ;
-* Troll ;
-* Gardien.
+- Zombie ;
+- Chauve-souris ;
+- Gobelin ;
+- Troll ;
+- Gardien.
 
 Table de rencontre actuelle :
 
-* Zombie : 42 %
-* Chauve-souris : 30 %
-* Gobelin : 18 %
-* Troll : 8 %
-* Gardien : 2 %
+- Zombie : 42 %
+- Chauve-souris : 30 %
+- Gobelin : 18 %
+- Troll : 8 %
+- Gardien : 2 %
 
 Philosophie :
 
-* danger parfois injuste ;
-* monstre fort possible dès le début ;
-* taux d’apparition faible pour les ennemis très dangereux.
+- danger parfois injuste ;
+- monstre fort possible dès le début ;
+- taux d’apparition faible pour les ennemis très dangereux.
 
 ---
 
-### 3.15 Loots actuels
+### 4.18 Loots actuels
 
-Les drops existent en version simple.
+Les drops sont fonctionnels.
 
 État actuel :
 
-* les monstres possèdent une `loot_table` ;
-* `CombatRewards` tire les drops ;
-* les objets trouvés sont affichés dans le journal ;
-* les objets ne sont pas encore stockés dans un inventaire.
+- les monstres possèdent une `loot_table` ;
+- `CombatRewards` tire les drops ;
+- les objets trouvés sont affichés dans le journal ;
+- les objets sont ajoutés à l’inventaire ;
+- les objets peuvent ensuite être équipés ou vendus.
 
 Intention de design :
 
-* les ennemis donnent surtout de l’équipement ;
-* les ennemis faibles donnent de l’équipement basique surtout utile à la revente ;
-* les ennemis forts donnent de meilleurs objets avec des chances faibles.
+- les ennemis donnent surtout de l’équipement ;
+- les ennemis faibles donnent de l’équipement basique surtout utile à la revente ;
+- les ennemis forts donnent de meilleurs objets avec des chances faibles.
 
 ---
 
-### 3.16 Visuels de monstres
+### 4.19 Visuels de monstres
 
 Les vrais sprites des monstres de l’étage 1 sont intégrés depuis `v0.2`.
 
 Monstres avec sprites dédiés :
 
-* Zombie ;
-* Gobelin ;
-* Chauve-souris ;
-* Troll ;
-* Gardien.
+- Zombie ;
+- Gobelin ;
+- Chauve-souris ;
+- Troll ;
+- Gardien.
 
 Structure utilisée :
 
@@ -480,169 +696,210 @@ assets/monsters/gardien/
 
 Chaque monstre utilise actuellement deux frames idle :
 
-* `*_idle_01.png`
-* `*_idle_02.png`
+- `*_idle_01.png`
+- `*_idle_02.png`
 
-`CombatMonsterDisplayUI.gd` charge maintenant les sprites dédiés de chaque monstre.
+`CombatMonsterDisplayUI.gd` charge les sprites dédiés de chaque monstre.
 
 Évolutions possibles plus tard :
 
-* frame damage spécifique ;
-* animation d’attaque par type de monstre ;
-* position ou taille plus fine par monstre ;
-* effets visuels spécifiques pour certains ennemis.
+- frame damage spécifique ;
+- animation d’attaque par type de monstre ;
+- position ou taille plus fine par monstre ;
+- effets visuels spécifiques pour certains ennemis.
 
-Priorité actuelle : faible à moyenne, les visuels principaux sont en place.
+Priorité actuelle : faible à moyenne.
 
 ---
 
-## 4. Ce qui manque encore de fondamental
+### 4.20 Inventaire
 
-### 4.1 Inventaire réel
+L’inventaire minimal est fonctionnel depuis `v0.3`.
 
-C’est le prochain système fondamental le plus important.
+Règles actuelles :
 
-Actuellement :
+- inventaire commun au groupe ;
+- 24 emplacements ;
+- objets empilés par `item_id` ;
+- 9 objets maximum par pile ;
+- objets vides masqués ;
+- message affiché si l’inventaire est vide ;
+- drops ajoutés automatiquement après victoire ;
+- sauvegarde et chargement de l’inventaire.
 
-* les drops apparaissent dans le journal ;
-* aucun objet n’est stocké.
+Affichage :
+
+```text
+Épée rouillée              | 2
+Bouclier fendu             | 1
+Cape déchirée              | 3
+```
+
+Depuis la boutique :
+
+- l’or du groupe est affiché dans un petit cadre compact ;
+- le bouton `Retour menu` est présent.
+
+Évolutions possibles :
+
+- tri ;
+- filtres ;
+- description détaillée ;
+- objets utilisables ;
+- objets clés ;
+- inventaire plein mieux signalé ;
+- interface plus graphique.
+
+Priorité actuelle : moyenne.
+
+---
+
+### 4.21 Base de données d’objets
+
+`ItemDatabase.gd` est maintenant la source centrale des objets.
+
+Données prévues / utilisées :
+
+- `item_id`
+- `display_name`
+- `item_type`
+- `description`
+- `sell_value`
+- `max_stack`
+- `equipment_slot`
+- `allowed_classes`
+- `stat_bonuses`
+
+Rôle actuel :
+
+- définir les objets dropés ;
+- définir les valeurs de vente ;
+- définir les restrictions d’équipement ;
+- centraliser les bonus de stats ;
+- préparer l’achat en boutique.
+
+Priorité actuelle :
+
+- maintenir l’équilibrage ici autant que possible ;
+- éviter de disperser les valeurs d’objets dans les autres scripts.
+
+---
+
+### 4.22 Équipement
+
+L’équipement de base est fonctionnel depuis `v0.4`.
+
+Accès :
+
+```text
+Menu d’aventure → Statut → bouton EQUIPEMENT d’un héros
+```
+
+Slots actuels par héros :
+
+- Arme ;
+- Casque ;
+- Armure ;
+- Bouclier ;
+- Bijou.
+
+Règles actuelles :
+
+- équiper un objet le retire de l’inventaire ;
+- déséquiper un objet le remet dans l’inventaire ;
+- remplacer un objet remet l’ancien dans l’inventaire si possible ;
+- les objets incompatibles avec la classe ne sont pas proposés ;
+- l’équipement est sauvegardé et restauré ;
+- les bonus de stats sont plats et centralisés dans `ItemDatabase.gd`.
+
+Stats concernées :
+
+- Force ;
+- Agilité ;
+- Endurance ;
+- Magie.
+
+Limites actuelles :
+
+- aucun objet de type casque n’existe encore dans les drops actuels ;
+- pas d’effets spéciaux d’équipement ;
+- pas de résistances ;
+- pas de bonus conditionnels ;
+- pas d’affichage graphique avancé.
+
+Priorité actuelle : moyenne.
+
+---
+
+## 5. Ce qui manque encore de fondamental
+
+### 5.1 Achat en boutique
+
+La boutique permet de vendre, mais pas encore d’acheter.
+
+Objectif futur :
+
+- inventaire marchand simple ;
+- objets basiques disponibles ;
+- prix d’achat basé sur `sell_value × multiplicateur` ;
+- refus d’achat si l’inventaire est plein ;
+- message clair dans le journal ou le panneau boutique.
+
+Recommandation :
+
+Ne pas vendre les objets rares ou très puissants en boutique.  
+Les drops rares doivent garder leur valeur.
+
+Priorité actuelle : élevée si l’on continue le système économique.
+
+---
+
+### 5.2 Transitions d’étage
+
+Les escaliers sont détectés, mais la transition vers un nouvel étage n’est pas encore un vrai système complet.
 
 À créer :
 
-* `InventoryData.gd`
-* `ItemData.gd`
-* `ItemDatabase.gd`
+- passer à l’étage suivant ;
+- créer un `FloorData` pour l’étage 2 ;
+- charger un nouveau layout ;
+- conserver le groupe ;
+- conserver inventaire, or et équipement ;
+- réinitialiser ou conserver certaines découvertes ;
+- changer la table de rencontre selon l’étage ;
+- sauvegarder l’étage courant correctement.
 
-Objectif minimal :
-
-* stocker `item_id` + quantité ;
-* afficher les objets dans le menu Inventaire ;
-* sauvegarder l’inventaire ;
-* charger l’inventaire ;
-* ajouter automatiquement les drops obtenus en combat.
-
-À ne pas faire immédiatement :
-
-* équipement actif complet ;
-* boutique ;
-* revente ;
-* effets complexes d’objets.
-
-Priorité actuelle : très élevée.
+Priorité actuelle : élevée.
 
 ---
 
-### 4.2 Base de données d’objets
-
-Les drops utilisent actuellement des `item_id` et des `display_name` directement dans les loot tables.
-
-À terme, il faudra déplacer les vraies informations d’objet dans `ItemDatabase.gd`.
-
-Données minimales d’un objet :
-
-* `item_id`
-* `display_name`
-* `item_type`
-* `sell_value`
-* `description`
-
-Types possibles au départ :
-
-* `weapon`
-* `armor`
-* `shield`
-* `accessory`
-* `misc`
-
-Priorité actuelle : très élevée, à faire avec l’inventaire minimal.
-
----
-
-### 4.3 Système d’équipement
-
-Le jeu parle déjà d’équipement, mais les héros ne peuvent pas encore équiper d’objets.
-
-À créer plus tard :
-
-* emplacements d’équipement ;
-* restrictions par classe ;
-* bonus d’attaque / défense / stats ;
-* affichage de l’équipement dans le statut.
-
-Ce système ne doit pas être commencé avant que l’inventaire et `ItemDatabase` soient solides.
-
-Priorité actuelle : moyenne, mais pas immédiate.
-
----
-
-### 4.4 Boutique / revente
-
-Le loot d’équipement faible a besoin d’un usage économique.
-
-Usage prévu :
-
-* objets faibles servent à la revente ;
-* objets meilleurs peuvent être gardés.
-
-À créer plus tard :
-
-* boutique ;
-* prix de vente ;
-* prix d’achat ;
-* interface de revente ;
-* monnaie.
-
-Ce n’est pas prioritaire tant que l’inventaire n’existe pas.
-
-Priorité actuelle : basse à moyenne.
-
----
-
-### 4.5 Transitions d’étage
-
-Les escaliers sont détectés, mais la transition vers un nouvel étage n’est pas encore un vrai système.
-
-À créer :
-
-* passer à l’étage suivant ;
-* créer un `FloorData` pour l’étage 2 ;
-* charger un nouveau layout ;
-* conserver le groupe ;
-* réinitialiser ou conserver certaines découvertes ;
-* changer la table de rencontre selon l’étage ;
-* sauvegarder l’étage courant correctement.
-
-Priorité actuelle : élevée, après inventaire minimal.
-
----
-
-### 4.6 Progression du contenu
+### 5.3 Progression du contenu
 
 Il manque encore :
 
-* plusieurs étages ;
-* événements de donjon ;
-* coffres ;
-* pièges ;
-* portes spéciales ;
-* rencontres fixes ;
-* boss ou mini-boss.
+- plusieurs étages ;
+- événements de donjon ;
+- coffres ;
+- pièges ;
+- portes spéciales ;
+- rencontres fixes ;
+- boss ou mini-boss.
 
-Priorité actuelle : moyenne, après les fondations inventaire / étage 2.
+Priorité actuelle : moyenne à élevée après transition d’étage.
 
 ---
 
-### 4.7 Mort / défaite
+### 5.4 Mort / défaite
 
-La défaite existe dans le combat, mais il manque une vraie conséquence.
+La défaite existe dans le combat, mais il manque une vraie conséquence claire.
 
 À définir :
 
-* retour menu principal ;
-* chargement automatique ;
-* écran Game Over ;
-* perte partielle ;
-* résurrection possible plus tard.
+- retour menu principal ;
+- chargement automatique ;
+- écran Game Over ;
+- perte partielle ;
+- résurrection possible plus tard.
 
 À court terme, un écran simple de défaite serait suffisant.
 
@@ -650,140 +907,41 @@ Priorité actuelle : moyenne.
 
 ---
 
-## 5. Pistes d’amélioration des systèmes existants
+### 5.5 Grimoire
 
-### 5.1 `Dungeon.gd`
-
-État actuel : sain.
-
-Il orchestre encore :
-
-* chargement d’étage ;
-* exploration ;
-* automap ;
-* découvertes de sorts ;
-* UI ;
-* déplacement ;
-* temple de guérison.
-
-À ne pas extraire immédiatement.
-
-Extraction possible plus tard :
-
-* `DungeonDiscoveryController.gd` → runes, coffres, pièges, événements ;
-* `DungeonFloorController.gd` → changements d’étages ;
-* `DungeonExplorationController.gd` → déplacement, portes, escaliers, rencontres.
-
-Priorité actuelle : faible à moyenne.
-
----
-
-### 5.2 `CombatManager.gd`
-
-État actuel : beaucoup plus propre.
-
-Il reste encore plusieurs responsabilités :
-
-* actions héros ;
-* attaque ennemie ;
-* calculs de dégâts ;
-* choix de cible ;
-* sorts disponibles ;
-* coût en MP ;
-* transmission future des drops à l’inventaire.
-
-Extractions futures possibles :
-
-* `CombatActions.gd` → attaque, magie, soin, fuite ;
-* `CombatTargeting.gd` → choix des cibles ;
-* `CombatAbilityResolver.gd` → sorts disponibles, coûts, effets.
-
-Priorité actuelle : moyenne, mais pas urgente.
-
----
-
-### 5.3 `MonsterDatabase.gd`
-
-État actuel : bon pour le prototype.
-
-Améliorations futures :
-
-* tables de rencontres par étage ;
-* variantes de monstres ;
-* rencontres fixes ;
-* ennemis rares ;
-* monstres uniques ;
-* équilibrage après ajout de l’inventaire et de l’équipement.
-
-Priorité actuelle : moyenne.
-
----
-
-### 5.4 `CombatMonsterDisplayUI.gd`
-
-État actuel : fonctionnel avec vrais sprites pour les monstres de l’étage 1.
-
-Améliorations futures :
-
-* animation damage spécifique ;
-* animation d’attaque par type de monstre ;
-* taille différente plus précise par monstre ;
-* position différente selon taille ;
-* effets particuliers pour certains ennemis.
-
-Priorité actuelle : faible à moyenne.
-
----
-
-### 5.5 Menu Inventaire
-
-État actuel : placeholder.
-
-C’est probablement l’un des plus gros manques visibles maintenant.
-
-À faire :
-
-* afficher les objets possédés ;
-* afficher les quantités ;
-* afficher une description simple ;
-* relier le menu aux données réelles de l’inventaire.
-
-Priorité actuelle : très élevée.
-
----
-
-### 5.6 Menu Grimoire
-
-État actuel : placeholder.
+Le menu Grimoire existe encore comme placeholder.
 
 À terme, il devrait afficher :
 
-* sorts connus ;
-* sorts découverts mais niveau insuffisant ;
-* coût en MP ;
-* description ;
-* classe concernée.
+- sorts connus ;
+- sorts découverts mais niveau insuffisant ;
+- coût en MP ;
+- description ;
+- classe concernée.
 
 Priorité actuelle : moyenne.
 
 ---
 
-### 5.7 Menu Statut
+### 5.6 Coffres, événements et lieux spéciaux
 
-État actuel : fonctionnel.
+Les symboles sont réservés dans `FLOOR_DESIGN.md`, mais pas encore implémentés.
 
-Améliorations futures :
+À prévoir :
 
-* afficher équipement équipé ;
-* afficher valeurs exactes de stats dérivées ;
-* afficher EXP / niveau suivant ;
-* afficher effets actifs.
+- `C` coffre ;
+- `P` piège ;
+- `E` événement ;
+- `M` rencontre fixe ;
+- `L` porte verrouillée ;
+- `S` passage secret ;
+- `R` rune / découverte magique visible.
 
-Priorité actuelle : moyenne.
+Priorité actuelle : moyenne, après transition d’étage ou achat boutique.
 
 ---
 
-### 5.8 Polish UI — cadres texturés `NinePatchRect`
+### 5.7 Polish UI — cadres texturés `NinePatchRect`
 
 Objectif :
 
@@ -791,69 +949,214 @@ Remplacer progressivement les bordures générées en code par des cadres graphi
 
 Éléments concernés :
 
-* panneaux latéraux des héros ;
-* cadres de portraits ;
-* panneau central du donjon ;
-* panneau du journal ;
-* cadre de l’automap ;
-* fenêtres du menu d’aventure ;
-* sous-menus ;
-* futures fenêtres d’inventaire / grimoire / statut.
+- panneaux latéraux des héros ;
+- cadres de portraits ;
+- panneau central du donjon ;
+- panneau du journal ;
+- cadre de l’automap ;
+- fenêtres du menu d’aventure ;
+- sous-menus ;
+- fenêtres d’inventaire ;
+- fenêtres de statut ;
+- fenêtres d’équipement ;
+- boutique.
 
 Approche technique :
 
-* conserver la structure actuelle en `Control` / `Container` ;
-* ajouter un `NinePatchRect` comme couche visuelle de fond ;
-* garder les `Label`, `ProgressBar`, portraits et contenus au-dessus ;
-* utiliser des marges de patch pour éviter la déformation des coins ;
-* importer les textures UI en Nearest, sans filtre, sans mipmaps.
+- conserver la structure actuelle en `Control` / `Container` ;
+- ajouter un `NinePatchRect` comme couche visuelle de fond ;
+- garder les `Label`, `ProgressBar`, portraits et contenus au-dessus ;
+- utiliser des marges de patch pour éviter la déformation des coins ;
+- importer les textures UI en Nearest, sans filtre, sans mipmaps.
 
 États visuels à prévoir :
 
-* cadre normal ;
-* cadre actif ;
-* cadre dégâts ;
-* cadre mort ;
-* flash esquive ;
-* éventuellement cadre animé plus tard.
+- cadre normal ;
+- cadre actif ;
+- cadre dégâts ;
+- cadre mort ;
+- flash esquive ;
+- éventuellement cadre animé plus tard.
 
 Priorité actuelle : moyenne / polish visuel.
 
 Note :
 
-Ne pas remplacer les containers par de simples images étirées.
+Ne pas remplacer les containers par de simples images étirées.  
 Les images doivent habiller l’UI, pas remplacer sa structure logique.
 
 ---
 
-## 6. Ordre d’action recommandé
+## 6. Pistes d’amélioration des systèmes existants
 
-### Phase 1 — Stabilisation des systèmes fondamentaux
+### 6.1 `Dungeon.gd`
+
+État actuel : fonctionnel, mais il orchestre beaucoup de systèmes.
+
+Il gère encore :
+
+- chargement d’étage ;
+- exploration ;
+- automap ;
+- découvertes de sorts ;
+- UI ;
+- déplacement ;
+- temple ;
+- boutique ;
+- téléportation temporaire de développement.
+
+À ne pas extraire immédiatement tant que les systèmes changent vite.
+
+Extraction possible plus tard :
+
+- `DungeonDiscoveryController.gd` → runes, coffres, pièges, événements ;
+- `DungeonFloorController.gd` → changements d’étages ;
+- `DungeonExplorationController.gd` → déplacement, portes, escaliers, rencontres ;
+- `DungeonSpecialTileController.gd` → temple, boutique, lieux spéciaux.
+
+Priorité actuelle : faible à moyenne.
+
+---
+
+### 6.2 `CombatManager.gd`
+
+État actuel : beaucoup plus propre qu’au départ.
+
+Il reste encore plusieurs responsabilités :
+
+- actions héros ;
+- attaque ennemie ;
+- calculs de dégâts ;
+- choix de cible ;
+- sorts disponibles ;
+- coût en MP ;
+- transmission des drops à l’inventaire.
+
+Extractions futures possibles :
+
+- `CombatActions.gd` → attaque, magie, soin, fuite ;
+- `CombatTargeting.gd` → choix des cibles ;
+- `CombatAbilityResolver.gd` → sorts disponibles, coûts, effets.
+
+Priorité actuelle : moyenne, mais pas urgente.
+
+---
+
+### 6.3 `MonsterDatabase.gd`
+
+État actuel : bon pour le prototype.
+
+Améliorations futures :
+
+- tables de rencontres par étage ;
+- variantes de monstres ;
+- rencontres fixes ;
+- ennemis rares ;
+- monstres uniques ;
+- équilibrage après achat boutique et étage 2.
+
+Priorité actuelle : moyenne.
+
+---
+
+### 6.4 `CombatMonsterDisplayUI.gd`
+
+État actuel : fonctionnel avec vrais sprites pour les monstres de l’étage 1.
+
+Améliorations futures :
+
+- animation damage spécifique ;
+- animation d’attaque par type de monstre ;
+- taille différente plus précise par monstre ;
+- position différente selon taille ;
+- effets particuliers pour certains ennemis.
+
+Priorité actuelle : faible à moyenne.
+
+---
+
+### 6.5 `InGameMenuPanelUI.gd`
+
+État actuel : centralise beaucoup d’écrans de menu.
+
+Il gère actuellement :
+
+- menu principal d’aventure ;
+- inventaire ;
+- statut ;
+- équipement ;
+- boutique ;
+- sous-menu système ;
+- outil temporaire de téléportation.
+
+Ce fichier risque de devenir lourd.
+
+Extraction possible plus tard :
+
+- `InventoryMenuUI.gd`
+- `StatusMenuUI.gd`
+- `EquipmentMenuUI.gd`
+- `ShopMenuUI.gd`
+- `DevTeleportMenuUI.gd` si l’outil reste longtemps pendant le développement.
+
+Priorité actuelle : moyenne, surtout si on ajoute l’achat boutique ou le grimoire.
+
+---
+
+## 7. Ordre d’action recommandé
+
+### Phase recommandée A — Stabilisation post-boutique
 
 Objectif :
 
-Rendre les drops réellement utiles.
+S’assurer que `v0.5.1` est bien une base fiable.
 
-À faire :
+À vérifier :
 
-* créer `ItemData.gd` ;
-* créer `ItemDatabase.gd` ;
-* créer `InventoryData.gd` ;
-* ajouter l’inventaire à `GameSession` ;
-* sauvegarder / charger l’inventaire ;
-* faire apparaître les drops dans l’inventaire ;
-* afficher l’inventaire dans le menu.
+- nouvelle partie ;
+- création d’équipe ;
+- stats après entrée en donjon ;
+- prise de niveau ;
+- sauvegarde / chargement ;
+- inventaire ;
+- équipement ;
+- vente boutique ;
+- or après sauvegarde / chargement ;
+- téléportation de test ;
+- aucune rencontre sur temple ou boutique.
 
 Résultat attendu :
 
-Un objet obtenu en combat est stocké, sauvegardé, chargé et visible dans le menu Inventaire.
+Le projet reste stable après l’ajout de la boutique et le hotfix stats.
 
-Statut : à faire.
 Priorité : très élevée.
 
 ---
 
-### Phase 2 — Transition d’étage
+### Phase recommandée B — Achat en boutique
+
+Objectif :
+
+Rendre la boutique plus complète.
+
+À faire :
+
+- définir l’inventaire marchand ;
+- vendre uniquement du basique ;
+- ajouter un prix d’achat ;
+- refuser l’achat si l’inventaire est plein ;
+- afficher l’or dans l’écran boutique ;
+- ajouter un retour clair entre Achat / Vente.
+
+Résultat attendu :
+
+Le joueur peut acheter quelques objets de base sans rendre les drops rares inutiles.
+
+Priorité : élevée.
+
+---
+
+### Phase recommandée C — Transition d’étage
 
 Objectif :
 
@@ -861,68 +1164,21 @@ Transformer l’escalier en vraie progression.
 
 À faire :
 
-* permettre de descendre à l’étage suivant ;
-* créer `FloorData` pour l’étage 2 ;
-* charger une nouvelle table de rencontre ;
-* sauvegarder l’étage courant ;
-* définir ce qui est conservé ou réinitialisé entre deux étages.
+- permettre de descendre à l’étage suivant ;
+- créer `FloorData` pour l’étage 2 ;
+- charger une nouvelle table de rencontre ;
+- sauvegarder l’étage courant ;
+- définir ce qui est conservé ou réinitialisé entre deux étages.
 
 Résultat attendu :
 
 Le joueur peut quitter l’étage 1 et arriver dans un nouvel étage.
 
-Statut : à faire.
 Priorité : élevée.
 
 ---
 
-### Phase 3 — Équipement actif
-
-Objectif :
-
-Rendre certains drops réellement utilisables.
-
-À faire :
-
-* définir les slots d’équipement ;
-* équiper / déséquiper ;
-* appliquer restrictions par classe ;
-* appliquer bonus ;
-* sauvegarder équipement équipé ;
-* afficher équipement dans le menu Statut.
-
-Résultat attendu :
-
-Un héros peut équiper une arme ou une armure et ses performances changent.
-
-Statut : à faire plus tard.
-Priorité : moyenne.
-
----
-
-### Phase 4 — Boutique / revente
-
-Objectif :
-
-Donner une utilité aux drops faibles.
-
-À faire :
-
-* créer une interface de boutique ;
-* vendre les objets inutiles ;
-* acheter équipement ou services ;
-* stocker une monnaie.
-
-Résultat attendu :
-
-Les objets basiques trouvés sur les ennemis deviennent utiles économiquement.
-
-Statut : à faire plus tard.
-Priorité : basse à moyenne.
-
----
-
-### Phase 5 — Contenu de donjon
+### Phase recommandée D — Contenu de donjon
 
 Objectif :
 
@@ -930,24 +1186,45 @@ Enrichir l’exploration.
 
 À faire :
 
-* coffres ;
-* pièges ;
-* portes spéciales ;
-* rencontres fixes ;
-* runes supplémentaires ;
-* événements simples ;
-* mini-boss ou boss.
+- coffres ;
+- pièges ;
+- portes spéciales ;
+- rencontres fixes ;
+- runes supplémentaires ;
+- événements simples ;
+- mini-boss ou boss.
 
 Résultat attendu :
 
 Le donjon ne repose plus seulement sur les combats aléatoires.
 
-Statut : à faire plus tard.
 Priorité : moyenne.
 
 ---
 
-### Phase 6 — Polish visuel UI
+### Phase recommandée E — Grimoire
+
+Objectif :
+
+Remplacer le placeholder du grimoire.
+
+À faire :
+
+- afficher les sorts connus ;
+- afficher les coûts ;
+- afficher les descriptions ;
+- indiquer la classe concernée ;
+- afficher les sorts découverts mais pas encore utilisables si souhaité.
+
+Résultat attendu :
+
+Le menu Grimoire devient utile.
+
+Priorité : moyenne.
+
+---
+
+### Phase recommandée F — Polish UI
 
 Objectif :
 
@@ -955,159 +1232,115 @@ Améliorer la présentation générale sans casser la structure UI.
 
 À faire :
 
-* créer des cadres graphiques propres ;
-* intégrer progressivement des `NinePatchRect` ;
-* améliorer les panneaux existants ;
-* préparer les fenêtres d’inventaire, grimoire et statut.
+- créer des cadres graphiques propres ;
+- intégrer progressivement des `NinePatchRect` ;
+- améliorer les panneaux existants ;
+- préparer les fenêtres d’inventaire, grimoire, statut, équipement et boutique.
 
 Résultat attendu :
 
 L’interface garde sa logique actuelle, mais gagne en finition visuelle.
 
-Statut : à faire plus tard.
 Priorité : moyenne.
-
----
-
-## 7. Phases terminées
-
-### Phase terminée — Temple de guérison
-
-Objectif :
-
-Compenser le danger élevé et les rencontres injustes.
-
-Fait :
-
-* symbole de carte dédié ;
-* ajout dans le layout ;
-* détection de la case temple ;
-* restauration complète PV / PM ;
-* blocage des rencontres aléatoires sur la case ;
-* rendu visuel dans le donjon ;
-* affichage sur l’automap.
-
-Statut : terminé en `v0.2`.
-
----
-
-### Phase terminée — Vrais sprites de monstres étage 1
-
-Objectif :
-
-Remplacer les placeholders.
-
-Fait :
-
-* zombie déjà présent ;
-* gobelin ajouté ;
-* chauve-souris ajoutée ;
-* troll ajouté ;
-* gardien ajouté ;
-* intégration dans `CombatMonsterDisplayUI.gd`.
-
-Résultat :
-
-Chaque monstre de l’étage 1 a une silhouette claire et reconnaissable.
-
-Statut : terminé en `v0.2`.
-
----
-
-### Phase terminée — Correction affichage héros identiques
-
-Objectif :
-
-Éviter les conflits visuels quand plusieurs héros partagent le même nom ou la même classe.
-
-Fait :
-
-* suivi des portraits et états visuels par slot de groupe ;
-* correction des cadres rouges persistants ;
-* correction des portraits damage au démarrage.
-
-Statut : terminé en `v0.2`.
-
----
-
-### Phase terminée — Amélioration audio combat / exploration
-
-Objectif :
-
-Éviter que les musiques recommencent toujours au début.
-
-Fait :
-
-* départ aléatoire sur mesure pour musique d’exploration ;
-* départ aléatoire sur mesure pour musique de combat ;
-* conservation du démarrage au début pour le thème titre ;
-* crossfade conservé.
-
-Statut : terminé en `v0.2`.
 
 ---
 
 ## 8. Priorités immédiates
 
-### Priorité très haute
+### Très haute priorité
 
-* Inventaire minimal ;
-* `ItemDatabase` minimal ;
-* sauvegarde de l’inventaire ;
-* affichage du menu Inventaire ;
-* ajout réel des drops dans l’inventaire.
+- stabiliser `v0.5.1` après le hotfix stats ;
+- vérifier sauvegarde / chargement avec stats, équipement, inventaire et or ;
+- documenter clairement l’outil temporaire de téléportation ;
+- garder `FLOOR_DESIGN.md` à jour.
 
-### Priorité haute
+### Haute priorité
 
-* Transition d’étage ;
-* création de l’étage 2 ;
-* tables de rencontre par étage.
+- achat en boutique ;
+- transition d’étage ;
+- étage 2 ;
+- tables de rencontre par étage.
 
 ### Priorité moyenne
 
-* écran de défaite / Game Over ;
-* Grimoire ;
-* Statut enrichi ;
-* polish UI ;
-* animations damage des monstres.
+- écran de défaite / Game Over ;
+- Grimoire ;
+- coffres ;
+- événements simples ;
+- Statut enrichi ;
+- polish UI ;
+- animations damage des monstres.
 
 ### Priorité basse pour l’instant
 
-* boutique ;
-* équipement complet ;
-* système économique ;
-* refactor supplémentaire du combat ;
-* coffres et pièges complexes ;
-* boss avancés.
+- boutique avancée avec stock limité ;
+- effets spéciaux d’équipement ;
+- système économique complexe ;
+- refactor important du combat ;
+- boss avancés ;
+- suppression complète de l’outil téléportation tant que les tests de layout restent fréquents.
 
 ---
 
 ## 9. Décision recommandée pour la prochaine session
 
-La prochaine étape la plus logique est :
+Deux directions sont cohérentes.
+
+### Option 1 — Stabilisation courte puis achat boutique
 
 ```text
-Créer le système d’inventaire minimal.
+v0.5.2 ou v0.6
 ```
 
-But exact :
-
-Quand un monstre droppe un objet :
+But :
 
 ```text
-→ l’objet est ajouté à l’inventaire
-→ l’inventaire est sauvegardé
-→ l’inventaire est chargé
-→ le menu Inventaire affiche l’objet
+Boutique complète minimale :
+→ vendre
+→ acheter du basique
+→ prix d’achat clair
+→ refus si inventaire plein
 ```
 
-Cette étape rendra les drops réellement fonctionnels sans encore ouvrir le chantier complexe de l’équipement.
+Avantage :
+
+- complète le système économique commencé avec `v0.5`.
+
+### Option 2 — Transition d’étage
+
+```text
+v0.6
+```
+
+But :
+
+```text
+Escalier réellement fonctionnel :
+→ quitter étage 1
+→ charger étage 2
+→ changer table de rencontre
+→ conserver groupe / inventaire / or / équipement
+```
+
+Avantage :
+
+- commence la vraie progression du jeu.
+
+Recommandation actuelle :
+
+```text
+Faire d’abord une petite passe de stabilisation sur v0.5.1,
+puis choisir entre achat boutique et transition d’étage.
+```
+
+Si la boutique actuelle reste stable, l’achat est la suite la plus naturelle.  
+Si l’objectif est de faire avancer la boucle de progression, l’étage 2 devient prioritaire.
 
 ---
 
 ## 10. Architecture cible à court terme
 
-Structure recommandée :
+Structure déjà présente ou recommandée :
 
 ```text
 res://scripts/items/
@@ -1116,43 +1349,58 @@ res://scripts/items/
 
 res://scripts/inventory/
     InventoryData.gd
+
+res://scripts/equipment/
+    EquipmentRules.gd
+
+res://scripts/shop/
+    ShopRules.gd
 ```
 
-Intégrations nécessaires :
+À envisager si `InGameMenuPanelUI.gd` devient trop lourd :
 
-* `GameSession.gd` → stocker l’inventaire courant ;
-* `SaveManager.gd` → sauvegarder / charger l’inventaire ;
-* `CombatRewards.gd` → renvoyer les `dropped_items` ;
-* `CombatManager.gd` → transmettre les drops à l’inventaire ;
-* `InGameMenuPanelUI.gd` → afficher le contenu de l’inventaire.
+```text
+res://scripts/ui/menus/
+    InventoryMenuUI.gd
+    StatusMenuUI.gd
+    EquipmentMenuUI.gd
+    ShopMenuUI.gd
+```
 
-Objectif de première version :
+À envisager pour les étages futurs :
 
-* pas d’équipement actif ;
-* pas d’utilisation d’objet ;
-* pas de boutique ;
-* uniquement stockage, sauvegarde, chargement et affichage.
+```text
+res://scripts/dungeon/
+    DungeonFloorController.gd
+    DungeonDiscoveryController.gd
+    DungeonSpecialTileController.gd
+```
 
 ---
 
 ## 11. Notes de design à conserver
 
-Décisions importantes à ne pas oublier :
+Décisions importantes :
 
-* pas de commande Défendre ;
-* combat dur et parfois injuste accepté ;
-* les compensations doivent venir du donjon, pas d’un équilibrage trop doux ;
-* les HP / MP restent en barres dans l’UI principale ;
-* les chiffres détaillés restent dans les menus ;
-* les monstres peuvent donner uniquement de l’équipement ;
-* les objets faibles servent surtout à la revente future ;
-* éviter les gros systèmes avant que les bases soient stables ;
-* conserver des scripts lisibles, commentés et découpés par responsabilité ;
-* préférer une progression modulaire plutôt qu’un gros chantier unique.
+- pas de commande Défendre ;
+- combat dur et parfois injuste accepté ;
+- les compensations doivent venir du donjon, pas d’un équilibrage trop doux ;
+- les HP / MP restent en barres dans l’UI principale ;
+- les chiffres détaillés restent dans les menus ;
+- les monstres peuvent donner surtout de l’équipement ;
+- les objets faibles servent surtout à la revente ;
+- les objets rares ne doivent pas être rendus trop accessibles en boutique ;
+- équipement retiré de l’inventaire quand équipé ;
+- bonus d’équipement simples et centralisés dans `ItemDatabase.gd` ;
+- éviter les gros systèmes avant que les bases soient stables ;
+- conserver des scripts lisibles, commentés et découpés par responsabilité ;
+- préférer une progression modulaire plutôt qu’un gros chantier unique ;
+- garder `FLOOR_DESIGN.md` comme référence pour tout nouveau symbole de layout ;
+- l’outil de téléportation est temporaire et ne doit pas rester dans une version finale.
 
 ---
 
-## 12. Historique des versions
+## 12. Historique détaillé des versions
 
 ### v0.1
 
@@ -1160,33 +1408,176 @@ Base stable du prototype.
 
 Contenu principal :
 
-* menu principal ;
-* création de groupe ;
-* exploration ;
-* combat ;
-* sauvegarde / chargement ;
-* automap ;
-* audio de base ;
-* premiers monstres et drops simples.
+- menu principal ;
+- création de groupe ;
+- exploration ;
+- combat ;
+- sauvegarde / chargement ;
+- automap ;
+- audio de base ;
+- premiers monstres et drops simples.
 
 Rôle :
 
-Point de retour stable avant l’ajout du temple de guérison.
+Point de retour stable initial.
 
 ---
 
 ### v0.2
 
-Version stable actuelle.
+Version de stabilisation visuelle et confort.
 
 Contenu principal :
 
-* temple de guérison ;
-* amélioration audio combat / exploration ;
-* correction du bug de portraits avec héros identiques ;
-* sprites dédiés pour Gobelin, Chauve-souris, Troll et Gardien ;
-* intégration complète des sprites monstres dans `CombatMonsterDisplayUI.gd`.
+- temple de guérison ;
+- amélioration audio combat / exploration ;
+- correction du bug de portraits avec héros identiques ;
+- sprites dédiés pour Gobelin, Chauve-souris, Troll et Gardien ;
+- intégration complète des sprites monstres dans `CombatMonsterDisplayUI.gd`.
 
 Rôle :
 
-Version de stabilisation visuelle et confort de jeu avant le chantier inventaire.
+Améliorer l’exploration, le combat et la lisibilité visuelle.
+
+---
+
+### v0.3
+
+Version inventaire minimal.
+
+Contenu principal :
+
+- inventaire commun au groupe ;
+- 24 emplacements ;
+- piles de 9 ;
+- drops ajoutés à l’inventaire ;
+- sauvegarde / chargement de l’inventaire ;
+- affichage simplifié de l’inventaire ;
+- base `ItemDatabase.gd`.
+
+Rôle :
+
+Rendre les drops réellement persistants et visibles.
+
+---
+
+### v0.4
+
+Version équipement de base stable.
+
+Contenu principal :
+
+- panneau d’équipement par héros ;
+- accès depuis le Statut via bouton `EQUIPEMENT` ;
+- slots Arme, Casque, Armure, Bouclier, Bijou ;
+- restrictions par classe ;
+- bonus plats de stats ;
+- équipement retiré de l’inventaire ;
+- sauvegarde / chargement de l’équipement ;
+- ajustements UI Statut / Équipement / Inventaire.
+
+Rôle :
+
+Rendre les objets utilisables par les héros.
+
+---
+
+### v0.5-unstable-shop
+
+Version boutique de vente et outils de conception.
+
+Contenu principal :
+
+- case boutique `B` ;
+- première boutique de vente ;
+- ajout de l’or ;
+- sauvegarde / chargement de l’or ;
+- affichage de l’or dans l’inventaire ;
+- rendu 3D boutique ;
+- boutique affichée sur l’automap ;
+- `FLOOR_DESIGN.md` ;
+- outil temporaire de téléportation ;
+- ajustements UI du menu d’aventure.
+
+Rôle :
+
+Poser les bases économiques et documenter la conception des étages.
+
+Statut :
+
+Version marquée comme instable côté boutique, car plusieurs systèmes ont été ajoutés rapidement.
+
+---
+
+### v0.5.1
+
+Hotfix stats héros.
+
+Contenu principal :
+
+- correction du bug où les stats des héros retombaient à `1 / 1 / 1 / 1` ;
+- conservation correcte du roll de création comme stats de base ;
+- compatibilité avec les bonus d’équipement ;
+- prise de niveau confirmée fonctionnelle.
+
+Rôle :
+
+Base actuelle corrigée pour continuer le développement après `v0.5-unstable-shop`.
+
+---
+
+## 13. Checklist de test après changements importants
+
+Après chaque ajout système, tester au minimum :
+
+```text
+[ ] Nouvelle partie
+[ ] Création de 4 héros
+[ ] Vérification des stats après entrée dans le donjon
+[ ] Combat simple
+[ ] Gain d’EXP
+[ ] Prise de niveau si possible
+[ ] Drop ajouté à l’inventaire
+[ ] Inventaire visible
+[ ] Équipement / déséquipement
+[ ] Statut mis à jour
+[ ] Vente boutique si concerné
+[ ] Or mis à jour
+[ ] Sauvegarde
+[ ] Chargement
+[ ] Vérification inventaire / équipement / or / stats après chargement
+[ ] Déplacement sur temple
+[ ] Déplacement sur boutique
+[ ] Absence de rencontre sur lieux sûrs
+[ ] Automap cohérente
+```
+
+---
+
+## 14. Notes de maintenance GitHub
+
+À chaque push, séparer clairement :
+
+```text
+Nouveaux fichiers :
+- ...
+
+Fichiers mis à jour :
+- ...
+
+Assets ajoutés :
+- ...
+
+Assets mis à jour :
+- ...
+
+À ne pas pousser :
+- *.zip
+- .godot/
+```
+
+À chaque release :
+
+- créer une sauvegarde zip locale du projet ;
+- vérifier que la release correspond bien à un point de retour utile ;
+- ne pas hésiter à nommer une release `unstable` si elle contient un système récent à stabiliser.
