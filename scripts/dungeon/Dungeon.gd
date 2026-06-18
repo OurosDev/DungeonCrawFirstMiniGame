@@ -112,6 +112,7 @@ func _ready() -> void:
 
 	connect_combat_signals()
 	connect_in_game_menu_signals()
+	connect_game_ui_command_signals()
 
 	GameSession.set_shop_available(is_shop_cell(player.grid_cell))
 	AudioManager.play_dungeon_music(current_floor_id)
@@ -122,6 +123,15 @@ func _ready() -> void:
 # ------------------------------------------------------------
 # INPUT
 # ------------------------------------------------------------
+
+func _input(event: InputEvent) -> void:
+	if input_controller == null:
+		input_controller = DungeonInputControllerScript.new()
+
+	if input_controller.has_method("handle_priority_input"):
+		if input_controller.handle_priority_input(self, event):
+			get_viewport().set_input_as_handled()
+
 
 func _unhandled_input(event: InputEvent) -> void:
 	if input_controller == null:
@@ -245,6 +255,35 @@ func connect_in_game_menu_signals() -> void:
 
 	if not game_ui.in_game_menu_quit_requested.is_connected(on_in_game_menu_quit_requested):
 		game_ui.in_game_menu_quit_requested.connect(on_in_game_menu_quit_requested)
+
+
+func connect_game_ui_command_signals() -> void:
+	if game_ui == null:
+		return
+
+	if game_ui.has_signal("exploration_command_pressed"):
+		if not game_ui.exploration_command_pressed.is_connected(on_game_ui_exploration_command_pressed):
+			game_ui.exploration_command_pressed.connect(on_game_ui_exploration_command_pressed)
+
+	if game_ui.has_signal("combat_command_pressed"):
+		if not game_ui.combat_command_pressed.is_connected(on_game_ui_combat_command_pressed):
+			game_ui.combat_command_pressed.connect(on_game_ui_combat_command_pressed)
+
+
+func on_game_ui_exploration_command_pressed(command_id: String) -> void:
+	if input_controller == null:
+		input_controller = DungeonInputControllerScript.new()
+
+	if input_controller.has_method("execute_exploration_command"):
+		input_controller.execute_exploration_command(self, command_id)
+
+
+func on_game_ui_combat_command_pressed(command_index: int) -> void:
+	if input_controller == null:
+		input_controller = DungeonInputControllerScript.new()
+
+	if input_controller.has_method("execute_combat_command_by_index"):
+		input_controller.execute_combat_command_by_index(self, command_index)
 
 
 func on_in_game_menu_save_requested() -> void:
