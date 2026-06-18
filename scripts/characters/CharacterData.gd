@@ -1,8 +1,20 @@
 extends Resource
 
+# ------------------------------------------------------------
+# DÉPENDANCES
+# Charge les bases nécessaires aux classes, sorts et équipements.
+# ------------------------------------------------------------
+
 const StatBlockScript = preload("res://scripts/core/StatBlock.gd")
 const ClassDatabaseScript = preload("res://scripts/characters/ClassDatabase.gd")
 const AbilityDatabaseScript = preload("res://scripts/abilities/AbilityDatabase.gd")
+const EquipmentRulesScript = preload("res://scripts/equipment/EquipmentRules.gd")
+
+
+# ------------------------------------------------------------
+# DONNÉES PRINCIPALES
+# Décrit l'identité, la progression et les ressources du héros.
+# ------------------------------------------------------------
 
 var character_name: String = ""
 var job: String = ""
@@ -11,14 +23,22 @@ var level: int = 1
 var exp: int = 0
 var exp_to_next: int = 20
 
+var base_stats = null
 var stats = null
 
 var hp: int = 1
 var max_hp: int = 1
-
 var mp: int = 0
 var max_mp: int = 0
 
+var equipped_items: Dictionary = {}
+var equipment_bonuses: Dictionary = {}
+
+
+# ------------------------------------------------------------
+# INITIALISATION
+# Crée un héros et prépare ses statistiques de base et effectives.
+# ------------------------------------------------------------
 
 func _init(
 	p_character_name: String = "",
@@ -30,23 +50,27 @@ func _init(
 ) -> void:
 	character_name = p_character_name
 	job = p_job
-
-	stats = StatBlockScript.new(
+	base_stats = StatBlockScript.new(
 		p_strength,
 		p_agility,
 		p_endurance,
 		p_magic_power
 	)
-
+	stats = base_stats.create_copy()
+	equipped_items = EquipmentRulesScript.create_empty_equipment()
+	equipment_bonuses = create_empty_bonus_dictionary()
+	recalculate_equipment_stats()
 	recalculate_derived_stats(true)
 
 
 # ------------------------------------------------------------
 # CLASSE
+# Fournit les données de classe et les capacités disponibles.
 # ------------------------------------------------------------
 
 func get_class_data():
 	return ClassDatabaseScript.get_class_data(job)
+
 
 func get_possible_ability_ids() -> Array[String]:
 	var class_data = get_class_data()
@@ -71,11 +95,162 @@ func get_first_available_ability_id_by_kind(
 		discovered_ability_ids,
 		ability_kind
 	)
+
+
+# ------------------------------------------------------------
+# STATISTIQUES ET ÉQUIPEMENT
+# Calcule les statistiques finales depuis les stats de base et les bonus équipés.
+# ------------------------------------------------------------
+
+func ensure_stat_blocks() -> void:
+	if base_stats == null:
+		if stats != null:
+			base_stats = stats.create_copy()
+		else:
+			base_stats = StatBlockScript.new()
+
+	if stats == null:
+		stats = base_stats.create_copy()
+
+
+func ensure_equipment() -> void:
+	if equipped_items == null or not (equipped_items is Dictionary):
+		equipped_items = EquipmentRulesScript.create_empty_equipment()
+
+	for slot_id in EquipmentRulesScript.get_slot_order():
+		if not equipped_items.has(slot_id):
+			equipped_items[slot_id] = ""
+
+	if equipment_bonuses == null or not (equipment_bonuses is Dictionary):
+		equipment_bonuses = create_empty_bonus_dictionary()
+
+
+func recalculate_equipment_stats() -> void:
+	ensure_stat_blocks()
+	ensure_equipment()
+
+	equipment_bonuses = EquipmentRulesScript.get_total_stat_bonuses(equipped_items)
+
+	stats.strength = int(base_stats.strength) + int(equipment_bonuses.get("strength", 0))
+	stats.agility = int(base_stats.agility) + int(equipment_bonuses.get("agility", 0))
+	stats.endurance = int(base_stats.endurance) + int(equipment_bonuses.get("endurance", 0))
+	stats.magic_power = int(base_stats.magic_power) + int(equipment_bonuses.get("magic_power", 0))
+
+
+func get_base_stat_value(stat_name: String) -> int:
+	ensure_stat_blocks()
+
+	if stat_name == "strength":
+		return int(base_stats.strength)
+
+	if stat_name == "agility":
+		return int(base_stats.agility)
+
+	if stat_name == "endurance":
+		return int(base_stats.endurance)
+
+	if stat_name == "magic_power" or stat_name == "magic":
+		return int(base_stats.magic_power)
+
+	return 0
+
+
+func get_equipment_bonus_value(stat_name: String) -> int:
+	recalculate_equipment_stats()
+
+	if stat_name == "magic":
+		stat_name = "magic_power"
+
+	return int(equipment_bonuses.get(stat_name, 0))
+
+
+func get_effective_stat_value(stat_name: String) -> int:
+	recalculate_equipment_stats()
+
+	if stat_name == "strength":
+		return int(stats.strength)
+
+	if stat_name == "agility":
+		return int(stats.agility)
+
+	if stat_name == "endurance":
+		return int(stats.endurance)
+
+	if stat_name == "magic_power" or stat_name == "magic":
+		return int(stats.magic_power)
+
+	return 0
+
+
+func create_empty_bonus_dictionary() -> Dictionary:
+	return {
+		"strength": 0,
+		"agility": 0,
+		"endurance": 0,
+		"magic_power": 0
+	}
+
+
+# ------------------------------------------------------------
+# ÉQUIPEMENT
+# Lit et modifie les objets équipés par slot.
+# ------------------------------------------------------------
+
+func get_equipped_item(slot_id: String) -> String:
+	ensure_equipment()
+	return str(equipped_items.get(slot_id, ""))
+
+
+func set_equipped_item(slot_id: String, item_id: String) -> void:
+	ensure_equipment()
+
+	if not EquipmentRulesScript.is_valid_slot(slot_id):
+		return
+
+	equipped_items[slot_id] = item_id.strip_edges().to_lower()
+	recalculate_equipment_stats()
+	recalculate_derived_stats(false)
+
+
+func clear_equipped_item(slot_id: String) -> void:
+	set_equipped_item(slot_id, "")
+
+
+func get_equipment_save_data() -> Dictionary:
+	ensure_equipment()
+
+	var save_data: Dictionary = {}
+
+	for slot_id in EquipmentRulesScript.get_slot_order():
+		var item_id: String = str(equipped_items.get(slot_id, ""))
+
+		if item_id == "":
+			continue
+
+		save_data[slot_id] = item_id
+
+	return save_data
+
+
+func load_equipment_save_data(save_data) -> void:
+	equipped_items = EquipmentRulesScript.create_empty_equipment()
+
+	if save_data is Dictionary:
+		for slot_id in EquipmentRulesScript.get_slot_order():
+			equipped_items[slot_id] = str(save_data.get(slot_id, ""))
+
+	recalculate_equipment_stats()
+	recalculate_derived_stats(false)
+
+
 # ------------------------------------------------------------
 # CALCULS DÉRIVÉS
+# Calcule les HP/MP depuis les statistiques finales.
 # ------------------------------------------------------------
 
 func recalculate_derived_stats(full_restore: bool = false) -> void:
+	recalculate_equipment_stats()
+
 	var class_data = get_class_data()
 
 	max_hp = class_data.base_hp + stats.endurance * 3 + (level - 1) * 2
@@ -95,9 +270,16 @@ func recalculate_derived_stats(full_restore: bool = false) -> void:
 		if mp > max_mp:
 			mp = max_mp
 
+		if mp < 0:
+			mp = 0
+
+		if hp < 0:
+			hp = 0
+
 
 # ------------------------------------------------------------
 # ÉTAT DU HÉROS
+# Gère les HP courants du héros.
 # ------------------------------------------------------------
 
 func is_alive() -> bool:
@@ -120,9 +302,12 @@ func heal(amount: int) -> void:
 
 # ------------------------------------------------------------
 # COMBAT
+# Calcule les dégâts et les commandes à partir des statistiques finales.
 # ------------------------------------------------------------
 
 func roll_attack_damage() -> int:
+	recalculate_equipment_stats()
+
 	var base_damage: int = randi_range(1, 4)
 	var strength_bonus: int = stats.get_strength_modifier()
 	var class_data = get_class_data()
@@ -131,6 +316,8 @@ func roll_attack_damage() -> int:
 
 
 func roll_spell_damage(base_min: int, base_max: int) -> int:
+	recalculate_equipment_stats()
+
 	var base_damage: int = randi_range(base_min, base_max)
 	var magic_bonus: int = stats.get_magic_modifier()
 
@@ -156,6 +343,7 @@ func get_combat_commands() -> Array[String]:
 
 # ------------------------------------------------------------
 # EXPÉRIENCE ET NIVEAUX
+# Fait évoluer les statistiques de base, puis recalcule les stats finales.
 # ------------------------------------------------------------
 
 func gain_exp(amount: int) -> String:
@@ -172,39 +360,37 @@ func gain_exp(amount: int) -> String:
 
 func level_up() -> String:
 	level += 1
-
 	apply_level_growth()
 	recalculate_derived_stats(true)
-
 	exp_to_next = int(float(exp_to_next) * 1.4)
 
 	return character_name + " atteint le niveau " + str(level) + " !"
 
 
 func apply_level_growth() -> void:
+	ensure_stat_blocks()
+
 	if job == "Guerrier":
-		stats.strength += 1
-		stats.endurance += 1
-
+		base_stats.strength += 1
+		base_stats.endurance += 1
 	elif job == "Voleuse":
-		stats.agility += 1
+		base_stats.agility += 1
 
 		if randi_range(1, 2) == 1:
-			stats.strength += 1
+			base_stats.strength += 1
 		else:
-			stats.endurance += 1
-
+			base_stats.endurance += 1
 	elif job == "Mage":
-		stats.magic_power += 1
+		base_stats.magic_power += 1
 
 		if randi_range(1, 2) == 1:
-			stats.agility += 1
+			base_stats.agility += 1
 		else:
-			stats.endurance += 1
-
+			base_stats.endurance += 1
 	elif job == "Prêtresse":
-		stats.magic_power += 1
-		stats.endurance += 1
-
+		base_stats.magic_power += 1
+		base_stats.endurance += 1
 	else:
-		stats.endurance += 1
+		base_stats.endurance += 1
+
+	recalculate_equipment_stats()
