@@ -1,6 +1,8 @@
 extends Node
 class_name CombatManager
 
+signal battle_finished(result_status: String, enemy)
+
 # ------------------------------------------------------------
 # DÉPENDANCES
 # Regroupe les bases de données et contrôleurs utilisés par le combat.
@@ -19,15 +21,11 @@ const CombatRewardsScript = preload("res://scripts/combat/CombatRewards.gd")
 # ------------------------------------------------------------
 
 var in_combat: bool = false
-
 var party: Array = []
 var current_enemy = null
-
 var turn_order_controller = null
 var rewards_controller = null
-
 var battle_log: String = ""
-
 var random_encounter_chance: float = 0.18
 
 
@@ -39,8 +37,8 @@ var random_encounter_chance: float = 0.18
 var waiting_for_damage_acknowledgement: bool = false
 var pending_damage_hero = null
 var pending_damage_should_end_defeat: bool = false
-
 var dodge_feedback_hero = null
+
 
 func _ready() -> void:
 	ensure_turn_order_controller()
@@ -66,7 +64,6 @@ func check_random_encounter(p_party: Array) -> bool:
 
 	var enemy = create_random_encounter_enemy()
 	start_battle(p_party, enemy)
-
 	return true
 
 
@@ -76,7 +73,6 @@ func start_battle(p_party: Array, enemy = null) -> void:
 
 	party = p_party
 	in_combat = true
-
 	reset_pending_damage_acknowledgement()
 	clear_dodge_feedback()
 
@@ -199,7 +195,6 @@ func acknowledge_pending_damage() -> bool:
 		return false
 
 	var should_end_defeat: bool = pending_damage_should_end_defeat
-
 	waiting_for_damage_acknowledgement = false
 	pending_damage_hero = null
 	pending_damage_should_end_defeat = false
@@ -249,6 +244,7 @@ func handle_after_enemy_action(log_parts: Array[String]) -> void:
 	advance_to_next_living_hero()
 	battle_log = join_log(log_parts)
 
+
 # ------------------------------------------------------------
 # FEEDBACK D’ESQUIVE
 # Mémorise brièvement le héros qui vient d’éviter une attaque.
@@ -294,10 +290,7 @@ func get_current_commands(active_hero_override = null) -> Array[String]:
 	if active_hero.has_method("get_combat_commands"):
 		return active_hero.get_combat_commands()
 
-	return [
-		"Attaquer",
-		"Fuir"
-	]
+	return [ "Attaquer", "Fuir" ]
 
 
 func get_current_enemy():
@@ -340,15 +333,13 @@ func hero_attack() -> void:
 		return
 
 	var damage: int = roll_hero_attack_damage(active_hero)
-
 	apply_damage_to_enemy(damage)
 
 	if damage > 0:
 		AudioManager.play_sfx("monster_hit")
-
-	log_parts.append(
-		get_hero_name(active_hero) + " attaque " + get_enemy_name() + " pour " + str(damage) + " dégâts."
-	)
+		log_parts.append(
+			get_hero_name(active_hero) + " attaque " + get_enemy_name() + " pour " + str(damage) + " dégâts."
+		)
 
 	if is_enemy_defeated():
 		end_battle_victory(log_parts)
@@ -380,19 +371,16 @@ func hero_use_first_available_magic() -> void:
 	hero_pay_ability_cost(active_hero, ability)
 
 	var log_parts: Array[String] = []
-
 	var damage: int = roll_hero_spell_power(active_hero, ability)
 
 	AudioManager.play_sfx("spell")
-
 	apply_damage_to_enemy(damage)
 
 	if damage > 0:
 		AudioManager.play_sfx("monster_hit")
-
-	log_parts.append(
-		get_hero_name(active_hero) + " lance " + get_ability_name(ability) + " sur " + get_enemy_name() + " pour " + str(damage) + " dégâts."
-	)
+		log_parts.append(
+			get_hero_name(active_hero) + " lance " + get_ability_name(ability) + " sur " + get_enemy_name() + " pour " + str(damage) + " dégâts."
+		)
 
 	if is_enemy_defeated():
 		end_battle_victory(log_parts)
@@ -430,12 +418,10 @@ func hero_use_first_available_heal() -> void:
 	hero_pay_ability_cost(active_hero, ability)
 
 	var log_parts: Array[String] = []
-
 	var heal_amount: int = roll_hero_spell_power(active_hero, ability)
+
 	apply_heal_to_hero(heal_target, heal_amount)
-
 	AudioManager.play_sfx("heal")
-
 	log_parts.append(
 		get_hero_name(active_hero) + " lance " + get_ability_name(ability) + " sur " + get_hero_name(heal_target) + "."
 	)
@@ -458,7 +444,9 @@ func try_escape() -> void:
 	AudioManager.play_sfx("escape")
 
 	if escape_roll <= 60:
+		var escaped_enemy = current_enemy
 		battle_log = "Le groupe prend la fuite."
+		battle_finished.emit("escape", escaped_enemy)
 		reset_combat_state()
 		return
 
@@ -512,7 +500,6 @@ func enemy_attack() -> String:
 
 	if not roll_physical_attack_hits(current_enemy, target):
 		register_dodge_feedback(target)
-
 		return get_enemy_name() + " attaque " + get_hero_name(target) + ", mais " + get_hero_name(target) + " esquive."
 
 	var damage: int = roll_enemy_attack_damage()
@@ -601,7 +588,6 @@ func is_enemy_defeated() -> bool:
 		return true
 
 	var enemy_hp: int = get_int_property(current_enemy, "hp", 0)
-
 	return enemy_hp <= 0
 
 
@@ -624,7 +610,6 @@ func is_hero_alive(hero) -> bool:
 		return hero.is_alive()
 
 	var hp: int = get_int_property(hero, "hp", 0)
-
 	return hp > 0
 
 
@@ -636,11 +621,11 @@ func is_hero_alive(hero) -> bool:
 func end_battle_victory(log_parts: Array[String]) -> void:
 	ensure_rewards_controller()
 
+	var defeated_enemy = current_enemy
 	var reward_result: Dictionary = rewards_controller.resolve_victory(
 		party,
-		current_enemy
+		defeated_enemy
 	)
-
 	var reward_log_lines = reward_result.get("log_lines", [])
 
 	if reward_log_lines is Array:
@@ -648,15 +633,15 @@ func end_battle_victory(log_parts: Array[String]) -> void:
 			log_parts.append(str(line))
 
 	battle_log = join_log(log_parts)
-
+	battle_finished.emit("victory", defeated_enemy)
 	reset_combat_state()
 
 
 func end_battle_defeat(log_parts: Array[String]) -> void:
+	var defeated_by_enemy = current_enemy
 	log_parts.append("Le groupe est vaincu.")
-
 	battle_log = join_log(log_parts)
-
+	battle_finished.emit("defeat", defeated_by_enemy)
 	reset_combat_state()
 
 
@@ -674,7 +659,6 @@ func roll_physical_attack_hits(attacker, defender) -> bool:
 
 	var attack_score: int = get_accuracy_score(attacker) + randi_range(1, 20)
 	var evasion_score: int = get_evasion_score(defender) + randi_range(1, 20)
-
 	return attack_score >= evasion_score
 
 
@@ -743,7 +727,7 @@ func get_monster_accuracy_score(monster) -> int:
 	if monster_id == "troll":
 		return 11
 
-	if monster_id == "gardien":
+	if monster_id == "gardien" or monster_id == "gardien_boss_etage_2":
 		return 14
 
 	return 10
@@ -764,7 +748,7 @@ func get_monster_evasion_score(monster) -> int:
 	if monster_id == "troll":
 		return 4
 
-	if monster_id == "gardien":
+	if monster_id == "gardien" or monster_id == "gardien_boss_etage_2":
 		return 9
 
 	return 6
@@ -832,7 +816,6 @@ func roll_hero_spell_power(hero, ability) -> int:
 		max_power = min_power
 
 	var amount: int = randi_range(min_power, max_power)
-
 	var uses_magic_modifier: bool = get_bool_property(
 		ability,
 		"uses_magic_modifier",
@@ -914,7 +897,6 @@ func apply_heal_to_hero(hero, amount: int) -> void:
 
 	var hp: int = get_int_property(hero, "hp", 0)
 	var max_hp: int = get_int_property(hero, "max_hp", hp)
-
 	hp += heal_amount
 
 	if hp > max_hp:
@@ -1001,7 +983,6 @@ func is_ability_available_for_basic_use(hero, ability) -> bool:
 
 	var ability_id: String = get_string_property(ability, "ability_id", "")
 	var discovery_id: String = get_string_property(ability, "discovery_id", "")
-
 	return hero_has_discovered_ability(hero, ability_id, discovery_id)
 
 
@@ -1034,7 +1015,6 @@ func hero_has_discovered_ability(
 
 			if container.has(discovery_id):
 				return true
-
 		elif container is Dictionary:
 			if container.has(ability_id):
 				return true
@@ -1063,7 +1043,6 @@ func hero_can_pay_ability_cost(hero, ability) -> bool:
 		return hero.can_spend_mp(mp_cost)
 
 	var current_mp: int = get_int_property(hero, "mp", 0)
-
 	return current_mp >= mp_cost
 
 
@@ -1204,7 +1183,6 @@ func object_has_property(target, property_name: String) -> bool:
 
 func normalize_identifier(text: String) -> String:
 	var normalized: String = text.strip_edges().to_lower()
-
 	normalized = normalized.replace(" ", "_")
 	normalized = normalized.replace("-", "_")
 	normalized = normalized.replace("é", "e")
@@ -1220,7 +1198,6 @@ func normalize_identifier(text: String) -> String:
 	normalized = normalized.replace("ô", "o")
 	normalized = normalized.replace("ö", "o")
 	normalized = normalized.replace("ç", "c")
-
 	return normalized
 
 
