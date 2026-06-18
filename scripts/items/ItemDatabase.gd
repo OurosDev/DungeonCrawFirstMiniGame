@@ -11,10 +11,22 @@ const ItemDataScript = preload("res://scripts/items/ItemData.gd")
 
 # ------------------------------------------------------------
 # CONSTANTES
-# Définit les limites communes des objets de l'inventaire v0.3.
+# Définit les limites communes des objets de l'inventaire et de l'équipement.
 # ------------------------------------------------------------
 
 const DEFAULT_MAX_STACK: int = 9
+
+const SLOT_NONE: String = ""
+const SLOT_WEAPON: String = "weapon"
+const SLOT_HELMET: String = "helmet"
+const SLOT_ARMOR: String = "armor"
+const SLOT_SHIELD: String = "shield"
+const SLOT_JEWELRY: String = "jewelry"
+
+const JOB_WARRIOR: String = "Guerrier"
+const JOB_THIEF: String = "Voleuse"
+const JOB_MAGE: String = "Mage"
+const JOB_CLERIC: String = "Prêtresse"
 
 
 # ------------------------------------------------------------
@@ -37,7 +49,10 @@ static func get_item_data(item_id: String):
 		str(data.get("item_type", "misc")),
 		str(data.get("description", "")),
 		int(data.get("sell_value", 0)),
-		int(data.get("max_stack", DEFAULT_MAX_STACK))
+		int(data.get("max_stack", DEFAULT_MAX_STACK)),
+		str(data.get("equipment_slot", SLOT_NONE)),
+		create_string_array(data.get("allowed_classes", [])),
+		create_bonus_dictionary(data.get("stat_bonuses", {}))
 	)
 
 
@@ -70,10 +85,36 @@ static func get_max_stack(item_id: String) -> int:
 	return max(1, int(item.max_stack))
 
 
+static func get_equipment_slot(item_id: String) -> String:
+	var item = get_item_data(item_id)
+	return str(item.equipment_slot)
+
+
+static func get_allowed_classes(item_id: String) -> Array[String]:
+	var item = get_item_data(item_id)
+	return item.allowed_classes.duplicate()
+
+
+static func get_stat_bonuses(item_id: String) -> Dictionary:
+	var item = get_item_data(item_id)
+	return item.stat_bonuses.duplicate(true)
+
+
+static func is_equippable(item_id: String) -> bool:
+	return get_equipment_slot(item_id) != SLOT_NONE
+
+
+static func can_item_be_equipped_by_class(item_id: String, job_name: String) -> bool:
+	var item = get_item_data(item_id)
+	return item.can_be_equipped_by_class(job_name)
+
+
 static func get_all_item_ids() -> Array[String]:
 	var ids: Array[String] = []
+
 	for item_id in get_item_definitions().keys():
 		ids.append(str(item_id))
+
 	ids.sort()
 	return ids
 
@@ -85,119 +126,176 @@ static func get_all_item_ids() -> Array[String]:
 
 static func get_item_definitions() -> Dictionary:
 	return {
-		"rusty_sword": create_item_definition(
+		"rusty_sword": create_equippable_item_definition(
 			"Épée rouillée",
 			"weapon",
-			"Une vieille lame piquée par la rouille. Peu fiable, mais revendable.",
-			4
+			"Une vieille lame piquée par la rouille. Peu fiable, mais encore utilisable.",
+			4,
+			SLOT_WEAPON,
+			[JOB_WARRIOR, JOB_THIEF, JOB_CLERIC],
+			{"strength": 1}
 		),
-		"worn_tunic": create_item_definition(
+		"worn_tunic": create_equippable_item_definition(
 			"Tunique usée",
 			"armor",
-			"Une tunique élimée qui a déjà beaucoup servi.",
-			2
+			"Une tunique élimée qui offre une protection minimale.",
+			2,
+			SLOT_ARMOR,
+			[JOB_WARRIOR, JOB_THIEF, JOB_MAGE, JOB_CLERIC],
+			{"endurance": 1}
 		),
-		"cracked_shield": create_item_definition(
+		"cracked_shield": create_equippable_item_definition(
 			"Bouclier fendu",
 			"shield",
-			"Un petit bouclier fissuré, encore bon pour quelques pièces.",
-			3
+			"Un petit bouclier fissuré, encore capable d'encaisser un choc.",
+			3,
+			SLOT_SHIELD,
+			[JOB_WARRIOR, JOB_CLERIC],
+			{"endurance": 1}
 		),
-		"torn_cloak": create_item_definition(
+		"torn_cloak": create_equippable_item_definition(
 			"Cape déchirée",
 			"armor",
-			"Une cape sombre et abîmée par les griffes et l'humidité.",
-			2
+			"Une cape sombre et abîmée qui facilite les mouvements discrets.",
+			2,
+			SLOT_ARMOR,
+			[JOB_THIEF, JOB_MAGE, JOB_CLERIC],
+			{"agility": 1}
 		),
-		"fragile_dagger": create_item_definition(
+		"fragile_dagger": create_equippable_item_definition(
 			"Dague fragile",
 			"weapon",
 			"Une dague légère dont la pointe menace de céder.",
-			3
+			3,
+			SLOT_WEAPON,
+			[JOB_THIEF, JOB_MAGE],
+			{"agility": 1}
 		),
-		"tarnished_ring": create_item_definition(
+		"tarnished_ring": create_equippable_item_definition(
 			"Anneau terni",
 			"accessory",
 			"Un anneau sans éclat, couvert d'une fine couche de crasse.",
-			5
+			5,
+			SLOT_JEWELRY,
+			[JOB_WARRIOR, JOB_THIEF, JOB_MAGE, JOB_CLERIC],
+			{"magic_power": 1}
 		),
-		"goblin_dagger": create_item_definition(
+		"goblin_dagger": create_equippable_item_definition(
 			"Dague gobeline",
 			"weapon",
 			"Une lame courte, sale et mal équilibrée, typique des gobelins.",
-			6
+			6,
+			SLOT_WEAPON,
+			[JOB_THIEF],
+			{"agility": 2}
 		),
-		"short_bow": create_item_definition(
+		"short_bow": create_equippable_item_definition(
 			"Arc court",
 			"weapon",
 			"Un arc simple, usé mais encore souple.",
-			7
+			7,
+			SLOT_WEAPON,
+			[JOB_THIEF],
+			{"agility": 1}
 		),
-		"leather_vest": create_item_definition(
+		"leather_vest": create_equippable_item_definition(
 			"Gilet de cuir",
 			"armor",
 			"Un gilet de cuir léger, marqué par les coups.",
-			6
+			6,
+			SLOT_ARMOR,
+			[JOB_WARRIOR, JOB_THIEF, JOB_CLERIC],
+			{"endurance": 1}
 		),
-		"small_shield": create_item_definition(
+		"small_shield": create_equippable_item_definition(
 			"Petit bouclier",
 			"shield",
 			"Un bouclier rond et basique, facile à transporter.",
-			5
+			5,
+			SLOT_SHIELD,
+			[JOB_WARRIOR, JOB_THIEF, JOB_CLERIC],
+			{"endurance": 1}
 		),
-		"heavy_club": create_item_definition(
+		"heavy_club": create_equippable_item_definition(
 			"Masse lourde",
 			"weapon",
 			"Une arme primitive, lourde, mais dangereuse entre de bonnes mains.",
-			10
+			10,
+			SLOT_WEAPON,
+			[JOB_WARRIOR, JOB_CLERIC],
+			{"strength": 2}
 		),
-		"reinforced_leather": create_item_definition(
+		"reinforced_leather": create_equippable_item_definition(
 			"Cuir renforcé",
 			"armor",
 			"Une protection de cuir épais renforcée par des plaques grossières.",
-			9
+			9,
+			SLOT_ARMOR,
+			[JOB_WARRIOR, JOB_CLERIC],
+			{"endurance": 2}
 		),
-		"chipped_axe": create_item_definition(
+		"chipped_axe": create_equippable_item_definition(
 			"Hache ébréchée",
 			"weapon",
 			"Une hache brutale dont le tranchant a souffert.",
-			8
+			8,
+			SLOT_WEAPON,
+			[JOB_WARRIOR],
+			{"strength": 2}
 		),
-		"thick_boots": create_item_definition(
+		"thick_boots": create_equippable_item_definition(
 			"Bottes épaisses",
 			"armor",
 			"Des bottes lourdes qui protègent bien les pieds.",
-			6
+			6,
+			SLOT_ARMOR,
+			[JOB_WARRIOR, JOB_THIEF, JOB_CLERIC],
+			{"endurance": 1}
 		),
-		"trollhide_vest": create_item_definition(
+		"trollhide_vest": create_equippable_item_definition(
 			"Gilet de peau de troll",
 			"armor",
 			"Un gilet répugnant, solide et étonnamment résistant.",
-			18
+			18,
+			SLOT_ARMOR,
+			[JOB_WARRIOR],
+			{"endurance": 3}
 		),
-		"ancient_blade": create_item_definition(
+		"ancient_blade": create_equippable_item_definition(
 			"Lame ancienne",
 			"weapon",
 			"Une lame ancienne dont le métal garde une lueur froide.",
-			16
+			16,
+			SLOT_WEAPON,
+			[JOB_WARRIOR],
+			{"strength": 3}
 		),
-		"guardian_mail": create_item_definition(
+		"guardian_mail": create_equippable_item_definition(
 			"Cotte gardienne",
 			"armor",
 			"Une cotte lourde portée par un ancien protecteur du donjon.",
-			18
+			18,
+			SLOT_ARMOR,
+			[JOB_WARRIOR],
+			{"endurance": 3}
 		),
-		"stone_amulet": create_item_definition(
+		"stone_amulet": create_equippable_item_definition(
 			"Amulette de pierre",
 			"accessory",
 			"Une amulette gravée de signes presque effacés.",
-			14
+			14,
+			SLOT_JEWELRY,
+			[JOB_WARRIOR, JOB_THIEF, JOB_MAGE, JOB_CLERIC],
+			{"endurance": 1, "magic_power": 1}
 		),
-		"ancient_shield": create_item_definition(
+		"ancient_shield": create_equippable_item_definition(
 			"Bouclier ancien",
 			"shield",
 			"Un bouclier massif, usé par le temps mais encore imposant.",
-			17
+			17,
+			SLOT_SHIELD,
+			[JOB_WARRIOR],
+			{"endurance": 2}
 		),
 		"guardian_relic": create_item_definition(
 			"Relique de gardien",
@@ -220,7 +318,32 @@ static func create_item_definition(
 		"item_type": item_type,
 		"description": description,
 		"sell_value": sell_value,
-		"max_stack": max_stack
+		"max_stack": max_stack,
+		"equipment_slot": SLOT_NONE,
+		"allowed_classes": [],
+		"stat_bonuses": {}
+	}
+
+
+static func create_equippable_item_definition(
+	display_name: String,
+	item_type: String,
+	description: String,
+	sell_value: int,
+	equipment_slot: String,
+	allowed_classes: Array[String],
+	stat_bonuses: Dictionary,
+	max_stack: int = DEFAULT_MAX_STACK
+) -> Dictionary:
+	return {
+		"display_name": display_name,
+		"item_type": item_type,
+		"description": description,
+		"sell_value": sell_value,
+		"max_stack": max_stack,
+		"equipment_slot": equipment_slot,
+		"allowed_classes": allowed_classes.duplicate(),
+		"stat_bonuses": stat_bonuses.duplicate(true)
 	}
 
 
@@ -241,9 +364,41 @@ static func create_unknown_item(item_id: String):
 		"misc",
 		"Objet non répertorié dans la base de données.",
 		0,
-		DEFAULT_MAX_STACK
+		DEFAULT_MAX_STACK,
+		SLOT_NONE,
+		[],
+		{}
 	)
 
 
+# ------------------------------------------------------------
+# HELPERS
+# Normalise et protège les données venant des dictionnaires.
+# ------------------------------------------------------------
+
 static func normalize_item_id(item_id: String) -> String:
 	return item_id.strip_edges().to_lower()
+
+
+static func create_string_array(raw_value) -> Array[String]:
+	var values: Array[String] = []
+
+	if not (raw_value is Array):
+		return values
+
+	for value in raw_value:
+		values.append(str(value))
+
+	return values
+
+
+static func create_bonus_dictionary(raw_value) -> Dictionary:
+	var bonuses: Dictionary = {}
+
+	if not (raw_value is Dictionary):
+		return bonuses
+
+	for key in raw_value.keys():
+		bonuses[str(key)] = int(raw_value[key])
+
+	return bonuses
