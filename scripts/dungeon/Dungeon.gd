@@ -1,24 +1,42 @@
 extends Node3D
 
+# ------------------------------------------------------------
+# CONSTANTES
+# ------------------------------------------------------------
+
 const CELL_SIZE: float = 2.0
+
 const HEALING_TEMPLE_TILE: String = "O"
 const SHOP_TILE: String = "B"
 const BOSS_TILE: String = "X"
 const STAIRS_UP_TILE: String = "<"
+const CHEST_TILE: String = "C"
+const MESSAGE_TILE: String = "M"
+const CLOSED_DOOR_TILE: String = "D"
+const OPEN_DOOR_TILE: String = "d"
+const LOCKED_DOOR_TILE: String = "L"
+
+const BOSS_KEY_ITEM_ID: String = "boss_door_key_floor_2"
 
 const SHOP_DISCOVERY_MESSAGE: String = "Un marchand s'est installé dans une alcôve.\nAppuyez sur Échap pour accéder à la boutique dans le menu."
 const INACTIVE_STAIRS_MESSAGE: String = "Un escalier descend plus profondément, mais le passage n'est pas encore accessible."
 const STAIRS_UP_MESSAGE: String = "Le groupe remonte vers l'étage supérieur."
 const BOSS_PLACEHOLDER_MESSAGE: String = "Une présence menaçante bloque cette zone.\nLe boss de cet étage sera ajouté plus tard."
 
+const PARTY_CREATION_SCENE_PATH: String = "res://scenes/PartyCreation.tscn"
+const MAIN_MENU_SCENE_PATH: String = "res://scenes/MainMenu.tscn"
+
+
+# ------------------------------------------------------------
+# DÉPENDANCES
+# ------------------------------------------------------------
+
 const DungeonThemeDataScript = preload("res://scripts/dungeon/DungeonThemeData.gd")
 const FloorDatabaseScript = preload("res://scripts/dungeon/FloorDatabase.gd")
 const MonsterDatabaseScript = preload("res://scripts/monsters/MonsterDatabase.gd")
 const DungeonInputControllerScript = preload("res://scripts/dungeon/DungeonInputController.gd")
 const DungeonSaveControllerScript = preload("res://scripts/dungeon/DungeonSaveController.gd")
-
-const PARTY_CREATION_SCENE_PATH: String = "res://scenes/PartyCreation.tscn"
-const MAIN_MENU_SCENE_PATH: String = "res://scenes/MainMenu.tscn"
+const ItemDatabaseScript = preload("res://scripts/items/ItemDatabase.gd")
 
 
 # ------------------------------------------------------------
@@ -37,6 +55,9 @@ const MAIN_MENU_SCENE_PATH: String = "res://scenes/MainMenu.tscn"
 
 var discovered_ability_ids: Array[String] = []
 var ability_discovery_locations: Dictionary = {}
+var chest_definitions: Dictionary = {}
+var message_definitions: Dictionary = {}
+var locked_door_definitions: Dictionary = {}
 var discovered_map_cells: Dictionary = {}
 
 var current_floor_theme = null
@@ -53,7 +74,6 @@ var stairs_up_cell: Vector2i = Vector2i(-1, -1)
 
 var party: Array = []
 var selected_combat_command: int = 0
-
 var input_controller = null
 var save_controller = null
 
@@ -86,7 +106,6 @@ func _ready() -> void:
 	connect_in_game_menu_signals()
 
 	GameSession.set_shop_available(is_shop_cell(player.grid_cell))
-
 	AudioManager.play_dungeon_music(current_floor_id)
 
 	refresh_ui()
@@ -156,17 +175,26 @@ func load_floor(
 ) -> void:
 	current_floor_id = floor_id
 	GameSession.current_floor_id = current_floor_id
-	current_floor_data = FloorDatabaseScript.get_floor_data(current_floor_id)
 
+	current_floor_data = FloorDatabaseScript.get_floor_data(current_floor_id)
 	layout = current_floor_data.layout.duplicate()
+
 	stairs_down_cell = current_floor_data.stairs_down_cell
 	stairs_up_cell = current_floor_data.stairs_up_cell
 
 	ability_discovery_locations.clear()
+	chest_definitions.clear()
+	message_definitions.clear()
+	locked_door_definitions.clear()
 	discovered_map_cells.clear()
 
 	current_floor_theme = create_current_floor_theme()
+
 	setup_ability_discoveries()
+	setup_chests()
+	setup_messages()
+	setup_locked_doors()
+
 	apply_floor_state_from_session(current_floor_id)
 
 	var target_spawn_cell: Vector2i = spawn_cell
@@ -175,6 +203,7 @@ func load_floor(
 		target_spawn_cell = current_floor_data.player_start_cell
 
 	player.move_to_cell(target_spawn_cell)
+
 	build_current_floor()
 
 	if game_ui != null:
@@ -213,7 +242,8 @@ func build_current_floor() -> void:
 
 # ------------------------------------------------------------
 # ÉTATS D'ÉTAGE
-# Sauvegarde en session les portes ouvertes et cellules découvertes par étage.
+# Sauvegarde en session les portes ouvertes, coffres ouverts
+# et cellules découvertes par étage via le layout courant.
 # ------------------------------------------------------------
 
 # Stocke l'état de l'étage courant avant une transition ou une sauvegarde.
@@ -283,7 +313,6 @@ func restore_discovered_map_cells(serialized_cells) -> void:
 			int(cell_data.get("x", 0)),
 			int(cell_data.get("y", 0))
 		)
-
 		discovered_map_cells[cell] = true
 
 
@@ -325,7 +354,7 @@ func discover_visible_line(
 		if tile == "#":
 			return
 
-		if tile == "D":
+		if tile == CLOSED_DOOR_TILE or tile == LOCKED_DOOR_TILE:
 			return
 
 
@@ -383,6 +412,180 @@ func get_ability_discovery_message(discovery_id: String) -> String:
 		return "Vous trouvez un symbole sacré ancien.\nLe groupe découvre le sort : Soin majeur.\nUne Prêtresse de niveau 4 pourra l'utiliser."
 
 	return "Le groupe découvre un savoir magique oublié."
+
+
+# ------------------------------------------------------------
+# COFFRES
+# ------------------------------------------------------------
+
+func setup_chests() -> void:
+	chest_definitions.clear()
+
+	if current_floor_data == null:
+		return
+
+	for cell in current_floor_data.chest_definitions.keys():
+		chest_definitions[cell] = current_floor_data.chest_definitions[cell].duplicate(true)
+
+
+func check_chest() -> bool:
+	var current_cell: Vector2i = player.grid_cell
+
+	if get_layout_tile(current_cell) != CHEST_TILE:
+		return false
+
+	var chest_data: Dictionary = get_chest_data(current_cell)
+	var reward_message: String = open_chest_at(current_cell, chest_data)
+
+	if combat_manager != null:
+		combat_manager.battle_log = reward_message
+
+	return true
+
+
+func get_chest_data(cell: Vector2i) -> Dictionary:
+	if chest_definitions.has(cell):
+		var chest_data = chest_definitions[cell]
+
+		if chest_data is Dictionary:
+			return chest_data.duplicate(true)
+
+	return {}
+
+
+func open_chest_at(cell: Vector2i, chest_data: Dictionary) -> String:
+	var gold_amount: int = max(0, int(chest_data.get("gold", 0)))
+	var item_id: String = str(chest_data.get("item_id", "")).strip_edges().to_lower()
+	var message_lines: Array[String] = ["Le groupe ouvre un coffre."]
+
+	if item_id != "":
+		if not GameSession.can_add_inventory_item(item_id, 1):
+			return "Le coffre contient " + ItemDatabaseScript.get_display_name(item_id) + ",\nmais l'inventaire est plein."
+
+		var add_result: Dictionary = GameSession.add_inventory_item(item_id, 1)
+
+		if not bool(add_result.get("success", false)):
+			return "Impossible de récupérer le contenu du coffre."
+
+		message_lines.append("Vous obtenez : " + ItemDatabaseScript.get_display_name(item_id) + ".")
+
+	if gold_amount > 0:
+		GameSession.add_gold(gold_amount)
+		message_lines.append("Vous trouvez " + str(gold_amount) + " or.")
+
+	if item_id == "" and gold_amount <= 0:
+		message_lines.append("Il est vide.")
+
+	set_layout_tile(cell, ".")
+	discover_cell(cell)
+
+	if dungeon_renderer != null:
+		build_current_floor()
+
+	return "\n".join(message_lines)
+
+
+# ------------------------------------------------------------
+# MESSAGES / INDICES
+# ------------------------------------------------------------
+
+func setup_messages() -> void:
+	message_definitions.clear()
+
+	if current_floor_data == null:
+		return
+
+	for cell in current_floor_data.message_definitions.keys():
+		message_definitions[cell] = str(current_floor_data.message_definitions[cell])
+
+
+func check_message_tile() -> bool:
+	var current_cell: Vector2i = player.grid_cell
+
+	if get_layout_tile(current_cell) != MESSAGE_TILE:
+		return false
+
+	var message: String = get_message_for_cell(current_cell)
+
+	if combat_manager != null:
+		combat_manager.battle_log = message
+
+	return true
+
+
+func get_message_for_cell(cell: Vector2i) -> String:
+	if message_definitions.has(cell):
+		return str(message_definitions[cell])
+
+	return "Une inscription ancienne est trop effacée pour être lue."
+
+
+# ------------------------------------------------------------
+# PORTES VERROUILLÉES
+# ------------------------------------------------------------
+
+func setup_locked_doors() -> void:
+	locked_door_definitions.clear()
+
+	if current_floor_data == null:
+		return
+
+	for cell in current_floor_data.locked_door_definitions.keys():
+		locked_door_definitions[cell] = current_floor_data.locked_door_definitions[cell].duplicate(true)
+
+
+func is_locked_door_cell(cell: Vector2i) -> bool:
+	if not is_inside_map(cell):
+		return false
+
+	return get_layout_tile(cell) == LOCKED_DOOR_TILE
+
+
+func try_unlock_locked_door_at(cell: Vector2i) -> bool:
+	var door_data: Dictionary = get_locked_door_data(cell)
+	var required_item_id: String = str(door_data.get("required_item_id", BOSS_KEY_ITEM_ID)).strip_edges().to_lower()
+
+	if required_item_id == "":
+		return false
+
+	if GameSession.get_inventory_item_quantity(required_item_id) <= 0:
+		var locked_message: String = str(door_data.get("locked_message", "Cette porte est verrouillée."))
+
+		if combat_manager != null:
+			combat_manager.battle_log = locked_message
+
+		return false
+
+	if not GameSession.remove_inventory_item(required_item_id, 1):
+		if combat_manager != null:
+			combat_manager.battle_log = "La clé est introuvable dans l'inventaire."
+
+		return false
+
+	set_layout_tile(cell, OPEN_DOOR_TILE)
+	discover_cell(cell)
+
+	if dungeon_renderer != null:
+		dungeon_renderer.set_door_open(cell)
+
+	var unlocked_message: String = str(door_data.get("unlocked_message", "La porte se déverrouille."))
+
+	if combat_manager != null:
+		combat_manager.battle_log = unlocked_message
+
+	AudioManager.play_sfx("door")
+
+	return true
+
+
+func get_locked_door_data(cell: Vector2i) -> Dictionary:
+	if locked_door_definitions.has(cell):
+		var door_data = locked_door_definitions[cell]
+
+		if door_data is Dictionary:
+			return door_data.duplicate(true)
+
+	return {}
 
 
 # ------------------------------------------------------------
@@ -450,16 +653,22 @@ func try_move_to_cell(target: Vector2i) -> void:
 	if not is_walkable(target):
 		return
 
+	if is_locked_door_cell(target):
+		if not try_unlock_locked_door_at(target):
+			refresh_ui()
+			return
+
 	if is_closed_door_cell(target):
 		open_door_at(target)
 
 	player.move_to_cell(target)
-
 	AudioManager.play_sfx("step")
 
 	discover_around_player()
 
 	var found_discovery: bool = check_ability_discovery()
+	var found_chest: bool = check_chest()
+	var found_message: bool = check_message_tile()
 	var found_stairs: bool = check_stairs()
 	var found_temple: bool = check_healing_temple()
 	var found_shop: bool = check_shop()
@@ -467,7 +676,15 @@ func try_move_to_cell(target: Vector2i) -> void:
 
 	GameSession.set_shop_available(is_shop_cell(player.grid_cell))
 
-	if not found_discovery and not found_stairs and not found_temple and not found_shop and not found_boss_marker:
+	if (
+		not found_discovery
+		and not found_chest
+		and not found_message
+		and not found_stairs
+		and not found_temple
+		and not found_shop
+		and not found_boss_marker
+	):
 		check_random_encounter_for_current_floor()
 
 	if combat_manager != null:
@@ -478,7 +695,7 @@ func try_move_to_cell(target: Vector2i) -> void:
 
 
 func open_door_at(cell: Vector2i) -> void:
-	set_layout_tile(cell, "d")
+	set_layout_tile(cell, OPEN_DOOR_TILE)
 	discover_cell(cell)
 
 	if dungeon_renderer != null:
@@ -492,7 +709,6 @@ func set_layout_tile(cell: Vector2i, new_tile: String) -> void:
 	var row: String = layout[cell.y]
 	var before: String = row.substr(0, cell.x)
 	var after: String = row.substr(cell.x + 1)
-
 	layout[cell.y] = before + new_tile + after
 
 
@@ -501,8 +717,7 @@ func is_closed_door_cell(cell: Vector2i) -> bool:
 		return false
 
 	var tile: String = get_layout_tile(cell)
-
-	return tile == "D"
+	return tile == CLOSED_DOOR_TILE
 
 
 func turn_left() -> void:
@@ -577,6 +792,7 @@ func transition_to_floor(
 	destination_cell: Vector2i = Vector2i(-1, -1)
 ) -> void:
 	store_current_floor_state()
+
 	GameSession.current_floor_id = next_floor_id
 	load_floor(next_floor_id, destination_cell)
 	GameSession.set_shop_available(is_shop_cell(player.grid_cell))
@@ -741,6 +957,13 @@ func debug_teleport_to_cell(target_cell: Vector2i) -> Dictionary:
 			"message": "Case non marchable : " + str(target_cell)
 		}
 
+	if is_locked_door_cell(target_cell):
+		if not try_unlock_locked_door_at(target_cell):
+			return {
+				"success": false,
+				"message": "Porte verrouillée : clé requise."
+			}
+
 	if is_closed_door_cell(target_cell):
 		open_door_at(target_cell)
 
@@ -748,12 +971,22 @@ func debug_teleport_to_cell(target_cell: Vector2i) -> Dictionary:
 	discover_around_player()
 
 	var found_discovery: bool = check_ability_discovery()
+	var found_chest: bool = check_chest()
+	var found_message: bool = check_message_tile()
 	var found_stairs: bool = check_stairs()
 	var found_temple: bool = check_healing_temple()
 	var found_shop: bool = check_shop()
 	var found_boss_marker: bool = check_boss_marker()
 
-	if not found_discovery and not found_stairs and not found_temple and not found_shop and not found_boss_marker:
+	if (
+		not found_discovery
+		and not found_chest
+		and not found_message
+		and not found_stairs
+		and not found_temple
+		and not found_shop
+		and not found_boss_marker
+	):
 		if combat_manager != null:
 			combat_manager.battle_log = "Téléportation de test vers " + str(target_cell) + "."
 

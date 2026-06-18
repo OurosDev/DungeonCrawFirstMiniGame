@@ -1,9 +1,7 @@
 extends Node3D
-
 class_name DungeonRenderer
 
 const DungeonThemeDataScript = preload("res://scripts/dungeon/DungeonThemeData.gd")
-
 
 # ------------------------------------------------------------
 # ORIENTATION DES LIEUX SPÉCIAUX
@@ -39,9 +37,11 @@ var ceiling_patch_material: StandardMaterial3D
 
 var wall_material: StandardMaterial3D
 var brick_line_material: StandardMaterial3D
+
 var rune_material: StandardMaterial3D
 
 var door_material: StandardMaterial3D
+var locked_door_material: StandardMaterial3D
 var door_frame_material: StandardMaterial3D
 var door_line_material: StandardMaterial3D
 var door_handle_material: StandardMaterial3D
@@ -57,6 +57,11 @@ var shop_gold_material: StandardMaterial3D
 var boss_marker_material: StandardMaterial3D
 var boss_glow_material: StandardMaterial3D
 var stair_marker_material: StandardMaterial3D
+
+var chest_wood_material: StandardMaterial3D
+var chest_metal_material: StandardMaterial3D
+var message_stone_material: StandardMaterial3D
+var message_rune_material: StandardMaterial3D
 
 
 # ------------------------------------------------------------
@@ -99,6 +104,7 @@ func build_dungeon(
 	for y in range(current_layout.size()):
 		for x in range(current_layout[y].length()):
 			var tile: String = current_layout[y].substr(x, 1)
+			var cell: Vector2i = Vector2i(x, y)
 
 			if tile == "#":
 				create_wall_tile(x, y)
@@ -109,17 +115,23 @@ func build_dungeon(
 					create_ceiling_tile(x, y)
 
 				if tile == "D":
-					create_closed_door_tile(Vector2i(x, y))
+					create_closed_door_tile(cell)
+				elif tile == "L":
+					create_locked_door_tile(cell)
 				elif tile == "d":
-					create_open_door_tile(Vector2i(x, y))
+					create_open_door_tile(cell)
 				elif tile == "O":
-					create_healing_temple_tile(Vector2i(x, y))
+					create_healing_temple_tile(cell)
 				elif tile == "B":
-					create_shop_tile(Vector2i(x, y))
+					create_shop_tile(cell)
+				elif tile == "C":
+					create_chest_tile(cell)
+				elif tile == "M":
+					create_message_tile(cell)
 				elif tile == "X":
-					create_boss_marker_tile(Vector2i(x, y))
+					create_boss_marker_tile(cell)
 				elif tile == ">" or tile == "<":
-					create_stair_marker_tile(Vector2i(x, y), tile)
+					create_stair_marker_tile(cell, tile)
 
 	create_ability_discovery_markers(ability_discovery_locations)
 
@@ -152,9 +164,11 @@ func create_materials() -> void:
 
 	wall_material = create_material(current_theme.wall_color)
 	brick_line_material = create_material(current_theme.brick_line_color)
+
 	rune_material = create_material(current_theme.rune_color)
 
 	door_material = create_material(current_theme.door_color)
+	locked_door_material = create_material(Color(0.20, 0.07, 0.035, 1.0))
 	door_frame_material = create_material(current_theme.door_frame_color)
 	door_line_material = create_material(current_theme.door_line_color)
 	door_handle_material = create_material(current_theme.door_handle_color)
@@ -171,11 +185,15 @@ func create_materials() -> void:
 	boss_glow_material = create_material(Color(0.95, 0.10, 0.05, 1.0))
 	stair_marker_material = create_material(Color(0.50, 0.36, 0.12, 1.0))
 
+	chest_wood_material = create_material(Color(0.34, 0.16, 0.055, 1.0))
+	chest_metal_material = create_material(Color(0.78, 0.55, 0.20, 1.0))
+	message_stone_material = create_material(Color(0.30, 0.30, 0.28, 1.0))
+	message_rune_material = create_material(Color(0.35, 0.78, 0.90, 1.0))
+
 
 func create_material(color: Color) -> StandardMaterial3D:
 	var material: StandardMaterial3D = StandardMaterial3D.new()
 	material.albedo_color = color
-
 	return material
 
 
@@ -185,7 +203,6 @@ func create_light() -> void:
 	light.name = "DungeonLight"
 	light.rotation_degrees = Vector3(-60.0, 30.0, 0.0)
 	light.light_energy = current_theme.light_energy
-
 	generated_root.add_child(light)
 
 
@@ -398,11 +415,7 @@ func create_wall_tile(x: int, y: int) -> void:
 	create_box(
 		"Wall",
 		Vector3(cell_size, current_theme.wall_height, cell_size),
-		Vector3(
-			float(x) * cell_size,
-			current_theme.wall_center_y,
-			float(y) * cell_size
-		),
+		Vector3(float(x) * cell_size, current_theme.wall_center_y, float(y) * cell_size),
 		wall_material
 	)
 
@@ -459,11 +472,7 @@ func create_wall_brick_face_east(x: int, y: int) -> void:
 func create_horizontal_brick_lines_x(wall_x: float, wall_z: float) -> void:
 	var line_depth: float = 0.025
 	var line_height: float = 0.035
-	var y_values: Array[float] = [
-		0.0,
-		0.5,
-		1.0
-	]
+	var y_values: Array[float] = [0.0, 0.5, 1.0]
 
 	for y_value in y_values:
 		create_box(
@@ -477,11 +486,7 @@ func create_horizontal_brick_lines_x(wall_x: float, wall_z: float) -> void:
 func create_horizontal_brick_lines_z(wall_x: float, wall_z: float) -> void:
 	var line_depth: float = 0.025
 	var line_height: float = 0.035
-	var y_values: Array[float] = [
-		0.0,
-		0.5,
-		1.0
-	]
+	var y_values: Array[float] = [0.0, 0.5, 1.0]
 
 	for y_value in y_values:
 		create_box(
@@ -496,12 +501,7 @@ func create_vertical_brick_lines_x(wall_x: float, wall_z: float) -> void:
 	var line_width: float = 0.035
 	var line_depth: float = 0.025
 	var row_height: float = 0.42
-	var row_centers: Array[float] = [
-		-0.25,
-		0.25,
-		0.75,
-		1.25
-	]
+	var row_centers: Array[float] = [-0.25, 0.25, 0.75, 1.25]
 
 	for row_index in range(row_centers.size()):
 		var row_y: float = row_centers[row_index]
@@ -520,7 +520,6 @@ func create_vertical_brick_lines_x(wall_x: float, wall_z: float) -> void:
 				Vector3(wall_x - 0.50, row_y, wall_z),
 				brick_line_material
 			)
-
 			create_box(
 				"BrickVerticalLine",
 				Vector3(line_width, row_height, line_depth),
@@ -533,12 +532,7 @@ func create_vertical_brick_lines_z(wall_x: float, wall_z: float) -> void:
 	var line_width: float = 0.035
 	var line_depth: float = 0.025
 	var row_height: float = 0.42
-	var row_centers: Array[float] = [
-		-0.25,
-		0.25,
-		0.75,
-		1.25
-	]
+	var row_centers: Array[float] = [-0.25, 0.25, 0.75, 1.25]
 
 	for row_index in range(row_centers.size()):
 		var row_y: float = row_centers[row_index]
@@ -557,7 +551,6 @@ func create_vertical_brick_lines_z(wall_x: float, wall_z: float) -> void:
 				Vector3(wall_x, row_y, wall_z - 0.50),
 				brick_line_material
 			)
-
 			create_box(
 				"BrickVerticalLine",
 				Vector3(line_depth, row_height, line_width),
@@ -576,7 +569,6 @@ func create_door_visual_root(cell: Vector2i) -> Node3D:
 
 	var root: Node3D = Node3D.new()
 	root.name = "Door_" + str(cell.x) + "_" + str(cell.y)
-
 	generated_root.add_child(root)
 	door_visuals[cell] = root
 
@@ -624,10 +616,17 @@ func get_door_center(cell: Vector2i) -> Vector3:
 
 
 func create_closed_door_tile(cell: Vector2i) -> void:
+	create_door_tile(cell, door_material, false)
+
+
+func create_locked_door_tile(cell: Vector2i) -> void:
+	create_door_tile(cell, locked_door_material, true)
+
+
+func create_door_tile(cell: Vector2i, panel_material: Material, has_lock_plate: bool) -> void:
 	var root: Node3D = create_door_visual_root(cell)
 	var orientation: String = get_door_orientation(cell)
 	var center: Vector3 = get_door_center(cell)
-
 	var door_width: float = cell_size * current_theme.door_width_ratio
 	var door_height: float = current_theme.door_height
 	var door_thickness: float = current_theme.door_thickness
@@ -637,21 +636,37 @@ func create_closed_door_tile(cell: Vector2i) -> void:
 			"ClosedDoorPanel",
 			Vector3(door_width, door_height, door_thickness),
 			center,
-			door_material,
+			panel_material,
 			root
 		)
-
 		create_closed_door_details_x(root, center, door_width, door_height, door_thickness)
+
+		if has_lock_plate:
+			create_box(
+				"LockPlate",
+				Vector3(0.22, 0.22, door_thickness + 0.08),
+				Vector3(center.x, center.y + 0.10, center.z),
+				door_handle_material,
+				root
+			)
 	else:
 		create_box(
 			"ClosedDoorPanel",
 			Vector3(door_thickness, door_height, door_width),
 			center,
-			door_material,
+			panel_material,
 			root
 		)
-
 		create_closed_door_details_z(root, center, door_width, door_height, door_thickness)
+
+		if has_lock_plate:
+			create_box(
+				"LockPlate",
+				Vector3(door_thickness + 0.08, 0.22, 0.22),
+				Vector3(center.x, center.y + 0.10, center.z),
+				door_handle_material,
+				root
+			)
 
 
 func create_closed_door_details_x(
@@ -774,7 +789,6 @@ func create_open_door_tile(cell: Vector2i) -> void:
 	var root: Node3D = create_door_visual_root(cell)
 	var orientation: String = get_door_orientation(cell)
 	var center: Vector3 = get_door_center(cell)
-
 	var door_width: float = cell_size * current_theme.door_width_ratio
 	var door_height: float = current_theme.door_height
 	var door_thickness: float = current_theme.door_thickness
@@ -861,56 +875,14 @@ func create_healing_temple_tile(cell: Vector2i) -> void:
 		float(cell.y) * cell_size
 	)
 	root.rotation.y = SPECIAL_TILE_WEST_FACING_ROTATION_Y
-
 	generated_root.add_child(root)
 
-	create_box(
-		"TempleBase",
-		Vector3(1.15, 0.18, 1.15),
-		Vector3(0.0, 0.09, 0.0),
-		temple_stone_material,
-		root
-	)
-
-	create_box(
-		"TempleAltar",
-		Vector3(0.75, 0.35, 0.75),
-		Vector3(0.0, 0.35, 0.0),
-		temple_stone_material,
-		root
-	)
-
-	create_box(
-		"TempleWater",
-		Vector3(0.52, 0.04, 0.52),
-		Vector3(0.0, 0.55, 0.0),
-		temple_water_material,
-		root
-	)
-
-	create_box(
-		"TempleLight",
-		Vector3(0.25, 0.25, 0.25),
-		Vector3(0.0, 0.82, 0.0),
-		temple_light_material,
-		root
-	)
-
-	create_box(
-		"TemplePillarLeft",
-		Vector3(0.16, 0.55, 0.16),
-		Vector3(-0.42, 0.38, -0.42),
-		temple_stone_material,
-		root
-	)
-
-	create_box(
-		"TemplePillarRight",
-		Vector3(0.16, 0.55, 0.16),
-		Vector3(0.42, 0.38, -0.42),
-		temple_stone_material,
-		root
-	)
+	create_box("TempleBase", Vector3(1.15, 0.18, 1.15), Vector3(0.0, 0.09, 0.0), temple_stone_material, root)
+	create_box("TempleAltar", Vector3(0.75, 0.35, 0.75), Vector3(0.0, 0.35, 0.0), temple_stone_material, root)
+	create_box("TempleWater", Vector3(0.52, 0.04, 0.52), Vector3(0.0, 0.55, 0.0), temple_water_material, root)
+	create_box("TempleLight", Vector3(0.25, 0.25, 0.25), Vector3(0.0, 0.82, 0.0), temple_light_material, root)
+	create_box("TemplePillarLeft", Vector3(0.16, 0.55, 0.16), Vector3(-0.42, 0.38, -0.42), temple_stone_material, root)
+	create_box("TemplePillarRight", Vector3(0.16, 0.55, 0.16), Vector3(0.42, 0.38, -0.42), temple_stone_material, root)
 
 	var glow: OmniLight3D = OmniLight3D.new()
 	glow.name = "TempleGlow"
@@ -918,7 +890,6 @@ func create_healing_temple_tile(cell: Vector2i) -> void:
 	glow.light_color = Color(0.45, 0.95, 1.0, 1.0)
 	glow.light_energy = 0.65
 	glow.omni_range = 2.3
-
 	root.add_child(glow)
 
 
@@ -937,56 +908,14 @@ func create_shop_tile(cell: Vector2i) -> void:
 		float(cell.y) * cell_size
 	)
 	root.rotation.y = SPECIAL_TILE_WEST_FACING_ROTATION_Y
-
 	generated_root.add_child(root)
 
-	create_box(
-		"ShopCounter",
-		Vector3(1.35, 0.34, 0.55),
-		Vector3(0.0, 0.18, 0.18),
-		shop_wood_material,
-		root
-	)
-
-	create_box(
-		"ShopBackShelf",
-		Vector3(1.45, 0.80, 0.18),
-		Vector3(0.0, 0.48, -0.55),
-		shop_wood_material,
-		root
-	)
-
-	create_box(
-		"ShopShelfLine",
-		Vector3(1.45, 0.06, 0.22),
-		Vector3(0.0, 0.58, -0.48),
-		shop_gold_material,
-		root
-	)
-
-	create_box(
-		"ShopCloth",
-		Vector3(1.15, 0.06, 0.50),
-		Vector3(0.0, 0.38, 0.18),
-		shop_cloth_material,
-		root
-	)
-
-	create_box(
-		"ShopCoinA",
-		Vector3(0.16, 0.06, 0.16),
-		Vector3(-0.34, 0.44, 0.05),
-		shop_gold_material,
-		root
-	)
-
-	create_box(
-		"ShopCoinB",
-		Vector3(0.14, 0.06, 0.14),
-		Vector3(-0.16, 0.44, 0.10),
-		shop_gold_material,
-		root
-	)
+	create_box("ShopCounter", Vector3(1.35, 0.34, 0.55), Vector3(0.0, 0.18, 0.18), shop_wood_material, root)
+	create_box("ShopBackShelf", Vector3(1.45, 0.80, 0.18), Vector3(0.0, 0.48, -0.55), shop_wood_material, root)
+	create_box("ShopShelfLine", Vector3(1.45, 0.06, 0.22), Vector3(0.0, 0.58, -0.48), shop_gold_material, root)
+	create_box("ShopCloth", Vector3(1.15, 0.06, 0.50), Vector3(0.0, 0.38, 0.18), shop_cloth_material, root)
+	create_box("ShopCoinA", Vector3(0.16, 0.06, 0.16), Vector3(-0.34, 0.44, 0.05), shop_gold_material, root)
+	create_box("ShopCoinB", Vector3(0.14, 0.06, 0.14), Vector3(-0.16, 0.44, 0.10), shop_gold_material, root)
 
 	var glow: OmniLight3D = OmniLight3D.new()
 	glow.name = "ShopWarmGlow"
@@ -994,9 +923,51 @@ func create_shop_tile(cell: Vector2i) -> void:
 	glow.light_color = Color(1.0, 0.62, 0.28, 1.0)
 	glow.light_energy = 0.38
 	glow.omni_range = 2.0
-
 	root.add_child(glow)
 
+
+# ------------------------------------------------------------
+# COFFRES
+# ------------------------------------------------------------
+
+# Crée un coffre basique en 3D sur une case "C".
+func create_chest_tile(cell: Vector2i) -> void:
+	var root: Node3D = Node3D.new()
+	root.name = "Chest_" + str(cell.x) + "_" + str(cell.y)
+	root.position = Vector3(
+		float(cell.x) * cell_size,
+		current_theme.floor_y + 0.08,
+		float(cell.y) * cell_size
+	)
+	generated_root.add_child(root)
+
+	create_box("ChestBase", Vector3(0.86, 0.36, 0.62), Vector3(0.0, 0.18, 0.0), chest_wood_material, root)
+	create_box("ChestLid", Vector3(0.92, 0.16, 0.68), Vector3(0.0, 0.44, 0.0), chest_wood_material, root)
+	create_box("ChestBandFront", Vector3(0.96, 0.08, 0.05), Vector3(0.0, 0.34, -0.35), chest_metal_material, root)
+	create_box("ChestBandBack", Vector3(0.96, 0.08, 0.05), Vector3(0.0, 0.34, 0.35), chest_metal_material, root)
+	create_box("ChestLock", Vector3(0.16, 0.18, 0.06), Vector3(0.0, 0.30, -0.38), chest_metal_material, root)
+
+
+# ------------------------------------------------------------
+# MESSAGES / INDICES
+# ------------------------------------------------------------
+
+# Crée une petite stèle lisible pour une case "M".
+func create_message_tile(cell: Vector2i) -> void:
+	var root: Node3D = Node3D.new()
+	root.name = "MessageMarker_" + str(cell.x) + "_" + str(cell.y)
+	root.position = Vector3(
+		float(cell.x) * cell_size,
+		current_theme.floor_y + 0.08,
+		float(cell.y) * cell_size
+	)
+	generated_root.add_child(root)
+
+	create_box("MessageBase", Vector3(0.65, 0.12, 0.48), Vector3(0.0, 0.06, 0.0), message_stone_material, root)
+	create_box("MessageStone", Vector3(0.48, 0.72, 0.12), Vector3(0.0, 0.45, -0.08), message_stone_material, root)
+	create_box("MessageRuneA", Vector3(0.34, 0.035, 0.04), Vector3(0.0, 0.55, -0.16), message_rune_material, root)
+	create_box("MessageRuneB", Vector3(0.26, 0.035, 0.04), Vector3(0.0, 0.42, -0.16), message_rune_material, root)
+	create_box("MessageRuneC", Vector3(0.30, 0.035, 0.04), Vector3(0.0, 0.29, -0.16), message_rune_material, root)
 
 
 # ------------------------------------------------------------
@@ -1014,7 +985,6 @@ func create_stair_marker_tile(cell: Vector2i, stair_symbol: String) -> void:
 		current_theme.floor_y + 0.09,
 		float(cell.y) * cell_size
 	)
-
 	generated_root.add_child(root)
 
 	var direction_offset: float = 0.18
@@ -1022,29 +992,9 @@ func create_stair_marker_tile(cell: Vector2i, stair_symbol: String) -> void:
 	if stair_symbol == "<":
 		direction_offset = -0.18
 
-	create_box(
-		"StairSlabA",
-		Vector3(0.90, 0.06, 0.22),
-		Vector3(0.0, 0.03, -0.28 + direction_offset),
-		stair_marker_material,
-		root
-	)
-
-	create_box(
-		"StairSlabB",
-		Vector3(0.70, 0.06, 0.22),
-		Vector3(0.0, 0.08, 0.0 + direction_offset),
-		stair_marker_material,
-		root
-	)
-
-	create_box(
-		"StairSlabC",
-		Vector3(0.50, 0.06, 0.22),
-		Vector3(0.0, 0.13, 0.28 + direction_offset),
-		stair_marker_material,
-		root
-	)
+	create_box("StairSlabA", Vector3(0.90, 0.06, 0.22), Vector3(0.0, 0.03, -0.28 + direction_offset), stair_marker_material, root)
+	create_box("StairSlabB", Vector3(0.70, 0.06, 0.22), Vector3(0.0, 0.08, 0.0 + direction_offset), stair_marker_material, root)
+	create_box("StairSlabC", Vector3(0.50, 0.06, 0.22), Vector3(0.0, 0.13, 0.28 + direction_offset), stair_marker_material, root)
 
 
 # ------------------------------------------------------------
@@ -1061,32 +1011,11 @@ func create_boss_marker_tile(cell: Vector2i) -> void:
 		current_theme.floor_y + 0.08,
 		float(cell.y) * cell_size
 	)
-
 	generated_root.add_child(root)
 
-	create_box(
-		"BossBase",
-		Vector3(0.80, 0.10, 0.80),
-		Vector3(0.0, 0.05, 0.0),
-		boss_marker_material,
-		root
-	)
-
-	create_box(
-		"BossObelisk",
-		Vector3(0.32, 0.90, 0.32),
-		Vector3(0.0, 0.52, 0.0),
-		boss_marker_material,
-		root
-	)
-
-	create_box(
-		"BossGlow",
-		Vector3(0.42, 0.08, 0.42),
-		Vector3(0.0, 1.02, 0.0),
-		boss_glow_material,
-		root
-	)
+	create_box("BossBase", Vector3(0.80, 0.10, 0.80), Vector3(0.0, 0.05, 0.0), boss_marker_material, root)
+	create_box("BossObelisk", Vector3(0.32, 0.90, 0.32), Vector3(0.0, 0.52, 0.0), boss_marker_material, root)
+	create_box("BossGlow", Vector3(0.42, 0.08, 0.42), Vector3(0.0, 1.02, 0.0), boss_glow_material, root)
 
 	var glow: OmniLight3D = OmniLight3D.new()
 	glow.name = "BossMarkerGlow"
@@ -1094,7 +1023,6 @@ func create_boss_marker_tile(cell: Vector2i) -> void:
 	glow.light_color = Color(0.95, 0.10, 0.05, 1.0)
 	glow.light_energy = 0.35
 	glow.omni_range = 1.8
-
 	root.add_child(glow)
 
 
@@ -1102,9 +1030,7 @@ func create_boss_marker_tile(cell: Vector2i) -> void:
 # MARQUEURS DE DÉCOUVERTE
 # ------------------------------------------------------------
 
-func create_ability_discovery_markers(
-	ability_discovery_locations: Dictionary
-) -> void:
+func create_ability_discovery_markers(ability_discovery_locations: Dictionary) -> void:
 	ability_discovery_markers.clear()
 
 	for cell_key in ability_discovery_locations.keys():
@@ -1114,14 +1040,12 @@ func create_ability_discovery_markers(
 			current_theme.floor_y + 0.09,
 			float(cell.y) * cell_size
 		)
-
 		var marker: MeshInstance3D = create_box(
 			"RuneMarker",
 			Vector3(0.6, 0.06, 0.6),
 			marker_position,
 			rune_material
 		)
-
 		ability_discovery_markers[cell] = marker
 
 
@@ -1147,5 +1071,4 @@ func is_wall_cell(cell: Vector2i) -> bool:
 		return true
 
 	var tile: String = current_layout[cell.y].substr(cell.x, 1)
-
 	return tile == "#"
