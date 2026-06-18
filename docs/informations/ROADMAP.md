@@ -13,40 +13,38 @@ Objectifs de conception :
 - combats au tour par tour ;
 - progression par étages ;
 - difficulté parfois brutale, compensée par l'exploration, la préparation et la gestion des ressources ;
-- documentation claire avant les ajouts de contenu.
-
----
+- documentation claire avant les ajouts de contenu majeurs.
 
 ## 2. Base de travail actuelle
 
-Version stable actuelle : `v0.8.1`
+Version stable actuelle : `v0.8.2`
 
-Release : `v0.8.1 — Stabilisation playtest et scaling fenêtre`
+Release : `v0.8.2 — Refactorisations internes et stabilisation technique`
 
 Cette base contient :
 
 1. la boucle complète `v0.7.1` : création de groupe, exploration, étage 2, coffres, messages, clé du gardien, porte verrouillée, boss et retour titre après K.O. ;
 2. les contrôles `v0.8` : souris, clavier AZERTY, commandes de combat et d'exploration plus accessibles ;
-3. la stabilisation `v0.8.1` : renderer `Compatibility / OpenGL`, scaling de fenêtre `canvas_items + keep`, playtest 01 documenté, builds/logs hors repo.
+3. la stabilisation `v0.8.1` : renderer `Compatibility / OpenGL`, scaling de fenêtre `canvas_items + keep`, playtest 01 documenté, builds/logs hors repo ;
+4. les refactorisations `v0.8.2` : extraction progressive de helpers depuis les grands contrôleurs du menu, du combat, du donjon, de la session et de la création d'équipe.
 
 Historique détaillé : voir `CHANGELOG/README.md` et les fichiers `CHANGELOG/vX.Y.md`.
-
----
 
 ## 3. Documents de référence
 
 ```text
-ROADMAP.md                         Direction actuelle et prochaines priorités
-TECHNICAL_DEBT.md                  Refactorisations utiles et dette technique connue
-ASSISTANT_WORKFLOW.md              Règles de collaboration avec l'assistant
-IA_RELAIS.md                       Passage de main entre conversations
-CHANGELOG/README.md                Historique synthétique des versions
-CHANGELOG/*.md                     Détail par version
-audits/STATE_AUDITvX.Y.Z.md        Photographies d'état du repo
-playtests/README.md                Règles de documentation des playtests
-playtests/PLAYTEST_XX_vX.Y.md      Synthèses propres des tests
-docs/dungeon/FLOOR_DESIGN.md       Règles de conception des étages et symboles
-docs/dungeon/FLOOR_VISUALIZER.md   Visualisation des layouts et variantes
+IA_RELAIS.md                              Passage de main entre conversations
+ASSISTANT_WORKFLOW.md                     Règles de collaboration avec l'assistant
+README.md                                 Présentation publique du projet
+CHANGELOG/README.md                       Historique synthétique des versions
+CHANGELOG/*.md                            Détail par version
+audits/STATE_AUDITvX.Y.Z.md               Photographies d'état du repo
+docs/informations/ROADMAP.md              Direction actuelle et prochaines priorités
+docs/informations/TECHNICAL_DEBT.md       Refactorisations utiles et dette technique connue
+docs/dungeon/FLOOR_DESIGN.md              Règles de conception des étages et symboles
+docs/dungeon/FLOOR_VISUALIZER.md          Visualisation des layouts et variantes
+playtests/README.md                       Règles de documentation des playtests
+playtests/PLAYTEST_XX_vX.Y.md             Synthèses propres des tests
 ```
 
 Rôle de `ROADMAP.md` : rester court, actuel et décisionnel.
@@ -57,9 +55,7 @@ Rôle de `ROADMAP.md` : rester court, actuel et décisionnel.
 - longues notes de refactorisation ;
 - instructions de collaboration avec l'assistant ;
 - détails exhaustifs des layouts ;
-- listes longues de systèmes déjà terminés.
-
----
+- listes trop longues de systèmes déjà terminés.
 
 ## 4. Systèmes fonctionnels importants
 
@@ -124,18 +120,19 @@ Rôle de `ROADMAP.md` : rester court, actuel et décisionnel.
 - `E` agit comme retour.
 - Scaling fenêtre stabilisé par `canvas_items + keep`.
 
-### Playtest et stabilité
+### Architecture après v0.8.2
 
-- Premier playtest externe documenté dans `playtests/PLAYTEST_01_v0.8.md`.
-- Crashs natifs Windows non reproduits localement, traités comme problème de renderer/export.
-- Builds Windows de playtest à exporter par défaut en `Compatibility / OpenGL`.
-- Logs bruts, builds et sauvegardes testeurs hors repo.
+Plusieurs grands scripts restent les points d'entrée principaux, mais délèguent maintenant des responsabilités spécialisées :
 
----
+- `InGameMenuPanelUI.gd` délègue les écrans de menu à `scripts/ui/menu/` ;
+- `CombatManager.gd` délègue plusieurs règles de combat à des resolvers/helpers ;
+- `Dungeon.gd` délègue des helpers de carte, d'état d'étage et d'automap ;
+- `GameSession.gd` délègue des helpers d'état d'étage, boutique et équipement ;
+- `PartyCreationUI.gd` délègue la construction UI, la création des héros et les résumés.
 
 ## 5. Priorité de reprise
 
-Avant d'ajouter beaucoup de contenu, faire une passe courte de stabilisation documentaire, technique et ergonomique à partir de la base `v0.8.1`.
+Après `v0.8.2`, le projet dispose d'une base plus saine pour reprendre soit le polish post-playtest, soit les premiers ajouts visibles de contenu.
 
 Axes à décider ensemble :
 
@@ -143,24 +140,22 @@ Axes à décider ensemble :
 A. Finaliser / poursuivre le playtest 01 sur base Compatibility / OpenGL
 B. Corriger les éventuels retours de confort issus du playtest
 C. Améliorer les feedbacks de progression, mort, boss, coffres et sauvegarde
-D. Faire des refactorisations légères sans casser la boucle jouable
+D. Centraliser les symboles et règles de cases du donjon
 E. Préparer le contenu suivant : étage 3, combats fixes F, grimoire, événements
 ```
 
 Recommandation actuelle :
 
 ```text
-Prochaine version probable : v0.8.2 ou v0.9
-Objectif v0.8.2 : correctifs / polish / documentation / confort post-playtest
+Prochaine version probable : v0.8.3 ou v0.9
+Objectif v0.8.3 : polish / confort / documentation / correctifs post-playtest
 Objectif v0.9 : nouveau contenu visible ou début d'étage 3
 ```
 
 Le numéro exact dépendra du périmètre :
 
-- `v0.8.2` si la version contient surtout du polish, de la documentation, des corrections ciblées ou des ajustements de playtest ;
+- `v0.8.3` si la version contient surtout du polish, de la documentation, des corrections ciblées ou des ajustements de playtest ;
 - `v0.9` si la version ajoute un vrai bloc de contenu visible ou une progression nouvelle.
-
----
 
 ## 6. Polish conseillé avant gros contenu
 
@@ -181,26 +176,21 @@ Priorité moyenne :
 - améliorer le rendu 3D des messages `M` ;
 - améliorer le rendu 3D des portes verrouillées `L` ;
 - cadres UI plus propres ;
-- début de `NinePatchRect` pour les panneaux principaux ;
+- début de `NinePatchRect` ou `StyleBoxTexture` pour les panneaux principaux ;
 - amélioration des fenêtres Inventaire / Statut / Équipement / Boutique ;
 - amélioration visuelle ou textuelle de la victoire boss.
 
----
+## 7. Refactorisations restantes utiles
 
-## 7. Refactorisations utiles à court terme
+Voir `docs/informations/TECHNICAL_DEBT.md` pour le détail.
 
-Voir `TECHNICAL_DEBT.md` pour le détail.
-
-À privilégier avant de gros ajouts :
+Après `v0.8.2`, les gros contrôleurs les plus visibles ont été allégés. Les refactorisations restantes doivent être plus ciblées :
 
 - centraliser les symboles de donjon ;
 - centraliser les règles de marchabilité ;
 - centraliser les règles de non-rencontre aléatoire ;
-- clarifier les événements de cases spéciales `C`, `M`, `L`, `X` ;
-- documenter ou isoler davantage l'outil de téléportation de développement ;
-- éviter une réécriture complète de `Dungeon.gd` tant que la boucle de jeu vient juste d'être stabilisée.
-
----
+- clarifier progressivement les événements de cases spéciales `C`, `M`, `L`, `X`, `O`, `B`, `<`, `>` ;
+- conserver `Dungeon.gd`, `CombatManager.gd` et `GameSession.gd` comme façades publiques plutôt que multiplier les dépendances directes.
 
 ## 8. Contenu futur possible
 
@@ -232,8 +222,6 @@ Voir `TECHNICAL_DEBT.md` pour le détail.
 - Descriptions d'objets plus détaillées.
 - Meilleur feedback de sauvegarde, mort, victoire et progression.
 
----
-
 ## 9. Règles de versioning
 
 Ne pas accélérer artificiellement vers `v1.0`.
@@ -241,7 +229,7 @@ Ne pas accélérer artificiellement vers `v1.0`.
 Le projet peut continuer en versions pré-1.0 :
 
 ```text
-v0.8.2
+v0.8.3
 v0.9
 v0.10
 v0.11
@@ -249,8 +237,6 @@ v0.11
 ```
 
 `v1.0` doit rester réservé à une version réellement complète, avec une progression suffisante, une boucle de jeu stabilisée, une documentation claire et une version exportable propre.
-
----
 
 ## 10. Notes de vigilance
 
