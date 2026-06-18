@@ -17,6 +17,8 @@ const LOG_COMBAT: String = "combat"
 
 signal in_game_menu_save_requested
 signal in_game_menu_quit_requested
+signal exploration_command_pressed(command_id: String)
+signal combat_command_pressed(command_index: int)
 
 var root: Control = null
 
@@ -91,11 +93,18 @@ func build_dungeon_viewport() -> void:
 	main_ui_root.add_child(dungeon_viewport)
 
 	dungeon_viewport.setup_camera_source(get_parent())
+
 	if dungeon_viewport.has_signal("in_game_menu_save_requested"):
 		dungeon_viewport.in_game_menu_save_requested.connect(on_in_game_menu_save_requested)
 
-		if dungeon_viewport.has_signal("in_game_menu_quit_requested"):
-			dungeon_viewport.in_game_menu_quit_requested.connect(on_in_game_menu_quit_requested)
+	if dungeon_viewport.has_signal("in_game_menu_quit_requested"):
+		dungeon_viewport.in_game_menu_quit_requested.connect(on_in_game_menu_quit_requested)
+
+	if dungeon_viewport.has_signal("exploration_command_pressed"):
+		dungeon_viewport.exploration_command_pressed.connect(on_dungeon_viewport_exploration_command_pressed)
+
+	if dungeon_viewport.has_signal("combat_command_pressed"):
+		dungeon_viewport.combat_command_pressed.connect(on_dungeon_viewport_combat_command_pressed)
 
 
 func open_in_game_menu(party: Array) -> void:
@@ -146,6 +155,14 @@ func on_in_game_menu_save_requested() -> void:
 
 func on_in_game_menu_quit_requested() -> void:
 	in_game_menu_quit_requested.emit()
+
+
+func on_dungeon_viewport_exploration_command_pressed(command_id: String) -> void:
+	exploration_command_pressed.emit(command_id)
+
+
+func on_dungeon_viewport_combat_command_pressed(command_index: int) -> void:
+	combat_command_pressed.emit(command_index)
 
 
 func set_dungeon_theme(theme) -> void:

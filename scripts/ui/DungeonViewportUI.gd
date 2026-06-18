@@ -9,6 +9,8 @@ const DEFAULT_CAMERA_FAR_DISTANCE: float = 24.0
 
 signal in_game_menu_save_requested
 signal in_game_menu_quit_requested
+signal exploration_command_pressed(command_id: String)
+signal combat_command_pressed(command_index: int)
 
 var subviewport_container: SubViewportContainer = null
 var world_subviewport: SubViewport = null
@@ -489,6 +491,28 @@ func build_command_overlay() -> void:
 	command_overlay = CommandOverlayUIScript.new()
 	command_overlay.name = "CommandOverlayUI"
 	add_child(command_overlay)
+	connect_command_overlay_signals()
+
+
+func connect_command_overlay_signals() -> void:
+	if command_overlay == null:
+		return
+
+	if command_overlay.has_signal("exploration_command_pressed"):
+		if not command_overlay.exploration_command_pressed.is_connected(on_command_overlay_exploration_command_pressed):
+			command_overlay.exploration_command_pressed.connect(on_command_overlay_exploration_command_pressed)
+
+	if command_overlay.has_signal("combat_command_pressed"):
+		if not command_overlay.combat_command_pressed.is_connected(on_command_overlay_combat_command_pressed):
+			command_overlay.combat_command_pressed.connect(on_command_overlay_combat_command_pressed)
+
+
+func on_command_overlay_exploration_command_pressed(command_id: String) -> void:
+	exploration_command_pressed.emit(command_id)
+
+
+func on_command_overlay_combat_command_pressed(command_index: int) -> void:
+	combat_command_pressed.emit(command_index)
 
 
 func show_exploration_commands() -> void:

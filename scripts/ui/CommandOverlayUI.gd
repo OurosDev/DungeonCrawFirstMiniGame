@@ -1,10 +1,41 @@
 extends Panel
 class_name CommandOverlayUI
 
+# ------------------------------------------------------------
+# SIGNAUX
+# ------------------------------------------------------------
+
+signal exploration_command_pressed(command_id: String)
+signal combat_command_pressed(command_index: int)
+
+# ------------------------------------------------------------
+# CONSTANTES
+# ------------------------------------------------------------
+
+const EXPLORATION_COMMAND_FORWARD: String = "move_forward"
+const EXPLORATION_COMMAND_BACK: String = "move_back"
+const EXPLORATION_COMMAND_TURN_LEFT: String = "turn_left"
+const EXPLORATION_COMMAND_TURN_RIGHT: String = "turn_right"
+const EXPLORATION_COMMAND_MENU: String = "menu"
+
+const BUTTON_MIN_SIZE: Vector2 = Vector2(94, 30)
+const MENU_BUTTON_MIN_SIZE: Vector2 = Vector2(78, 30)
+
+# ------------------------------------------------------------
+# RÉFÉRENCES UI
+# ------------------------------------------------------------
+
 var commands_box: HBoxContainer = null
+
+# ------------------------------------------------------------
+# ÉTAT
+# ------------------------------------------------------------
 
 var ui_built: bool = false
 
+# ------------------------------------------------------------
+# INITIALISATION
+# ------------------------------------------------------------
 
 func _ready() -> void:
 	build_ui()
@@ -16,7 +47,8 @@ func build_ui() -> void:
 
 	ui_built = true
 
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# L'overlay doit recevoir la souris pour rendre les commandes cliquables.
+	mouse_filter = Control.MOUSE_FILTER_STOP
 
 	add_theme_stylebox_override(
 		"panel",
@@ -27,12 +59,12 @@ func build_ui() -> void:
 		)
 	)
 
-	anchor_left = 0.12
+	anchor_left = 0.08
 	anchor_top = 1.0
-	anchor_right = 0.88
+	anchor_right = 0.92
 	anchor_bottom = 1.0
 	offset_left = 0
-	offset_top = -54
+	offset_top = -58
 	offset_right = 0
 	offset_bottom = -12
 
@@ -44,9 +76,12 @@ func build_ui() -> void:
 	commands_box.offset_right = -8
 	commands_box.offset_bottom = -6
 	commands_box.alignment = BoxContainer.ALIGNMENT_CENTER
-	commands_box.add_theme_constant_override("separation", 8)
+	commands_box.add_theme_constant_override("separation", 6)
 	add_child(commands_box)
 
+# ------------------------------------------------------------
+# COMMANDES D'EXPLORATION
+# ------------------------------------------------------------
 
 func show_exploration_commands() -> void:
 	ensure_ui_ready()
@@ -54,11 +89,36 @@ func show_exploration_commands() -> void:
 	visible = true
 	clear_container(commands_box)
 
-	add_command_label("↑ Avancer", false)
-	add_command_label("↓ Reculer", false)
-	add_command_label("← Tourner", false)
-	add_command_label("→ Tourner", false)
+	add_exploration_command_button("Z ↑ Avancer", EXPLORATION_COMMAND_FORWARD, BUTTON_MIN_SIZE)
+	add_exploration_command_button("S ↓ Reculer", EXPLORATION_COMMAND_BACK, BUTTON_MIN_SIZE)
+	add_exploration_command_button("Q ← Tourner", EXPLORATION_COMMAND_TURN_LEFT, BUTTON_MIN_SIZE)
+	add_exploration_command_button("D → Tourner", EXPLORATION_COMMAND_TURN_RIGHT, BUTTON_MIN_SIZE)
+	add_exploration_command_button("E Menu", EXPLORATION_COMMAND_MENU, MENU_BUTTON_MIN_SIZE)
 
+
+func add_exploration_command_button(
+	button_text: String,
+	command_id: String,
+	minimum_size: Vector2 = BUTTON_MIN_SIZE
+) -> void:
+	var button: Button = create_command_button(button_text, false, minimum_size)
+	button.pressed.connect(on_exploration_button_pressed.bind(command_id))
+	commands_box.add_child(button)
+
+
+func on_exploration_button_pressed(command_id: String) -> void:
+	# Le signal du bouton Godot verrouille temporairement le contrôle cliqué.
+	# On diffère donc la commande pour éviter de reconstruire l'overlay
+	# pendant que le bouton est encore en cours d'émission.
+	call_deferred("emit_exploration_command_pressed", command_id)
+
+
+func emit_exploration_command_pressed(command_id: String) -> void:
+	exploration_command_pressed.emit(command_id)
+
+# ------------------------------------------------------------
+# COMMANDES DE COMBAT
+# ------------------------------------------------------------
 
 func show_combat_commands(
 	commands: Array[String],
@@ -71,14 +131,44 @@ func show_combat_commands(
 
 	for i in range(commands.size()):
 		var selected: bool = i == selected_command_index
-		add_command_label(commands[i], selected)
+		add_combat_command_button(commands[i], i, selected)
 
+
+func add_combat_command_button(
+	button_text: String,
+	command_index: int,
+	selected: bool
+) -> void:
+	var button: Button = create_command_button(button_text, selected, BUTTON_MIN_SIZE)
+	button.pressed.connect(on_combat_button_pressed.bind(command_index))
+	commands_box.add_child(button)
+
+
+func on_combat_button_pressed(command_index: int) -> void:
+	# Même logique que pour l'exploration : le clic est relayé après
+	# la fin du callback du bouton, ce qui sécurise les rafraîchissements UI.
+	call_deferred("emit_combat_command_pressed", command_index)
+
+
+func emit_combat_command_pressed(command_index: int) -> void:
+	combat_command_pressed.emit(command_index)
+
+# ------------------------------------------------------------
+# VISIBILITÉ
+# ------------------------------------------------------------
 
 func hide_commands() -> void:
 	visible = false
 
+# ------------------------------------------------------------
+# FABRIQUE UI
+# ------------------------------------------------------------
 
-func add_command_label(command_text: String, selected: bool) -> void:
+func create_command_button(
+	button_text: String,
+	selected: bool,
+	minimum_size: Vector2
+) -> Button:
 	var panel_color: Color = Color(0.10, 0.065, 0.035, 0.95)
 	var border_color: Color = Color(0.32, 0.20, 0.08, 1.0)
 	var text_color: Color = Color(0.86, 0.78, 0.58)
@@ -88,27 +178,43 @@ func add_command_label(command_text: String, selected: bool) -> void:
 		border_color = Color(1.0, 0.78, 0.22, 1.0)
 		text_color = Color(1.0, 0.92, 0.42)
 
-	var command_panel: Panel = Panel.new()
-	command_panel.custom_minimum_size = Vector2(90, 30)
-	command_panel.add_theme_stylebox_override(
-		"panel",
+	var button: Button = Button.new()
+	button.text = button_text
+	button.custom_minimum_size = minimum_size
+	button.focus_mode = Control.FOCUS_NONE
+	button.mouse_filter = Control.MOUSE_FILTER_STOP
+	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	button.add_theme_font_size_override("font_size", 14)
+	button.add_theme_color_override("font_color", text_color)
+	button.add_theme_color_override("font_hover_color", Color(1.0, 0.90, 0.55))
+	button.add_theme_color_override("font_pressed_color", Color(1.0, 0.96, 0.72))
+
+	button.add_theme_stylebox_override(
+		"normal",
+		create_panel_style(panel_color, border_color, 2)
+	)
+	button.add_theme_stylebox_override(
+		"hover",
 		create_panel_style(
-			panel_color,
-			border_color,
+			Color(panel_color.r + 0.04, panel_color.g + 0.03, panel_color.b + 0.02, panel_color.a),
+			Color(0.78, 0.50, 0.16, 1.0),
 			2
 		)
 	)
+	button.add_theme_stylebox_override(
+		"pressed",
+		create_panel_style(
+			Color(0.36, 0.21, 0.08, 0.98),
+			Color(1.0, 0.78, 0.22, 1.0),
+			2
+		)
+	)
+	button.add_theme_stylebox_override(
+		"disabled",
+		create_panel_style(Color(0.06, 0.04, 0.03, 0.80), Color(0.18, 0.12, 0.06, 1.0), 2)
+	)
 
-	commands_box.add_child(command_panel)
-
-	var label: Label = Label.new()
-	label.text = command_text
-	label.set_anchors_preset(Control.PRESET_FULL_RECT)
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 14)
-	label.add_theme_color_override("font_color", text_color)
-	command_panel.add_child(label)
+	return button
 
 
 func create_panel_style(
@@ -127,6 +233,9 @@ func create_panel_style(
 
 	return style
 
+# ------------------------------------------------------------
+# OUTILS
+# ------------------------------------------------------------
 
 func clear_container(container: Node) -> void:
 	if container == null:
