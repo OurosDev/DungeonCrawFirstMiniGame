@@ -47,7 +47,7 @@ func save_game_from_dungeon(dungeon) -> bool:
 
 	var save_data: Dictionary = {}
 
-	save_data["version"] = 2
+	save_data["version"] = 3
 	save_data["current_floor_id"] = dungeon.current_floor_id
 	save_data["party"] = serialize_party(dungeon.party)
 	save_data["layout"] = dungeon.layout.duplicate()
@@ -138,18 +138,37 @@ func serialize_hero(hero) -> Dictionary:
 	data["max_hp"] = get_int_property(hero, "max_hp", 1)
 	data["mp"] = get_int_property(hero, "mp", 0)
 	data["max_mp"] = get_int_property(hero, "max_mp", 0)
+	data["equipment"] = serialize_hero_equipment(hero)
 
-	var stats = get_property_value(hero, "stats", null)
+	var base_stats = get_property_value(hero, "base_stats", null)
 
-	if stats != null:
+	if base_stats == null:
+		base_stats = get_property_value(hero, "stats", null)
+
+	if base_stats != null:
 		data["stats"] = {
-			"strength": get_int_property(stats, "strength", 1),
-			"agility": get_int_property(stats, "agility", 1),
-			"endurance": get_int_property(stats, "endurance", 1),
-			"magic_power": get_int_property(stats, "magic_power", 1)
+			"strength": get_int_property(base_stats, "strength", 1),
+			"agility": get_int_property(base_stats, "agility", 1),
+			"endurance": get_int_property(base_stats, "endurance", 1),
+			"magic_power": get_int_property(base_stats, "magic_power", 1)
 		}
 
 	return data
+
+
+func serialize_hero_equipment(hero) -> Dictionary:
+	if hero == null:
+		return {}
+
+	if hero.has_method("get_equipment_save_data"):
+		return hero.get_equipment_save_data()
+
+	var equipment = get_property_value(hero, "equipped_items", {})
+
+	if equipment is Dictionary:
+		return equipment.duplicate(true)
+
+	return {}
 
 
 # ------------------------------------------------------------
@@ -189,12 +208,20 @@ func deserialize_hero(data: Dictionary):
 	var stats_data = data.get("stats", {})
 
 	if stats_data is Dictionary:
-		hero.stats = StatBlockScript.new(
+		var loaded_base_stats = StatBlockScript.new(
 			int(stats_data.get("strength", 1)),
 			int(stats_data.get("agility", 1)),
 			int(stats_data.get("endurance", 1)),
 			int(stats_data.get("magic_power", 1))
 		)
+
+		if object_has_property(hero, "base_stats"):
+			hero.base_stats = loaded_base_stats
+
+		hero.stats = loaded_base_stats.create_copy()
+
+	if hero.has_method("load_equipment_save_data"):
+		hero.load_equipment_save_data(data.get("equipment", {}))
 
 	if hero.has_method("recalculate_derived_stats"):
 		hero.recalculate_derived_stats()
@@ -210,6 +237,9 @@ func deserialize_hero(data: Dictionary):
 
 	if object_has_property(hero, "mp"):
 		hero.mp = int(data.get("mp", hero.max_mp))
+
+	if hero.has_method("recalculate_derived_stats"):
+		hero.recalculate_derived_stats(false)
 
 	return hero
 
