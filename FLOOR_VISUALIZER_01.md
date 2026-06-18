@@ -1,83 +1,850 @@
 # FLOOR_VISUALIZER
 
-Visualisation lisible des layouts du donjon.
+Visualisation des layouts du donjon.
 
-Ce fichier sert à préparer les placements de coffres `C`, messages `M`, combats fixes `F`, boss `X`, portes verrouillées `L` ou passages secrets `S`, sans modifier directement les scripts du jeu.
+Ce fichier sert à relire les étages plus facilement que dans le layout ASCII brut, notamment avant d’ajouter des coffres `C`, des messages `M`, des combats fixes `F` ou des boss `X`.
 
----
-
-## Objectifs
-
-- Garder une section qui reflète strictement l'état actuel en jeu.
-- Préparer une section séparée pour les variantes de planification.
-- Conserver une lecture simple sur GitHub, sans HTML, CSS ni couleur.
-- Afficher les chemins comme des cases vides pour réduire le bruit visuel.
-- Garder les coordonnées `x` et `y` visibles autour des grilles.
+> Note : ce fichier utilise des tableaux HTML simples pour conserver une vraie grille lisible dans un aperçu Markdown. Les cases de sol / couloir sont volontairement laissées vides.
 
 ---
 
 ## Légende
 
-| Symbole | Affichage | Rôle |
+| Symbole logique | Affichage dans la grille | Rôle |
 |---|---|---|
-| `#` | `■` | Mur |
-| `.` | espace vide | Sol / couloir |
+| `#` | carré `■` | Mur |
+| `.` | cellule vide | Sol / couloir |
 | `D` | `D` | Porte fermée |
-| `d` | `d` | Porte ouverte runtime |
+| `d` | `d` | Porte ouverte |
 | `>` | `>` | Escalier descendant |
 | `<` | `<` | Escalier montant |
 | `O` | `O` | Temple |
 | `B` | `B` | Boutique |
 | `C` | `C` | Coffre |
 | `M` | `M` | Message / PNJ neutre / indication |
-| `F` | `F` | Combat fixe non-boss |
+| `F` | `F` | Combat fixe |
 | `X` | `X` | Boss / rencontre majeure |
+| `P` | `P` | Piège |
+| `E` | `E` | Événement |
+| `R` | `R` | Rune / sort visible |
 | `L` | `L` | Porte verrouillée |
 | `S` | `S` | Passage secret |
 
 ---
 
-## 1. État actuel en jeu
+## Étage 1 — Galeries de terre sombre
 
-Cette section doit rester alignée avec `scripts/dungeon/FloorDatabase.gd`.
+Dimensions : **31 × 21**.
 
-Ne pas tester les futurs coffres `C` ou messages `M` dans cette section. Les variantes doivent être placées dans la section suivante.
+<table>
+  <tr>
+    <th>Y\X</th>
+    <th>0</th>
+    <th>1</th>
+    <th>2</th>
+    <th>3</th>
+    <th>4</th>
+    <th>5</th>
+    <th>6</th>
+    <th>7</th>
+    <th>8</th>
+    <th>9</th>
+    <th>10</th>
+    <th>11</th>
+    <th>12</th>
+    <th>13</th>
+    <th>14</th>
+    <th>15</th>
+    <th>16</th>
+    <th>17</th>
+    <th>18</th>
+    <th>19</th>
+    <th>20</th>
+    <th>21</th>
+    <th>22</th>
+    <th>23</th>
+    <th>24</th>
+    <th>25</th>
+    <th>26</th>
+    <th>27</th>
+    <th>28</th>
+    <th>29</th>
+    <th>30</th>
+    <th>Y</th>
+  </tr>
+  <tr>
+    <th>0</th>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <th>0</th>
+  </tr>
+  <tr>
+    <th>1</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>D</td>
+    <td>O</td>
+    <td>■</td>
+    <th>1</th>
+  </tr>
+  <tr>
+    <th>2</th>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <th>2</th>
+  </tr>
+  <tr>
+    <th>3</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>3</th>
+  </tr>
+  <tr>
+    <th>4</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>4</th>
+  </tr>
+  <tr>
+    <th>5</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>5</th>
+  </tr>
+  <tr>
+    <th>6</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>D</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <th>6</th>
+  </tr>
+  <tr>
+    <th>7</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>7</th>
+  </tr>
+  <tr>
+    <th>8</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>8</th>
+  </tr>
+  <tr>
+    <th>9</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>9</th>
+  </tr>
+  <tr>
+    <th>10</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>10</th>
+  </tr>
+  <tr>
+    <th>11</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>11</th>
+  </tr>
+  <tr>
+    <th>12</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <th>12</th>
+  </tr>
+  <tr>
+    <th>13</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>D</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>13</th>
+  </tr>
+  <tr>
+    <th>14</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>14</th>
+  </tr>
+  <tr>
+    <th>15</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>D</td>
+    <td>B</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>15</th>
+  </tr>
+  <tr>
+    <th>16</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>16</th>
+  </tr>
+  <tr>
+    <th>17</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&gt;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>17</th>
+  </tr>
+  <tr>
+    <th>18</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>D</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>18</th>
+  </tr>
+  <tr>
+    <th>19</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>D</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>19</th>
+  </tr>
+  <tr>
+    <th>20</th>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <th>20</th>
+  </tr>
+  <tr>
+    <th>Y\X</th>
+    <th>0</th>
+    <th>1</th>
+    <th>2</th>
+    <th>3</th>
+    <th>4</th>
+    <th>5</th>
+    <th>6</th>
+    <th>7</th>
+    <th>8</th>
+    <th>9</th>
+    <th>10</th>
+    <th>11</th>
+    <th>12</th>
+    <th>13</th>
+    <th>14</th>
+    <th>15</th>
+    <th>16</th>
+    <th>17</th>
+    <th>18</th>
+    <th>19</th>
+    <th>20</th>
+    <th>21</th>
+    <th>22</th>
+    <th>23</th>
+    <th>24</th>
+    <th>25</th>
+    <th>26</th>
+    <th>27</th>
+    <th>28</th>
+    <th>29</th>
+    <th>30</th>
+    <th>Y</th>
+  </tr>
+</table>
 
----
-
-### Étage 1 — Galeries de terre sombre
-
-Dimensions : **31 × 21**
-
-```text
-    0000000000111111111122222222223
-    0123456789012345678901234567890
-00  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  00
-01  ■   ■ ■                     DO■  01
-02  ■■■ ■ ■ ■■ ■■ ■■■■■■■■■■■■■■■■■  02
-03  ■ ■ ■ ■     ■       ■         ■  03
-04  ■ ■ ■ ■■■ ■■■■■■■■■ ■ ■■■■■■  ■  04
-05  ■ ■ ■     ■         ■   ■     ■  05
-06  ■ ■ ■ ■D■■■ ■■■ ■■■■■■■ ■ ■■■■■  06
-07  ■ ■   ■   ■   ■ ■     ■ ■     ■  07
-08  ■ ■■■ ■■■ ■■■ ■■■ ■ ■■■ ■■■■■ ■  08
-09  ■     ■     ■   ■ ■         ■ ■  09
-10  ■ ■ ■ ■■■■■ ■■■ ■ ■■■■■■■■■■■ ■  10
-11  ■ ■ ■     ■ ■   ■   ■     ■   ■  11
-12  ■ ■■■■■■■ ■ ■   ■ ■ ■ ■■■ ■ ■■■  12
-13  ■         ■         ■   ■D  ■ ■  13
-14  ■ ■■■■■■■■■■■■■■■■■ ■■■ ■■■ ■ ■  14
-15  ■ ■           DB■   ■   ■   ■ ■  15
-16  ■ ■ ■■■■■ ■■■ ■■■ ■ ■ ■■■ ■ ■ ■  16
-17  ■ ■ ■   ■         ■ ■ ■>■ ■ ■ ■  17
-18  ■ ■ ■ ■■■ ■■ ■■■■ ■ ■ ■D■   ■ ■  18
-19  ■   ■           ■   D ■   ■   ■  19
-20  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  20
-    0123456789012345678901234567890
-    0000000000111111111122222222223
-```
-
-#### Cases spéciales — étage 1
+### Cases spéciales — étage 1
 
 | Symbole | Coordonnée | Rôle |
 |---|---:|---|
@@ -93,44 +860,824 @@ Dimensions : **31 × 21**
 
 ---
 
-### Étage 2 — Cryptes de pierre froide
+## Étage 2 — Cryptes de pierre froide
 
-Dimensions : **31 × 21**
+Dimensions : **31 × 21**.
 
-```text
-    0000000000111111111122222222223
-    0123456789012345678901234567890
-00  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  00
-01  ■ D X>■         ■     ■       ■  01
-02  ■ ■■■■■ ■■■■■■■ ■ ■■■ ■ ■■■■■ ■  02
-03  ■   ■   ■       ■   ■ ■ ■     ■  03
-04  ■■■ ■ ■ ■ ■■■■■■■ ■ ■ ■ ■ ■■■ ■  04
-05  ■   ■ ■ ■ ■ DB■     ■ ■ ■   ■ ■  05
-06  ■ ■■■ ■■■ ■ ■ ■■■■■ ■ ■ ■■■ ■ ■  06
-07  ■   ■       ■       ■ ■ ■   ■ ■  07
-08  ■ ■ ■■■■■■■■■ ■■■■■■■ ■ ■■■ ■ ■  08
-09  ■ ■   ■   ■   ■      ■    ■   ■  09
-10  ■ ■ ■ ■ ■ ■■■ ■ ■■■ ■■■ ■ ■■■ ■  10
-11  ■   ■   ■   ■ ■           ■ ■ ■  11
-12  ■■■ ■■■■■ ■ ■■■ ■■■ ■■■■■■■ ■ ■  12
-13  ■ ■   ■   ■   ■   ■ ■       ■ ■  13
-14  ■ ■■■ ■ ■ ■■■ ■■■ ■■■ ■ ■ ■ ■ ■  14
-15  ■ ■ DO■   ■     ■     ■ ■ ■   ■  15
-16  ■ ■ ■■■■■ ■ ■■■■■■■■■■■ ■ ■■■ ■  16
-17  ■ ■   ■   ■           ■<■ ■   ■  17
-18  ■ ■■■ ■ ■ ■■■■■ ■ ■■■■■■■ ■ ■ ■  18
-19  ■       ■       ■             ■  19
-20  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  20
-    0123456789012345678901234567890
-    0000000000111111111122222222223
-```
+<table>
+  <tr>
+    <th>Y\X</th>
+    <th>0</th>
+    <th>1</th>
+    <th>2</th>
+    <th>3</th>
+    <th>4</th>
+    <th>5</th>
+    <th>6</th>
+    <th>7</th>
+    <th>8</th>
+    <th>9</th>
+    <th>10</th>
+    <th>11</th>
+    <th>12</th>
+    <th>13</th>
+    <th>14</th>
+    <th>15</th>
+    <th>16</th>
+    <th>17</th>
+    <th>18</th>
+    <th>19</th>
+    <th>20</th>
+    <th>21</th>
+    <th>22</th>
+    <th>23</th>
+    <th>24</th>
+    <th>25</th>
+    <th>26</th>
+    <th>27</th>
+    <th>28</th>
+    <th>29</th>
+    <th>30</th>
+    <th>Y</th>
+  </tr>
+  <tr>
+    <th>0</th>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <th>0</th>
+  </tr>
+  <tr>
+    <th>1</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>D</td>
+    <td>&nbsp;</td>
+    <td>X</td>
+    <td>&gt;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>1</th>
+  </tr>
+  <tr>
+    <th>2</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>2</th>
+  </tr>
+  <tr>
+    <th>3</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>3</th>
+  </tr>
+  <tr>
+    <th>4</th>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>4</th>
+  </tr>
+  <tr>
+    <th>5</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>D</td>
+    <td>B</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>5</th>
+  </tr>
+  <tr>
+    <th>6</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>6</th>
+  </tr>
+  <tr>
+    <th>7</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>7</th>
+  </tr>
+  <tr>
+    <th>8</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>8</th>
+  </tr>
+  <tr>
+    <th>9</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>9</th>
+  </tr>
+  <tr>
+    <th>10</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>10</th>
+  </tr>
+  <tr>
+    <th>11</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>11</th>
+  </tr>
+  <tr>
+    <th>12</th>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>12</th>
+  </tr>
+  <tr>
+    <th>13</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>13</th>
+  </tr>
+  <tr>
+    <th>14</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>14</th>
+  </tr>
+  <tr>
+    <th>15</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>D</td>
+    <td>O</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>15</th>
+  </tr>
+  <tr>
+    <th>16</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>16</th>
+  </tr>
+  <tr>
+    <th>17</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&lt;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>17</th>
+  </tr>
+  <tr>
+    <th>18</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>18</th>
+  </tr>
+  <tr>
+    <th>19</th>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>■</td>
+    <th>19</th>
+  </tr>
+  <tr>
+    <th>20</th>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <td>■</td>
+    <th>20</th>
+  </tr>
+  <tr>
+    <th>Y\X</th>
+    <th>0</th>
+    <th>1</th>
+    <th>2</th>
+    <th>3</th>
+    <th>4</th>
+    <th>5</th>
+    <th>6</th>
+    <th>7</th>
+    <th>8</th>
+    <th>9</th>
+    <th>10</th>
+    <th>11</th>
+    <th>12</th>
+    <th>13</th>
+    <th>14</th>
+    <th>15</th>
+    <th>16</th>
+    <th>17</th>
+    <th>18</th>
+    <th>19</th>
+    <th>20</th>
+    <th>21</th>
+    <th>22</th>
+    <th>23</th>
+    <th>24</th>
+    <th>25</th>
+    <th>26</th>
+    <th>27</th>
+    <th>28</th>
+    <th>29</th>
+    <th>30</th>
+    <th>Y</th>
+  </tr>
+</table>
 
-#### Cases spéciales — étage 2
+### Cases spéciales — étage 2
 
 | Symbole | Coordonnée | Rôle |
 |---|---:|---|
 | `D` | `Vector2i(2, 1)` | Porte fermée |
-| `X` | `Vector2i(4, 1)` | Boss / rencontre majeure |
+| `X` | `Vector2i(4, 1)` | Boss |
 | `>` | `Vector2i(5, 1)` | Escalier descendant |
 | `D` | `Vector2i(12, 5)` | Porte fermée |
 | `B` | `Vector2i(13, 5)` | Boutique |
@@ -140,55 +1687,16 @@ Dimensions : **31 × 21**
 
 ---
 
-## 2. Variantes de planification
-
-Cette section servira à tester les modifications prévues avant de toucher à `FloorDatabase.gd`.
-
-Règles d'utilisation :
-
-- Copier une grille depuis la section **État actuel en jeu**.
-- Remplacer uniquement des cases de sol vides par les symboles prévus.
-- Ne pas placer de vraie clé tant que les portes verrouillées `L` ne sont pas codées.
-- Ne pas placer de coffre sur une case réservée à une découverte de sort.
-- Garder `M` pour les messages, PNJ neutres ou indices.
-- Garder `F` pour les combats fixes non-boss.
-- Garder `X` pour les boss ou rencontres majeures.
-
----
-
-### Étage 1 — variante de planification
-
-À compléter uniquement quand les emplacements `C` et `M` seront validés.
-
-```text
-Copier ici la grille de l'étage 1, puis remplacer certaines cases vides par :
-- C pour un coffre ;
-- M pour un message / PNJ neutre / indice.
-```
-
----
-
-### Étage 2 — variante de planification
-
-À compléter uniquement quand les emplacements `C` et `M` seront validés.
-
-```text
-Copier ici la grille de l'étage 2, puis remplacer certaines cases vides par :
-- C pour un coffre ;
-- M pour un message / PNJ neutre / indice.
-```
-
----
-
 ## Notes de maintenance
 
 - Les coordonnées sont en `Vector2i(x, y)`.
 - `x` augmente vers la droite.
 - `y` augmente vers le bas.
-- Les deux lignes du haut indiquent les dizaines puis les unités de `x`.
-- Les deux lignes du bas répètent les unités puis les dizaines de `x`.
-- Les coordonnées `y` sont affichées à gauche et à droite de chaque ligne.
-- Les murs `#` sont affichés comme `■`.
-- Les cases de sol `.` sont affichées comme des espaces vides.
-- Ce fichier est un outil de lecture et de planification.
-- La source gameplay reste `scripts/dungeon/FloorDatabase.gd`.
+- Les coordonnées `x` sont affichées au-dessus et sous chaque grille.
+- Les coordonnées `y` sont affichées à gauche et à droite de chaque grille.
+- Les murs `#` sont affichés comme des carrés `■`.
+- Les cases de sol `.` sont affichées comme des cellules vides.
+- Pour ajouter un coffre, remplacer une case de sol `.` par `C`.
+- Pour ajouter un message ou PNJ neutre, remplacer une case de sol `.` par `M`.
+- Pour un combat fixe non-boss, utiliser `F`.
+- Pour un boss ou une rencontre majeure, utiliser `X`.
