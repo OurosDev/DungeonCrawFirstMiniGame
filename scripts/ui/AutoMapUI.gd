@@ -1,10 +1,8 @@
 extends Panel
-
 class_name AutoMapUI
 
 const VISIBLE_RADIUS_X: int = 7
 const VISIBLE_RADIUS_Y: int = 5
-
 
 # ------------------------------------------------------------
 # RÉFÉRENCES UI
@@ -56,11 +54,7 @@ func build_ui() -> void:
 	box.add_theme_constant_override("separation", 5)
 	add_child(box)
 
-	title_label = create_label(
-		"AUTOMAP",
-		16,
-		Color(0.95, 0.78, 0.38)
-	)
+	title_label = create_label("AUTOMAP", 16, Color(0.95, 0.78, 0.38))
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title_label)
 
@@ -75,11 +69,7 @@ func build_ui() -> void:
 	map_grid.add_theme_constant_override("v_separation", 1)
 	map_center.add_child(map_grid)
 
-	info_label = create_label(
-		"",
-		12,
-		Color(0.65, 0.76, 0.58)
-	)
+	info_label = create_label("", 12, Color(0.65, 0.76, 0.58))
 	info_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(info_label)
 
@@ -118,7 +108,6 @@ func update_map(
 			var is_player_cell: bool = cell == player_position
 			var is_discovered: bool = discovered_cells.has(cell)
 			var is_outside_map: bool = not is_inside_layout(layout, cell)
-
 			var cell_panel: Panel = create_map_cell(
 				tile,
 				is_discovered,
@@ -126,7 +115,6 @@ func update_map(
 				is_outside_map,
 				facing_name
 			)
-
 			map_grid.add_child(cell_panel)
 
 	title_label.text = "AUTOMAP"
@@ -134,7 +122,6 @@ func update_map(
 	var info: String = ""
 	info += "Pos : " + str(player_position.x) + ", " + str(player_position.y)
 	info += " " + facing_name
-
 	info_label.text = info
 
 
@@ -142,8 +129,9 @@ func update_map(
 # CELLULES DE L'AUTOMAP
 # ------------------------------------------------------------
 
-# Crée une cellule visuelle de l'automap selon le contenu de la case :
-# mur, porte, escalier, temple, joueur ou zone non découverte.
+# Crée une cellule visuelle selon le contenu de la case :
+# mur, porte, porte verrouillée, escalier, temple, boutique,
+# coffre, message, boss, joueur ou zone non découverte.
 func create_map_cell(
 	tile: String,
 	is_discovered: bool,
@@ -178,6 +166,11 @@ func create_map_cell(
 		border_color = Color(0.85, 0.58, 0.20, 1.0)
 		text_color = Color(1.0, 0.82, 0.36)
 		symbol = "D"
+	elif tile == "L":
+		background_color = Color(0.18, 0.06, 0.035, 1.0)
+		border_color = Color(0.90, 0.32, 0.14, 1.0)
+		text_color = Color(1.0, 0.58, 0.32, 1.0)
+		symbol = "L"
 	elif tile == "d":
 		background_color = Color(0.22, 0.12, 0.05, 1.0)
 		border_color = Color(0.55, 0.34, 0.12, 1.0)
@@ -203,6 +196,11 @@ func create_map_cell(
 		border_color = Color(0.86, 0.58, 0.18, 1.0)
 		text_color = Color(1.0, 0.82, 0.34, 1.0)
 		symbol = "B"
+	elif tile == "C":
+		background_color = Color(0.12, 0.075, 0.035, 1.0)
+		border_color = Color(0.88, 0.62, 0.22, 1.0)
+		text_color = Color(1.0, 0.82, 0.38, 1.0)
+		symbol = "C"
 	elif tile == "X":
 		background_color = Color(0.12, 0.025, 0.025, 1.0)
 		border_color = Color(0.90, 0.18, 0.12, 1.0)
@@ -227,22 +225,13 @@ func create_map_cell(
 	panel.custom_minimum_size = Vector2(cell_pixel_size, cell_pixel_size)
 	panel.add_theme_stylebox_override(
 		"panel",
-		create_panel_style(
-			background_color,
-			border_color,
-			1
-		)
+		create_panel_style(background_color, border_color, 1)
 	)
 
-	var label: Label = create_label(
-		symbol,
-		8,
-		text_color
-	)
+	var label: Label = create_label(symbol, 8, text_color)
 	label.set_anchors_preset(Control.PRESET_FULL_RECT)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-
 	panel.add_child(label)
 
 	return panel
@@ -257,13 +246,10 @@ func get_player_symbol(facing_name: String) -> String:
 
 	if lower_name.contains("nord") or lower_name.contains("north"):
 		return "▲"
-
 	if lower_name.contains("ouest") or lower_name.contains("west"):
 		return "◀"
-
 	if lower_name.contains("est") or lower_name.contains("east"):
 		return "▶"
-
 	if lower_name.contains("sud") or lower_name.contains("south"):
 		return "▼"
 
@@ -277,7 +263,6 @@ func get_player_symbol(facing_name: String) -> String:
 func is_inside_layout(layout: Array[String], cell: Vector2i) -> bool:
 	if cell.y < 0 or cell.y >= layout.size():
 		return false
-
 	if cell.x < 0 or cell.x >= layout[cell.y].length():
 		return false
 
@@ -308,21 +293,15 @@ func create_panel_style(
 	style.corner_radius_top_right = 1
 	style.corner_radius_bottom_left = 1
 	style.corner_radius_bottom_right = 1
-
 	return style
 
 
-func create_label(
-	text: String,
-	font_size: int,
-	font_color: Color
-) -> Label:
+func create_label(text: String, font_size: int, font_color: Color) -> Label:
 	var label: Label = Label.new()
 	label.text = text
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", font_color)
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-
 	return label
 
 
