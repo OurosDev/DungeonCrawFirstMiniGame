@@ -12,10 +12,11 @@ signal quit_requested
 
 # ------------------------------------------------------------
 # DÉPENDANCES
-# Utilise la base d'objets pour afficher l'inventaire du groupe.
+# Utilise les bases d'objets et règles d'équipement pour les menus.
 # ------------------------------------------------------------
 
 const ItemDatabaseScript = preload("res://scripts/items/ItemDatabase.gd")
+const EquipmentRulesScript = preload("res://scripts/equipment/EquipmentRules.gd")
 
 
 # ------------------------------------------------------------
@@ -180,7 +181,7 @@ func show_main_screen() -> void:
 
 # ------------------------------------------------------------
 # INVENTAIRE
-# Affiche les 24 emplacements du sac commun du groupe.
+# Affiche uniquement les objets possédés dans le sac commun du groupe.
 # ------------------------------------------------------------
 
 func show_inventory_screen() -> void:
@@ -188,11 +189,11 @@ func show_inventory_screen() -> void:
 	clear_content()
 
 	var inventory_wrapper: VBoxContainer = VBoxContainer.new()
-	inventory_wrapper.custom_minimum_size = Vector2(580, 370)
+	inventory_wrapper.custom_minimum_size = Vector2(580, 350)
 	inventory_wrapper.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	inventory_wrapper.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	inventory_wrapper.alignment = BoxContainer.ALIGNMENT_CENTER
-	inventory_wrapper.add_theme_constant_override("separation", 12)
+	inventory_wrapper.add_theme_constant_override("separation", 6)
 	content_box.add_child(inventory_wrapper)
 
 	var list_panel: Panel = create_panel(
@@ -200,30 +201,12 @@ func show_inventory_screen() -> void:
 		Color(0.32, 0.21, 0.10, 1.0),
 		2
 	)
-	list_panel.custom_minimum_size = Vector2(560, 320)
+	list_panel.custom_minimum_size = Vector2(560, 260)
 	list_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	list_panel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	inventory_wrapper.add_child(list_panel)
 
-	var list_margin: MarginContainer = MarginContainer.new()
-	list_margin.set_anchors_preset(Control.PRESET_FULL_RECT)
-	list_margin.add_theme_constant_override("margin_left", 14)
-	list_margin.add_theme_constant_override("margin_top", 12)
-	list_margin.add_theme_constant_override("margin_right", 14)
-	list_margin.add_theme_constant_override("margin_bottom", 12)
-	list_panel.add_child(list_margin)
-
-	var inventory_scroll: ScrollContainer = ScrollContainer.new()
-	inventory_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	inventory_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	inventory_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	inventory_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
-	list_margin.add_child(inventory_scroll)
-
-	var inventory_list: VBoxContainer = VBoxContainer.new()
-	inventory_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	inventory_list.add_theme_constant_override("separation", 4)
-	inventory_scroll.add_child(inventory_list)
+	var inventory_list: VBoxContainer = create_scrollable_list_inside_panel(list_panel)
 
 	var inventory = null
 	var slots: Array = []
@@ -250,17 +233,34 @@ func show_inventory_screen() -> void:
 		visible_slot_count += 1
 
 	if visible_slot_count <= 0:
-		var empty_label: Label = create_label("Inventaire vide.", 14, Color(0.62, 0.56, 0.46))
-		empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		empty_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		empty_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		empty_label.custom_minimum_size = Vector2(0, 44)
-		inventory_list.add_child(empty_label)
+		inventory_list.add_child(create_empty_message_label("Inventaire vide."))
 
-	var hint_label: Label = create_label("Échap : retour au jeu", 14, Color(0.70, 0.62, 0.48))
+	var back_panel: Panel = create_panel(
+		Color(0.060, 0.040, 0.030, 1.0),
+		Color(0.32, 0.21, 0.10, 1.0),
+		1
+	)
+	back_panel.custom_minimum_size = Vector2(560, 38)
+	back_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	inventory_wrapper.add_child(back_panel)
+
+	var back_center: CenterContainer = CenterContainer.new()
+	back_center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	back_center.offset_left = 8
+	back_center.offset_top = 4
+	back_center.offset_right = -8
+	back_center.offset_bottom = -4
+	back_panel.add_child(back_center)
+
+	var back_button: Button = create_compact_menu_button("Retour menu")
+	back_button.pressed.connect(show_main_screen)
+	back_center.add_child(back_button)
+
+	var hint_label: Label = create_label("Échap : retour au jeu", 12, Color(0.70, 0.62, 0.48))
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	inventory_wrapper.add_child(hint_label)
+
 
 func create_inventory_row(item_id: String, quantity: int) -> Control:
 	var panel: Panel = create_panel(
@@ -278,37 +278,27 @@ func create_inventory_row(item_id: String, quantity: int) -> Control:
 	row.add_theme_constant_override("separation", 8)
 	panel.add_child(row)
 
-	var display_name: String = "—"
-	var quantity_text: String = ""
-	var name_color: Color = Color(0.46, 0.41, 0.34)
-	var separator_color: Color = Color(0.30, 0.24, 0.18)
-	var quantity_color: Color = Color(0.46, 0.41, 0.34)
+	var display_name: String = ItemDatabaseScript.get_display_name(item_id)
 
-	if item_id != "" and quantity > 0:
-		display_name = ItemDatabaseScript.get_display_name(item_id)
-		quantity_text = str(quantity)
-		name_color = Color(0.82, 0.76, 0.62)
-		separator_color = Color(0.56, 0.45, 0.30)
-		quantity_color = Color(0.92, 0.84, 0.58)
-
-	var name_label: Label = create_label(display_name, 13, name_color)
+	var name_label: Label = create_label(display_name, 12, Color(0.82, 0.76, 0.62))
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(name_label)
 
-	var separator_label: Label = create_label("|", 13, separator_color)
+	var separator_label: Label = create_label("|", 13, Color(0.56, 0.45, 0.30))
 	separator_label.custom_minimum_size = Vector2(28, 20)
 	separator_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	separator_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(separator_label)
 
-	var quantity_label: Label = create_label(quantity_text, 13, quantity_color)
+	var quantity_label: Label = create_label(str(quantity), 13, Color(0.92, 0.84, 0.58))
 	quantity_label.custom_minimum_size = Vector2(40, 20)
 	quantity_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	quantity_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(quantity_label)
 
 	return panel
+
 
 # ------------------------------------------------------------
 # GRIMOIRE
@@ -341,6 +331,7 @@ func show_grimoire_screen() -> void:
 # ------------------------------------------------------------
 # STATUT
 # Affiche les données détaillées des héros du groupe.
+# Le bouton EQUIPEMENT de chaque héros ouvre son panneau dédié.
 # ------------------------------------------------------------
 
 func show_status_screen() -> void:
@@ -365,6 +356,10 @@ func show_status_screen() -> void:
 
 		var hero_frame: Panel = create_status_hero_frame(hero, party_index)
 		grid.add_child(hero_frame)
+
+	var hint_label: Label = create_label("Cliquez sur EQUIPEMENT pour gérer le héros. Échap : retour au jeu", 14, Color(0.70, 0.62, 0.48))
+	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	content_box.add_child(hint_label)
 
 
 func create_status_hero_frame(hero, index: int) -> Panel:
@@ -406,33 +401,30 @@ func create_status_hero_frame(hero, index: int) -> Panel:
 	sub_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(sub_label)
 
-	var portrait_panel: Panel = create_panel(
-		Color(0.10, 0.07, 0.05, 1.0),
-		Color(0.24, 0.16, 0.08, 1.0),
-		1
-	)
-	portrait_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	portrait_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	portrait_panel.custom_minimum_size = Vector2(0, 46)
-	box.add_child(portrait_panel)
-
-	var portrait_label: Label = create_label("", 12, Color(0.65, 0.58, 0.46))
-	portrait_label.set_anchors_preset(Control.PRESET_FULL_RECT)
-	portrait_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	portrait_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-
 	if hero == null:
-		portrait_label.text = "VIDE"
-	else:
-		portrait_label.text = get_string_property(hero, "job", "").to_upper()
+		var empty_slot_panel: Panel = create_panel(
+			Color(0.10, 0.07, 0.05, 1.0),
+			Color(0.24, 0.16, 0.08, 1.0),
+			1
+		)
+		empty_slot_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		empty_slot_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		empty_slot_panel.custom_minimum_size = Vector2(0, 46)
+		box.add_child(empty_slot_panel)
 
-	portrait_panel.add_child(portrait_label)
+		var empty_slot_label: Label = create_label("VIDE", 12, Color(0.65, 0.58, 0.46))
+		empty_slot_label.set_anchors_preset(Control.PRESET_FULL_RECT)
+		empty_slot_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		empty_slot_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		empty_slot_panel.add_child(empty_slot_label)
 
-	if hero == null:
 		var empty_stats_label: Label = create_label("Aucune donnée.", 12, Color(0.72, 0.66, 0.56))
 		empty_stats_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(empty_stats_label)
 		return panel
+
+	var equipment_button: Button = create_status_equipment_button(index)
+	box.add_child(equipment_button)
 
 	var hpmp_label: Label = create_label(
 		"HP " + str(get_int_property(hero, "hp", 0)) + " / " + str(get_int_property(hero, "max_hp", 0)) + " | MP " + str(get_int_property(hero, "mp", 0)) + " / " + str(get_int_property(hero, "max_mp", 0)),
@@ -442,20 +434,283 @@ func create_status_hero_frame(hero, index: int) -> Panel:
 	hpmp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(hpmp_label)
 
-	var stats = get_property_value(hero, "stats", null)
-	var stats_text: String = "FOR 0 AGI 0 END 0 MAG 0"
-
-	if stats != null:
-		stats_text = "FOR " + str(get_int_property(stats, "strength", 0))
-		stats_text += " AGI " + str(get_int_property(stats, "agility", 0))
-		stats_text += " END " + str(get_int_property(stats, "endurance", 0))
-		stats_text += " MAG " + str(get_int_property(stats, "magic_power", 0))
-
-	var stats_label: Label = create_label(stats_text, 12, Color(0.82, 0.76, 0.62))
+	var stats_label: Label = create_label(format_compact_stats(hero), 12, Color(0.82, 0.76, 0.62))
 	stats_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(stats_label)
 
 	return panel
+
+
+# Crée le bouton explicite qui ouvre l'équipement du héros.
+func create_status_equipment_button(hero_index: int) -> Button:
+	var button: Button = Button.new()
+	button.text = "EQUIPEMENT"
+	button.focus_mode = Control.FOCUS_NONE
+	button.custom_minimum_size = Vector2(0, 46)
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	button.add_theme_font_size_override("font_size", 13)
+	button.pressed.connect(show_equipment_screen.bind(hero_index))
+	return button
+
+
+# ------------------------------------------------------------
+# ÉQUIPEMENT
+# Affiche et modifie l'équipement du héros sélectionné.
+# ------------------------------------------------------------
+
+func show_equipment_screen(hero_index: int, feedback_text: String = "") -> void:
+	set_menu_chrome_visible(false)
+	clear_content()
+
+	var hero = get_hero_from_index(hero_index)
+
+	if hero == null:
+		content_box.add_child(create_empty_message_label("Héros introuvable."))
+		return
+
+	var wrapper: VBoxContainer = VBoxContainer.new()
+	wrapper.custom_minimum_size = Vector2(620, 360)
+	wrapper.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	wrapper.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	wrapper.alignment = BoxContainer.ALIGNMENT_CENTER
+	wrapper.add_theme_constant_override("separation", 6)
+	content_box.add_child(wrapper)
+
+	var stats_panel: Panel = create_panel(
+		Color(0.060, 0.040, 0.030, 1.0),
+		Color(0.26, 0.17, 0.08, 1.0),
+		1
+	)
+	stats_panel.custom_minimum_size = Vector2(560, 102)
+	stats_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	wrapper.add_child(stats_panel)
+	fill_equipment_stats_panel(stats_panel, hero)
+
+	var slots_panel: Panel = create_panel(
+		Color(0.060, 0.040, 0.030, 1.0),
+		Color(0.32, 0.21, 0.10, 1.0),
+		2
+	)
+	slots_panel.custom_minimum_size = Vector2(560, 165)
+	slots_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	wrapper.add_child(slots_panel)
+
+	var slot_list: VBoxContainer = VBoxContainer.new()
+	slot_list.set_anchors_preset(Control.PRESET_FULL_RECT)
+	slot_list.offset_left = 14
+	slot_list.offset_top = 8
+	slot_list.offset_right = -14
+	slot_list.offset_bottom = -8
+	slot_list.add_theme_constant_override("separation", 4)
+	slots_panel.add_child(slot_list)
+
+	for slot_id in EquipmentRulesScript.get_slot_order():
+		var slot_button: Button = create_equipment_slot_button(hero, hero_index, slot_id)
+		slot_list.add_child(slot_button)
+
+	if feedback_text != "":
+		var feedback_label: Label = create_label(feedback_text, 13, Color(0.86, 0.76, 0.48))
+		feedback_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		wrapper.add_child(feedback_label)
+
+	var back_panel: Panel = create_panel(
+		Color(0.060, 0.040, 0.030, 1.0),
+		Color(0.32, 0.21, 0.10, 1.0),
+		1
+	)
+	back_panel.custom_minimum_size = Vector2(560, 38)
+	back_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	wrapper.add_child(back_panel)
+
+	var back_center: CenterContainer = CenterContainer.new()
+	back_center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	back_center.offset_left = 8
+	back_center.offset_top = 4
+	back_center.offset_right = -8
+	back_center.offset_bottom = -4
+	back_panel.add_child(back_center)
+
+	var back_button: Button = create_compact_menu_button("Retour statut")
+	back_button.pressed.connect(show_status_screen)
+	back_center.add_child(back_button)
+
+	var hint_label: Label = create_label("Cliquez sur un emplacement pour modifier l'équipement. Échap : retour au jeu", 12, Color(0.70, 0.62, 0.48))
+	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	wrapper.add_child(hint_label)
+
+
+func fill_equipment_stats_panel(panel: Panel, hero) -> void:
+	var stats_box: VBoxContainer = VBoxContainer.new()
+	stats_box.set_anchors_preset(Control.PRESET_FULL_RECT)
+	stats_box.offset_left = 20
+	stats_box.offset_top = 8
+	stats_box.offset_right = -20
+	stats_box.offset_bottom = -8
+	stats_box.add_theme_constant_override("separation", 3)
+	panel.add_child(stats_box)
+
+	stats_box.add_child(create_stat_line(hero, "Force", "strength"))
+	stats_box.add_child(create_stat_line(hero, "Agilité", "agility"))
+	stats_box.add_child(create_stat_line(hero, "Endurance", "endurance"))
+	stats_box.add_child(create_stat_line(hero, "Magie", "magic_power"))
+
+
+func create_stat_line(hero, display_name: String, stat_name: String) -> HBoxContainer:
+	var base_value: int = get_hero_base_stat(hero, stat_name)
+	var bonus_value: int = get_hero_equipment_bonus(hero, stat_name)
+	var final_value: int = get_hero_effective_stat(hero, stat_name)
+
+	var row: HBoxContainer = HBoxContainer.new()
+	row.custom_minimum_size = Vector2(520, 18)
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_theme_constant_override("separation", 8)
+
+	var name_label: Label = create_label(display_name, 12, Color(0.82, 0.76, 0.62))
+	name_label.custom_minimum_size = Vector2(120, 0)
+	row.add_child(name_label)
+
+	var final_label: Label = create_label(str(final_value), 12, Color(1.0, 0.82, 0.35))
+	final_label.custom_minimum_size = Vector2(48, 0)
+	final_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	row.add_child(final_label)
+
+	var bonus_text: String = ""
+	var bonus_color: Color = Color(0.70, 0.62, 0.48)
+
+	if bonus_value > 0:
+		bonus_text = "+" + str(bonus_value)
+		bonus_color = Color(0.55, 0.86, 0.48)
+	elif bonus_value < 0:
+		bonus_text = str(bonus_value)
+		bonus_color = Color(0.86, 0.40, 0.34)
+
+	var bonus_label: Label = create_label(bonus_text, 12, bonus_color)
+	bonus_label.custom_minimum_size = Vector2(64, 0)
+	bonus_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	row.add_child(bonus_label)
+
+	var spacer: Control = Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(spacer)
+
+	var base_label: Label = create_label("Base " + str(base_value), 12, Color(0.70, 0.62, 0.48))
+	base_label.custom_minimum_size = Vector2(120, 0)
+	base_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	row.add_child(base_label)
+
+	return row
+
+
+func create_equipment_slot_button(hero, hero_index: int, slot_id: String) -> Button:
+	var button: Button = Button.new()
+	button.focus_mode = Control.FOCUS_NONE
+	button.custom_minimum_size = Vector2(520, 28)
+	button.add_theme_font_size_override("font_size", 13)
+
+	var item_id: String = get_hero_equipped_item(hero, slot_id)
+	var item_name: String = "—"
+
+	if item_id != "":
+		item_name = ItemDatabaseScript.get_display_name(item_id)
+
+	button.text = EquipmentRulesScript.get_slot_display_name(slot_id) + "     |     " + item_name
+	button.pressed.connect(show_equipment_choice_screen.bind(hero_index, slot_id))
+
+	return button
+
+
+func show_equipment_choice_screen(hero_index: int, slot_id: String) -> void:
+	set_menu_chrome_visible(false)
+	clear_content()
+
+	var hero = get_hero_from_index(hero_index)
+
+	if hero == null:
+		content_box.add_child(create_empty_message_label("Héros introuvable."))
+		return
+
+	var wrapper: VBoxContainer = VBoxContainer.new()
+	wrapper.custom_minimum_size = Vector2(640, 440)
+	wrapper.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	wrapper.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	wrapper.alignment = BoxContainer.ALIGNMENT_CENTER
+	wrapper.add_theme_constant_override("separation", 10)
+	content_box.add_child(wrapper)
+
+	var title_text: String = EquipmentRulesScript.get_slot_display_name(slot_id)
+	title_text += " — " + get_string_property(hero, "character_name", "Héros")
+
+	var title: Label = create_label(title_text, 20, Color(1.0, 0.82, 0.35))
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	wrapper.add_child(title)
+
+	var list_panel: Panel = create_panel(
+		Color(0.060, 0.040, 0.030, 1.0),
+		Color(0.32, 0.21, 0.10, 1.0),
+		2
+	)
+	list_panel.custom_minimum_size = Vector2(560, 280)
+	wrapper.add_child(list_panel)
+
+	var list: VBoxContainer = create_scrollable_list_inside_panel(list_panel)
+	var current_item_id: String = get_hero_equipped_item(hero, slot_id)
+
+	if current_item_id != "":
+		var remove_button: Button = create_equipment_choice_button("Retirer : " + ItemDatabaseScript.get_display_name(current_item_id))
+		remove_button.pressed.connect(on_unequip_pressed.bind(hero_index, slot_id))
+		list.add_child(remove_button)
+
+	var inventory = GameSession.get_inventory()
+	var equippable_ids: Array[String] = EquipmentRulesScript.get_equippable_item_ids_for_slot(hero, slot_id, inventory)
+
+	for item_id in equippable_ids:
+		var quantity: int = GameSession.get_inventory_item_quantity(item_id)
+		var option_text: String = ItemDatabaseScript.get_display_name(item_id)
+		option_text += "     |     " + str(quantity)
+
+		var bonus_text: String = EquipmentRulesScript.get_item_bonus_text(item_id)
+		if bonus_text != "":
+			option_text += "     " + bonus_text
+
+		var item_button: Button = create_equipment_choice_button(option_text)
+		item_button.pressed.connect(on_equip_pressed.bind(hero_index, slot_id, item_id))
+		list.add_child(item_button)
+
+	if current_item_id == "" and equippable_ids.is_empty():
+		list.add_child(create_empty_message_label("Aucun objet compatible dans l'inventaire."))
+	elif current_item_id != "" and equippable_ids.is_empty():
+		list.add_child(create_empty_message_label("Aucun remplacement compatible."))
+
+	var back_button: Button = create_menu_button("Retour équipement")
+	back_button.pressed.connect(show_equipment_screen.bind(hero_index))
+	wrapper.add_child(back_button)
+
+	var hint_label: Label = create_label("Échap : retour au jeu", 14, Color(0.70, 0.62, 0.48))
+	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	wrapper.add_child(hint_label)
+
+
+func create_equipment_choice_button(text: String) -> Button:
+	var button: Button = Button.new()
+	button.text = text
+	button.custom_minimum_size = Vector2(520, 28)
+	button.focus_mode = Control.FOCUS_NONE
+	button.add_theme_font_size_override("font_size", 13)
+	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	return button
+
+
+func on_equip_pressed(hero_index: int, slot_id: String, item_id: String) -> void:
+	var result: Dictionary = GameSession.equip_item_to_hero(hero_index, slot_id, item_id)
+	var feedback_text: String = str(result.get("message", ""))
+	show_equipment_screen(hero_index, feedback_text)
+
+
+func on_unequip_pressed(hero_index: int, slot_id: String) -> void:
+	var result: Dictionary = GameSession.unequip_item_from_hero(hero_index, slot_id)
+	var feedback_text: String = str(result.get("message", ""))
+	show_equipment_screen(hero_index, feedback_text)
 
 
 # ------------------------------------------------------------
@@ -532,6 +787,11 @@ func show_options_screen() -> void:
 	content_box.add_child(back_button)
 
 
+# ------------------------------------------------------------
+# ACTIONS SYSTÈME ET AUDIO
+# Transmet les actions au donjon ou à AudioManager.
+# ------------------------------------------------------------
+
 func on_save_pressed() -> void:
 	save_requested.emit()
 
@@ -572,7 +832,7 @@ func update_sfx_volume_label() -> void:
 
 # ------------------------------------------------------------
 # HELPERS UI
-# Crée les composants visuels communs du menu.
+# Crée les composants visuels réutilisables.
 # ------------------------------------------------------------
 
 func clear_content() -> void:
@@ -585,12 +845,19 @@ func clear_content() -> void:
 
 func create_menu_button(text: String) -> Button:
 	var button: Button = Button.new()
-
 	button.text = text
 	button.custom_minimum_size = Vector2(260, 42)
 	button.focus_mode = Control.FOCUS_NONE
 	button.add_theme_font_size_override("font_size", 17)
+	return button
 
+
+func create_compact_menu_button(text: String) -> Button:
+	var button: Button = Button.new()
+	button.text = text
+	button.custom_minimum_size = Vector2(200, 28)
+	button.focus_mode = Control.FOCUS_NONE
+	button.add_theme_font_size_override("font_size", 13)
 	return button
 
 
@@ -600,12 +867,10 @@ func create_label(
 	font_color: Color
 ) -> Label:
 	var label: Label = Label.new()
-
 	label.text = text
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", font_color)
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-
 	return label
 
 
@@ -630,9 +895,128 @@ func create_panel(
 	return panel
 
 
+func create_scrollable_list_inside_panel(panel: Panel) -> VBoxContainer:
+	var list_margin: MarginContainer = MarginContainer.new()
+	list_margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	list_margin.add_theme_constant_override("margin_left", 14)
+	list_margin.add_theme_constant_override("margin_top", 12)
+	list_margin.add_theme_constant_override("margin_right", 14)
+	list_margin.add_theme_constant_override("margin_bottom", 12)
+	panel.add_child(list_margin)
+
+	var scroll: ScrollContainer = ScrollContainer.new()
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	list_margin.add_child(scroll)
+
+	var list: VBoxContainer = VBoxContainer.new()
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	list.add_theme_constant_override("separation", 4)
+	scroll.add_child(list)
+
+	return list
+
+
+func create_empty_message_label(text: String) -> Label:
+	var empty_label: Label = create_label(text, 14, Color(0.62, 0.56, 0.46))
+	empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	empty_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	empty_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	empty_label.custom_minimum_size = Vector2(0, 44)
+	return empty_label
+
+
+# ------------------------------------------------------------
+# HELPERS HÉROS / STATS
+# Lit les héros et prépare les textes de stats avec bonus.
+# ------------------------------------------------------------
+
+func get_hero_from_index(hero_index: int):
+	if hero_index < 0:
+		return null
+
+	if hero_index >= current_party.size():
+		return null
+
+	return current_party[hero_index]
+
+
+func get_hero_equipped_item(hero, slot_id: String) -> String:
+	if hero == null:
+		return ""
+
+	if hero.has_method("get_equipped_item"):
+		return hero.get_equipped_item(slot_id)
+
+	return ""
+
+
+func format_compact_stats(hero) -> String:
+	var text: String = "FOR " + format_compact_stat_value(hero, "strength")
+	text += " AGI " + format_compact_stat_value(hero, "agility")
+	text += " END " + format_compact_stat_value(hero, "endurance")
+	text += " MAG " + format_compact_stat_value(hero, "magic_power")
+	return text
+
+
+func format_compact_stat_value(hero, stat_name: String) -> String:
+	var final_value: int = get_hero_effective_stat(hero, stat_name)
+	var bonus_value: int = get_hero_equipment_bonus(hero, stat_name)
+
+	if bonus_value > 0:
+		return str(final_value) + "(+" + str(bonus_value) + ")"
+
+	if bonus_value < 0:
+		return str(final_value) + "(" + str(bonus_value) + ")"
+
+	return str(final_value)
+
+
+func get_hero_base_stat(hero, stat_name: String) -> int:
+	if hero == null:
+		return 0
+
+	if hero.has_method("get_base_stat_value"):
+		return int(hero.get_base_stat_value(stat_name))
+
+	var stats = get_property_value(hero, "stats", null)
+
+	if stats == null:
+		return 0
+
+	return get_int_property(stats, stat_name, 0)
+
+
+func get_hero_equipment_bonus(hero, stat_name: String) -> int:
+	if hero == null:
+		return 0
+
+	if hero.has_method("get_equipment_bonus_value"):
+		return int(hero.get_equipment_bonus_value(stat_name))
+
+	return 0
+
+
+func get_hero_effective_stat(hero, stat_name: String) -> int:
+	if hero == null:
+		return 0
+
+	if hero.has_method("get_effective_stat_value"):
+		return int(hero.get_effective_stat_value(stat_name))
+
+	var stats = get_property_value(hero, "stats", null)
+
+	if stats == null:
+		return 0
+
+	return get_int_property(stats, stat_name, 0)
+
+
 # ------------------------------------------------------------
 # HELPERS DE PROPRIÉTÉS
-# Lit les propriétés des héros sans dépendre trop fortement des classes concrètes.
+# Lit les propriétés sans dépendre fortement des classes concrètes.
 # ------------------------------------------------------------
 
 func get_int_property(target, property_name: String, default_value: int = 0) -> int:
@@ -680,11 +1064,6 @@ func object_has_property(target, property_name: String) -> bool:
 
 	return false
 
-
-# ------------------------------------------------------------
-# SÉCURITÉ UI
-# Construit l'interface si elle est appelée trop tôt.
-# ------------------------------------------------------------
 
 func ensure_ui_ready() -> void:
 	if not ui_built:
