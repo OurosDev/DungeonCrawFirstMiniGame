@@ -2,6 +2,14 @@ extends RefCounted
 class_name MonsterDatabase
 
 # ------------------------------------------------------------
+# CONSTANTES
+# ------------------------------------------------------------
+
+const GUARDIAN_BOSS_ID: String = "gardien_boss_etage_2"
+const GUARDIAN_BOSS_HP_MULTIPLIER: int = 5
+
+
+# ------------------------------------------------------------
 # DÉPENDANCES
 # Fournit les ressources nécessaires à la création des monstres.
 # ------------------------------------------------------------
@@ -16,20 +24,25 @@ const StatBlockScript = preload("res://scripts/core/StatBlock.gd")
 # ------------------------------------------------------------
 
 static func get_monster_data(monster_id: String):
-	if monster_id == "zombie":
+	var normalized_id: String = monster_id.strip_edges().to_lower()
+
+	if normalized_id == "zombie":
 		return create_zombie()
 
-	if monster_id == "chauve_souris":
+	if normalized_id == "chauve_souris":
 		return create_bat()
 
-	if monster_id == "gobelin":
+	if normalized_id == "gobelin":
 		return create_goblin()
 
-	if monster_id == "troll":
+	if normalized_id == "troll":
 		return create_troll()
 
-	if monster_id == "gardien":
+	if normalized_id == "gardien":
 		return create_guardian()
+
+	if normalized_id == GUARDIAN_BOSS_ID:
+		return create_guardian_boss_floor_2()
 
 	return create_zombie()
 
@@ -37,7 +50,6 @@ static func get_monster_data(monster_id: String):
 static func get_random_encounter_monster(floor_id: int = 1):
 	var encounter_table: Array = get_floor_encounter_table(floor_id)
 	var monster_id: String = choose_monster_id_from_table(encounter_table)
-
 	return get_monster_data(monster_id)
 
 
@@ -225,6 +237,24 @@ static func create_guardian():
 			create_loot_entry("guardian_relic", "Relique de gardien", 2)
 		]
 	)
+
+
+# ------------------------------------------------------------
+# BOSS - ÉTAGE 2
+# Réutilise le gardien normal, avec uniquement les HP multipliés.
+# ------------------------------------------------------------
+
+static func create_guardian_boss_floor_2():
+	var boss = create_guardian()
+	var base_max_hp: int = int(boss.max_hp)
+	var boss_max_hp: int = base_max_hp * GUARDIAN_BOSS_HP_MULTIPLIER
+
+	set_property_if_available(boss, "monster_id", GUARDIAN_BOSS_ID)
+	set_property_if_available(boss, "visual_id", "gardien")
+	set_property_if_available(boss, "max_hp", boss_max_hp)
+	set_property_if_available(boss, "hp", boss_max_hp)
+
+	return boss
 
 
 # ------------------------------------------------------------
