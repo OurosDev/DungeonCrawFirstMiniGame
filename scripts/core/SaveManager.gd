@@ -1,16 +1,37 @@
 extends Node
 
+# ------------------------------------------------------------
+# DÉPENDANCES
+# Charge les données nécessaires à la sauvegarde des héros.
+# ------------------------------------------------------------
+
 const CharacterDataScript = preload("res://scripts/characters/CharacterData.gd")
 const StatBlockScript = preload("res://scripts/core/StatBlock.gd")
+
+
+# ------------------------------------------------------------
+# CONSTANTES ET ÉTAT
+# Définit le chemin de sauvegarde et le dernier message d'erreur.
+# ------------------------------------------------------------
 
 const SAVE_FILE_PATH: String = "user://savegame.json"
 
 var last_error: String = ""
 
 
+# ------------------------------------------------------------
+# ACCÈS FICHIER
+# Vérifie l'existence d'une sauvegarde.
+# ------------------------------------------------------------
+
 func has_save_file() -> bool:
 	return FileAccess.file_exists(SAVE_FILE_PATH)
 
+
+# ------------------------------------------------------------
+# SAUVEGARDE
+# Sérialise l'état utile du donjon et de la session.
+# ------------------------------------------------------------
 
 func save_game_from_dungeon(dungeon) -> bool:
 	last_error = ""
@@ -26,17 +47,17 @@ func save_game_from_dungeon(dungeon) -> bool:
 
 	var save_data: Dictionary = {}
 
-	save_data["version"] = 1
+	save_data["version"] = 2
 	save_data["current_floor_id"] = dungeon.current_floor_id
 	save_data["party"] = serialize_party(dungeon.party)
 	save_data["layout"] = dungeon.layout.duplicate()
 	save_data["discovered_map_cells"] = serialize_discovered_map_cells(dungeon.discovered_map_cells)
+	save_data["inventory"] = GameSession.get_inventory_save_data()
 
 	if dungeon.player != null:
 		save_data["player_cell"] = vector2i_to_dictionary(dungeon.player.grid_cell)
 
 	var json_text: String = JSON.stringify(save_data, "\t")
-
 	var file = FileAccess.open(SAVE_FILE_PATH, FileAccess.WRITE)
 
 	if file == null:
@@ -48,6 +69,11 @@ func save_game_from_dungeon(dungeon) -> bool:
 
 	return true
 
+
+# ------------------------------------------------------------
+# CHARGEMENT
+# Lit une sauvegarde et prépare GameSession pour la scène Dungeon.
+# ------------------------------------------------------------
 
 func load_game_to_session() -> bool:
 	last_error = ""
@@ -83,6 +109,11 @@ func load_game_to_session() -> bool:
 	return true
 
 
+# ------------------------------------------------------------
+# SÉRIALISATION DU GROUPE
+# Convertit les héros en données JSON simples.
+# ------------------------------------------------------------
+
 func serialize_party(party: Array) -> Array:
 	var serialized_party: Array = []
 
@@ -103,7 +134,6 @@ func serialize_hero(hero) -> Dictionary:
 	data["level"] = get_int_property(hero, "level", 1)
 	data["exp"] = get_int_property(hero, "exp", 0)
 	data["exp_to_next"] = get_int_property(hero, "exp_to_next", 100)
-
 	data["hp"] = get_int_property(hero, "hp", 1)
 	data["max_hp"] = get_int_property(hero, "max_hp", 1)
 	data["mp"] = get_int_property(hero, "mp", 0)
@@ -121,6 +151,11 @@ func serialize_hero(hero) -> Dictionary:
 
 	return data
 
+
+# ------------------------------------------------------------
+# DÉSÉRIALISATION DU GROUPE
+# Reconstruit les héros depuis les données JSON.
+# ------------------------------------------------------------
 
 func deserialize_party(serialized_party) -> Array:
 	var loaded_party: Array = []
@@ -179,6 +214,11 @@ func deserialize_hero(data: Dictionary):
 	return hero
 
 
+# ------------------------------------------------------------
+# SÉRIALISATION DU DONJON
+# Convertit les cellules découvertes et positions en données JSON simples.
+# ------------------------------------------------------------
+
 func serialize_discovered_map_cells(discovered_map_cells: Dictionary) -> Array:
 	var serialized_cells: Array = []
 
@@ -202,6 +242,11 @@ func dictionary_to_vector2i(data: Dictionary) -> Vector2i:
 		int(data.get("y", 0))
 	)
 
+
+# ------------------------------------------------------------
+# HELPERS DE PROPRIÉTÉS
+# Lit les propriétés sans dépendre trop fortement des classes concrètes.
+# ------------------------------------------------------------
 
 func get_int_property(target, property_name: String, default_value: int = 0) -> int:
 	if target == null:
