@@ -21,7 +21,9 @@ const BOSS_KEY_ITEM_ID: String = "boss_door_key_floor_2"
 const SHOP_DISCOVERY_MESSAGE: String = "Un marchand s'est installé dans une alcôve.\nAppuyez sur Échap pour accéder à la boutique dans le menu."
 const INACTIVE_STAIRS_MESSAGE: String = "Un escalier descend plus profondément, mais le passage n'est pas encore accessible."
 const STAIRS_UP_MESSAGE: String = "Le groupe remonte vers l'étage supérieur."
-const BOSS_PLACEHOLDER_MESSAGE: String = "Une présence menaçante bloque cette zone.\nLe boss de cet étage sera ajouté plus tard."
+const GUARDIAN_BOSS_MONSTER_ID: String = "gardien_boss_etage_2"
+const BOSS_DEFEATED_MESSAGE: String = "Le Gardien des profondeurs s'effondre.\nLe passage vers les profondeurs est libre."
+const BOSS_RETREAT_MESSAGE: String = "Le groupe recule devant le Gardien des profondeurs."
 
 const PARTY_CREATION_SCENE_PATH: String = "res://scenes/PartyCreation.tscn"
 const MAIN_MENU_SCENE_PATH: String = "res://scenes/MainMenu.tscn"
@@ -67,6 +69,11 @@ var layout: Array[String] = []
 var stairs_down_cell: Vector2i = Vector2i(-1, -1)
 var stairs_up_cell: Vector2i = Vector2i(-1, -1)
 
+var active_boss_combat_cell: Vector2i = Vector2i(-1, -1)
+var active_boss_return_cell: Vector2i = Vector2i(-1, -1)
+var active_boss_monster_id: String = ""
+var active_boss_in_progress: bool = false
+
 
 # ------------------------------------------------------------
 # ÉTAT DU GROUPE ET DES CONTRÔLEURS
@@ -103,6 +110,7 @@ func _ready() -> void:
 		combat_manager.in_combat = false
 		combat_manager.party = party
 
+	connect_combat_signals()
 	connect_in_game_menu_signals()
 
 	GameSession.set_shop_available(is_shop_cell(player.grid_cell))
@@ -120,6 +128,96 @@ func _unhandled_input(event: InputEvent) -> void:
 		input_controller = DungeonInputControllerScript.new()
 
 	input_controller.handle_input(self, event)
+
+
+# ------------------------------------------------------------
+# SIGNALS DE COMBAT
+# ------------------------------------------------------------
+
+func connect_combat_signals() -> void:
+	if combat_manager == null:
+		return
+
+	if not combat_manager.has_signal("battle_finished"):
+		return
+
+	var callback: Callable = Callable(self, "on_combat_battle_finished")
+
+	if not combat_manager.is_connected("battle_finished", callback):
+		combat_manager.connect("battle_finished", callback)
+
+
+func on_combat_battle_finished(result_status: String, enemy) -> void:
+	var normalized_status: String = result_status.strip_edges().to_lower()
+
+	if normalized_status == "defeat":
+		handle_party_defeat()
+		return
+
+	if not active_boss_in_progress:
+		return
+
+	var boss_cell: Vector2i = active_boss_combat_cell
+	var return_cell: Vector2i = active_boss_return_cell
+	var boss_monster_id: String = active_boss_monster_id
+
+	reset_active_boss_context()
+
+	if boss_monster_id != GUARDIAN_BOSS_MONSTER_ID:
+		return
+
+	if normalized_status == "victory":
+		complete_boss_victory(boss_cell)
+		return
+
+	restore_player_after_boss_interrupt(return_cell, normalized_status)
+
+
+func reset_active_boss_context() -> void:
+	active_boss_combat_cell = Vector2i(-1, -1)
+	active_boss_return_cell = Vector2i(-1, -1)
+	active_boss_monster_id = ""
+	active_boss_in_progress = false
+
+
+func handle_party_defeat() -> void:
+	reset_active_boss_context()
+	GameSession.prepare_new_game()
+	get_tree().call_deferred("change_scene_to_file", MAIN_MENU_SCENE_PATH)
+
+
+func complete_boss_victory(boss_cell: Vector2i) -> void:
+	if is_inside_map(boss_cell) and get_layout_tile(boss_cell) == BOSS_TILE:
+		set_layout_tile(boss_cell, ".")
+		discover_cell(boss_cell)
+
+		if dungeon_renderer != null:
+			build_current_floor()
+
+	store_current_floor_state()
+	append_to_battle_log(BOSS_DEFEATED_MESSAGE)
+
+
+func restore_player_after_boss_interrupt(return_cell: Vector2i, result_status: String) -> void:
+	if is_inside_map(return_cell) and is_walkable(return_cell):
+		player.move_to_cell(return_cell)
+		discover_around_player()
+
+	if result_status == "escape":
+		append_to_battle_log(BOSS_RETREAT_MESSAGE)
+
+
+func append_to_battle_log(message: String) -> void:
+	if combat_manager == null:
+		return
+
+	if message == "":
+		return
+
+	if combat_manager.battle_log != "":
+		combat_manager.battle_log += "\n"
+
+	combat_manager.battle_log += message
 
 
 # ------------------------------------------------------------
@@ -653,6 +751,8 @@ func try_move_to_cell(target: Vector2i) -> void:
 	if not is_walkable(target):
 		return
 
+	var origin_cell: Vector2i = player.grid_cell
+
 	if is_locked_door_cell(target):
 		if not try_unlock_locked_door_at(target):
 			refresh_ui()
@@ -672,7 +772,7 @@ func try_move_to_cell(target: Vector2i) -> void:
 	var found_stairs: bool = check_stairs()
 	var found_temple: bool = check_healing_temple()
 	var found_shop: bool = check_shop()
-	var found_boss_marker: bool = check_boss_marker()
+	var found_boss_marker: bool = check_boss_marker(origin_cell)
 
 	GameSession.set_shop_available(is_shop_cell(player.grid_cell))
 
@@ -874,19 +974,53 @@ func is_shop_cell(cell: Vector2i) -> bool:
 
 
 # ------------------------------------------------------------
-# BOSS / RENCONTRE MAJEURE TEMPORAIRE
+# BOSS / RENCONTRE MAJEURE
 # ------------------------------------------------------------
 
-# Reconnaît le symbole X comme zone majeure de l'étage.
-# Le vrai combat de boss sera ajouté plus tard ; pour l'instant la case est sûre.
-func check_boss_marker() -> bool:
+# Déclenche une rencontre fixe quand le joueur entre sur un symbole X.
+func check_boss_marker(previous_cell: Vector2i = Vector2i(-1, -1)) -> bool:
 	if get_layout_tile(player.grid_cell) != BOSS_TILE:
 		return false
 
-	if combat_manager != null:
-		combat_manager.battle_log = BOSS_PLACEHOLDER_MESSAGE
+	return start_boss_encounter_at(player.grid_cell, previous_cell)
+
+
+# Lance le boss de l'étage courant.
+# Pour v0.7.1, le seul boss actif est le gardien de l'étage 2.
+func start_boss_encounter_at(boss_cell: Vector2i, return_cell: Vector2i) -> bool:
+	if combat_manager == null:
+		return true
+
+	if combat_manager.in_combat:
+		return true
+
+	if party.is_empty():
+		return true
+
+	var boss_monster_id: String = get_boss_monster_id_for_cell(current_floor_id, boss_cell)
+
+	if boss_monster_id == "":
+		return true
+
+	active_boss_combat_cell = boss_cell
+	active_boss_return_cell = return_cell
+	active_boss_monster_id = boss_monster_id
+	active_boss_in_progress = true
+
+	var enemy = MonsterDatabaseScript.get_monster_data(boss_monster_id)
+	combat_manager.start_battle(party, enemy)
+	selected_combat_command = 0
 
 	return true
+
+
+# Associe les symboles X aux futurs boss fixes.
+# Cette fonction pourra recevoir d'autres coordonnées plus tard.
+func get_boss_monster_id_for_cell(floor_id: int, cell: Vector2i) -> String:
+	if floor_id == 2 and cell == Vector2i(4, 1):
+		return GUARDIAN_BOSS_MONSTER_ID
+
+	return ""
 
 
 # ------------------------------------------------------------
@@ -967,6 +1101,7 @@ func debug_teleport_to_cell(target_cell: Vector2i) -> Dictionary:
 	if is_closed_door_cell(target_cell):
 		open_door_at(target_cell)
 
+	var origin_cell: Vector2i = player.grid_cell
 	player.move_to_cell(target_cell)
 	discover_around_player()
 
@@ -976,7 +1111,7 @@ func debug_teleport_to_cell(target_cell: Vector2i) -> Dictionary:
 	var found_stairs: bool = check_stairs()
 	var found_temple: bool = check_healing_temple()
 	var found_shop: bool = check_shop()
-	var found_boss_marker: bool = check_boss_marker()
+	var found_boss_marker: bool = check_boss_marker(origin_cell)
 
 	if (
 		not found_discovery
