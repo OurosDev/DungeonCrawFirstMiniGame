@@ -3,11 +3,42 @@ class_name ShopRules
 
 # ------------------------------------------------------------
 # CONSTANTES
-# Centralise les règles simples de la première boutique.
+# Centralise les règles simples de la boutique.
 # ------------------------------------------------------------
 
 const SHOP_TILE: String = "B"
 const BUY_PRICE_MULTIPLIER: int = 4
+
+# Stock marchand volontairement limité à des objets basiques.
+# Les meilleurs objets doivent rester liés aux drops et à l'exploration.
+const SHOP_BUY_ITEM_IDS: Array[String] = [
+	"rusty_sword",
+	"fragile_dagger",
+	"worn_tunic",
+	"cracked_shield",
+	"tarnished_ring"
+]
+
+
+# ------------------------------------------------------------
+# STOCK D'ACHAT
+# Fournit la liste des objets disponibles chez le marchand.
+# ------------------------------------------------------------
+
+static func get_shop_buy_item_ids() -> Array[String]:
+	return SHOP_BUY_ITEM_IDS.duplicate()
+
+
+static func can_buy_item(item_id: String) -> bool:
+	var normalized_item_id: String = item_id.strip_edges().to_lower()
+
+	if normalized_item_id == "":
+		return false
+
+	if not SHOP_BUY_ITEM_IDS.has(normalized_item_id):
+		return false
+
+	return get_buy_price(normalized_item_id) > 0
 
 
 # ------------------------------------------------------------
@@ -15,12 +46,12 @@ const BUY_PRICE_MULTIPLIER: int = 4
 # Calcule les valeurs utilisées par la boutique.
 # ------------------------------------------------------------
 
-# Pour cette première version, le prix de vente est directement le sell_value de l'objet.
+# Le prix de vente est directement le sell_value de l'objet.
 static func get_sell_price(item_id: String) -> int:
 	return max(0, ItemDatabase.get_sell_value(item_id))
 
 
-# Prévu pour l'achat futur : achat plus cher que la revente.
+# Le prix d'achat reste centralisé ici pour faciliter l'équilibrage.
 static func get_buy_price(item_id: String) -> int:
 	return get_sell_price(item_id) * BUY_PRICE_MULTIPLIER
 
