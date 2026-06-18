@@ -28,6 +28,9 @@ const JOB_THIEF: String = "Voleuse"
 const JOB_MAGE: String = "Mage"
 const JOB_CLERIC: String = "Prêtresse"
 
+const ITEM_TYPE_MISC: String = "misc"
+const ITEM_TYPE_QUEST: String = "quest"
+
 
 # ------------------------------------------------------------
 # ACCÈS AUX OBJETS
@@ -46,7 +49,7 @@ static func get_item_data(item_id: String):
 	return ItemDataScript.new(
 		normalized_id,
 		str(data.get("display_name", normalized_id)),
-		str(data.get("item_type", "misc")),
+		str(data.get("item_type", ITEM_TYPE_MISC)),
 		str(data.get("description", "")),
 		int(data.get("sell_value", 0)),
 		int(data.get("max_stack", DEFAULT_MAX_STACK)),
@@ -104,6 +107,10 @@ static func is_equippable(item_id: String) -> bool:
 	return get_equipment_slot(item_id) != SLOT_NONE
 
 
+static func is_quest_item(item_id: String) -> bool:
+	return get_item_type(item_id) == ITEM_TYPE_QUEST
+
+
 static func can_item_be_equipped_by_class(item_id: String, job_name: String) -> bool:
 	var item = get_item_data(item_id)
 	return item.can_be_equipped_by_class(job_name)
@@ -121,7 +128,8 @@ static func get_all_item_ids() -> Array[String]:
 
 # ------------------------------------------------------------
 # BASE D'OBJETS
-# Centralise les objets déjà utilisés dans les loot tables des monstres.
+# Centralise les objets déjà utilisés dans les loot tables,
+# l'équipement, les coffres et les objets de quête.
 # ------------------------------------------------------------
 
 static func get_item_definitions() -> Dictionary:
@@ -129,7 +137,7 @@ static func get_item_definitions() -> Dictionary:
 		"rusty_sword": create_equippable_item_definition(
 			"Épée rouillée",
 			"weapon",
-			"Une vieille lame piquée par la rouille. Peu fiable, mais encore utilisable.",
+			"Une vieille lame piquée par la rouille.\nPeu fiable, mais encore utilisable.",
 			4,
 			SLOT_WEAPON,
 			[JOB_WARRIOR, JOB_THIEF, JOB_CLERIC],
@@ -299,9 +307,16 @@ static func get_item_definitions() -> Dictionary:
 		),
 		"guardian_relic": create_item_definition(
 			"Relique de gardien",
-			"misc",
+			ITEM_TYPE_MISC,
 			"Un fragment de relique lié aux gardiens oubliés du donjon.",
 			30
+		),
+		"boss_door_key_floor_2": create_item_definition(
+			"Clé du gardien",
+			ITEM_TYPE_QUEST,
+			"Une clé froide et lourde, destinée à la porte du gardien de l'étage 2.",
+			0,
+			1
 		)
 	}
 
@@ -361,7 +376,7 @@ static func create_unknown_item(item_id: String):
 	return ItemDataScript.new(
 		fallback_id,
 		fallback_id,
-		"misc",
+		ITEM_TYPE_MISC,
 		"Objet non répertorié dans la base de données.",
 		0,
 		DEFAULT_MAX_STACK,
