@@ -203,6 +203,21 @@ func create_map_cell(
 		border_color = Color(0.86, 0.58, 0.18, 1.0)
 		text_color = Color(1.0, 0.82, 0.34, 1.0)
 		symbol = "B"
+	elif tile == "X":
+		background_color = Color(0.12, 0.025, 0.025, 1.0)
+		border_color = Color(0.90, 0.18, 0.12, 1.0)
+		text_color = Color(1.0, 0.45, 0.32, 1.0)
+		symbol = "X"
+	elif tile == "F":
+		background_color = Color(0.11, 0.04, 0.025, 1.0)
+		border_color = Color(0.85, 0.32, 0.12, 1.0)
+		text_color = Color(1.0, 0.60, 0.38, 1.0)
+		symbol = "F"
+	elif tile == "M":
+		background_color = Color(0.055, 0.075, 0.08, 1.0)
+		border_color = Color(0.42, 0.72, 0.80, 1.0)
+		text_color = Color(0.75, 0.95, 1.0, 1.0)
+		symbol = "M"
 	else:
 		background_color = Color(0.08, 0.055, 0.035, 1.0)
 		border_color = Color(0.12, 0.08, 0.045, 1.0)
