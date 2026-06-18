@@ -49,33 +49,24 @@ static func get_random_encounter_monster(floor_id: int = 1):
 static func get_floor_encounter_table(floor_id: int) -> Array:
 	if floor_id == 1:
 		return [
-			{
-				"monster_id": "zombie",
-				"weight": 42
-			},
-			{
-				"monster_id": "chauve_souris",
-				"weight": 30
-			},
-			{
-				"monster_id": "gobelin",
-				"weight": 18
-			},
-			{
-				"monster_id": "troll",
-				"weight": 8
-			},
-			{
-				"monster_id": "gardien",
-				"weight": 2
-			}
+			{ "monster_id": "zombie", "weight": 42 },
+			{ "monster_id": "chauve_souris", "weight": 30 },
+			{ "monster_id": "gobelin", "weight": 18 },
+			{ "monster_id": "troll", "weight": 8 },
+			{ "monster_id": "gardien", "weight": 2 }
+		]
+
+	if floor_id == 2:
+		return [
+			{ "monster_id": "zombie", "weight": 20 },
+			{ "monster_id": "chauve_souris", "weight": 22 },
+			{ "monster_id": "gobelin", "weight": 28 },
+			{ "monster_id": "troll", "weight": 20 },
+			{ "monster_id": "gardien", "weight": 10 }
 		]
 
 	return [
-		{
-			"monster_id": "zombie",
-			"weight": 100
-		}
+		{ "monster_id": "zombie", "weight": 100 }
 	]
 
 
@@ -116,8 +107,9 @@ static func choose_monster_id_from_table(encounter_table: Array) -> String:
 
 
 # ------------------------------------------------------------
-# MONSTRES - ÉTAGE 1
-# Crée les ennemis disponibles actuellement dans le premier étage.
+# MONSTRES - ÉTAGE 1 / ÉTAGE 2 TEMPORAIRE
+# Crée les ennemis disponibles actuellement.
+# L'étage 2 réutilise ces monstres avec une table plus dangereuse.
 # ------------------------------------------------------------
 
 static func create_zombie():
@@ -260,7 +252,6 @@ static func create_monster(
 	set_property_if_available(enemy, "monster_id", monster_id)
 	set_property_if_available(enemy, "visual_id", visual_id)
 	set_property_if_available(enemy, "monster_name", monster_name)
-
 	set_property_if_available(
 		enemy,
 		"stats",
@@ -271,18 +262,13 @@ static func create_monster(
 			magic_power
 		)
 	)
-
 	set_property_if_available(enemy, "max_hp", max_hp)
 	set_property_if_available(enemy, "hp", max_hp)
-
 	set_property_if_available(enemy, "max_mp", max_mp)
 	set_property_if_available(enemy, "mp", max_mp)
-
 	set_property_if_available(enemy, "attack_min", attack_min)
 	set_property_if_available(enemy, "attack_max", attack_max)
-
 	set_property_if_available(enemy, "exp_reward", exp_reward)
-
 	set_property_if_available(enemy, "loot_table", loot_table.duplicate(true))
 
 	return enemy
