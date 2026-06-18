@@ -235,6 +235,53 @@ func sell_inventory_item(item_id: String, quantity: int = 1) -> Dictionary:
 	return result
 
 
+# Achète un exemplaire d'un objet disponible chez le marchand.
+func buy_shop_item(item_id: String, quantity: int = 1) -> Dictionary:
+	ensure_inventory()
+
+	var result: Dictionary = create_shop_result()
+	var normalized_item_id: String = item_id.strip_edges().to_lower()
+	var buy_quantity: int = max(1, quantity)
+
+	if normalized_item_id == "":
+		result["message"] = "Objet invalide."
+		return result
+
+	if not ShopRulesScript.can_buy_item(normalized_item_id):
+		result["message"] = "Cet objet n'est pas vendu ici."
+		return result
+
+	var unit_price: int = ShopRulesScript.get_buy_price(normalized_item_id)
+	var total_price: int = unit_price * buy_quantity
+
+	if get_gold() < total_price:
+		result["message"] = "Or insuffisant."
+		return result
+
+	if not can_add_inventory_item(normalized_item_id, buy_quantity):
+		result["message"] = "Inventaire plein."
+		return result
+
+	if not spend_gold(total_price):
+		result["message"] = "Or insuffisant."
+		return result
+
+	var add_result: Dictionary = add_inventory_item(normalized_item_id, buy_quantity)
+
+	if not bool(add_result.get("success", false)) or int(add_result.get("remaining_quantity", 0)) > 0:
+		add_gold(total_price)
+		result["message"] = "Achat annulé : inventaire plein."
+		return result
+
+	result["success"] = true
+	result["item_id"] = normalized_item_id
+	result["quantity"] = buy_quantity
+	result["gold_delta"] = -total_price
+	result["message"] = ItemDatabaseScript.get_display_name(normalized_item_id) + " acheté pour " + str(total_price) + " or."
+
+	return result
+
+
 func create_shop_result() -> Dictionary:
 	return {
 		"success": false,
