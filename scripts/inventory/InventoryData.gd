@@ -44,7 +44,6 @@ func add_item(
 	max_stack: int = DEFAULT_MAX_STACK
 ) -> Dictionary:
 	var result: Dictionary = create_add_result(item_id, quantity)
-
 	var normalized_id: String = normalize_item_id(item_id)
 	var remaining_quantity: int = max(0, quantity)
 	var stack_limit: int = max(1, max_stack)
@@ -59,7 +58,6 @@ func add_item(
 		stack_limit,
 		result
 	)
-
 	remaining_quantity = create_new_stacks(
 		normalized_id,
 		remaining_quantity,
@@ -73,6 +71,43 @@ func add_item(
 	result["inventory_full"] = remaining_quantity > 0
 
 	return result
+
+
+# Vérifie si une quantité complète pourrait être ajoutée sans modifier l'inventaire.
+func can_add_item(item_id: String, quantity: int = 1, max_stack: int = DEFAULT_MAX_STACK) -> bool:
+	var normalized_id: String = normalize_item_id(item_id)
+	var remaining_quantity: int = max(0, quantity)
+	var stack_limit: int = max(1, max_stack)
+
+	if normalized_id == "" or remaining_quantity <= 0:
+		return false
+
+	var simulated_slots: Array = slots.duplicate(true)
+
+	for slot in simulated_slots:
+		if remaining_quantity <= 0:
+			return true
+
+		if not (slot is Dictionary):
+			continue
+
+		if str(slot.get("item_id", "")) != normalized_id:
+			continue
+
+		var current_quantity: int = int(slot.get("quantity", 0))
+		var free_amount: int = max(0, stack_limit - current_quantity)
+		var amount_to_add: int = min(free_amount, remaining_quantity)
+		remaining_quantity -= amount_to_add
+
+	while remaining_quantity > 0 and simulated_slots.size() < max_slots:
+		var new_stack_amount: int = min(stack_limit, remaining_quantity)
+		simulated_slots.append({
+			"item_id": normalized_id,
+			"quantity": new_stack_amount
+		})
+		remaining_quantity -= new_stack_amount
+
+	return remaining_quantity <= 0
 
 
 # Remplit les piles existantes du même objet avant de consommer des emplacements libres.
@@ -95,6 +130,7 @@ func fill_existing_stacks(
 			continue
 
 		var current_quantity: int = int(slot.get("quantity", 0))
+
 		if current_quantity >= max_stack:
 			continue
 
