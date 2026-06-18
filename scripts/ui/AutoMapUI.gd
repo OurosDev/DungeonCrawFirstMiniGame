@@ -198,6 +198,11 @@ func create_map_cell(
 		border_color = Color(0.35, 0.85, 0.75, 1.0)
 		text_color = Color(0.75, 1.0, 0.92, 1.0)
 		symbol = "O"
+	elif tile == "B":
+		background_color = Color(0.11, 0.065, 0.025, 1.0)
+		border_color = Color(0.86, 0.58, 0.18, 1.0)
+		text_color = Color(1.0, 0.82, 0.34, 1.0)
+		symbol = "B"
 	else:
 		background_color = Color(0.08, 0.055, 0.035, 1.0)
 		border_color = Color(0.12, 0.08, 0.045, 1.0)

@@ -17,6 +17,16 @@ signal quit_requested
 
 const ItemDatabaseScript = preload("res://scripts/items/ItemDatabase.gd")
 const EquipmentRulesScript = preload("res://scripts/equipment/EquipmentRules.gd")
+const ShopRulesScript = preload("res://scripts/shop/ShopRules.gd")
+
+
+# ------------------------------------------------------------
+# OUTILS TEMPORAIRES DE DÉVELOPPEMENT
+# Active un bouton de téléportation pour accélérer les tests de layout.
+# À désactiver ou supprimer avant une version finale.
+# ------------------------------------------------------------
+
+const DEV_TELEPORT_ENABLED: bool = true
 
 
 # ------------------------------------------------------------
@@ -37,6 +47,11 @@ var sfx_volume_slider: HSlider = null
 
 var top_separator: HSeparator = null
 var bottom_separator: HSeparator = null
+
+var dev_teleport_button: Button = null
+var dev_teleport_x_input: LineEdit = null
+var dev_teleport_y_input: LineEdit = null
+var dev_teleport_feedback_label: Label = null
 
 
 # ------------------------------------------------------------
@@ -108,6 +123,198 @@ func build_ui() -> void:
 	message_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	main_box.add_child(message_label)
 
+	create_dev_teleport_button()
+
+
+# ------------------------------------------------------------
+# OUTIL TEMPORAIRE DE TÉLÉPORTATION
+# Petit menu de développement pour atteindre rapidement une coordonnée.
+# ------------------------------------------------------------
+
+# Crée le petit bouton carré "T" affiché en haut à gauche du menu.
+func create_dev_teleport_button() -> void:
+	if not DEV_TELEPORT_ENABLED:
+		return
+
+	if dev_teleport_button != null:
+		return
+
+	dev_teleport_button = Button.new()
+	dev_teleport_button.name = "DevTeleportButton"
+	dev_teleport_button.text = "T"
+	dev_teleport_button.focus_mode = Control.FOCUS_NONE
+	dev_teleport_button.custom_minimum_size = Vector2(34, 34)
+	dev_teleport_button.add_theme_font_size_override("font_size", 14)
+	dev_teleport_button.tooltip_text = "Téléportation de test"
+	dev_teleport_button.anchor_left = 0.0
+	dev_teleport_button.anchor_top = 0.0
+	dev_teleport_button.anchor_right = 0.0
+	dev_teleport_button.anchor_bottom = 0.0
+	dev_teleport_button.offset_left = 8
+	dev_teleport_button.offset_top = 8
+	dev_teleport_button.offset_right = 42
+	dev_teleport_button.offset_bottom = 42
+	dev_teleport_button.pressed.connect(show_dev_teleport_screen)
+	root_panel.add_child(dev_teleport_button)
+
+
+# Affiche un écran simple permettant de saisir une coordonnée X/Y.
+func show_dev_teleport_screen() -> void:
+	if not DEV_TELEPORT_ENABLED:
+		return
+
+	set_menu_chrome_visible(false)
+	clear_content()
+
+	var wrapper: VBoxContainer = VBoxContainer.new()
+	wrapper.custom_minimum_size = Vector2(360, 280)
+	wrapper.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	wrapper.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	wrapper.alignment = BoxContainer.ALIGNMENT_CENTER
+	wrapper.add_theme_constant_override("separation", 10)
+	content_box.add_child(wrapper)
+
+	var title: Label = create_label("TÉLÉPORTATION TEST", 18, Color(1.0, 0.82, 0.35))
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	wrapper.add_child(title)
+
+	var current_position: Vector2i = get_dev_current_player_cell()
+	var current_label: Label = create_label(
+		"Position actuelle : X " + str(current_position.x) + " / Y " + str(current_position.y),
+		13,
+		Color(0.82, 0.74, 0.56)
+	)
+	current_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	current_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	wrapper.add_child(current_label)
+
+	var input_panel: Panel = create_panel(
+		Color(0.060, 0.040, 0.030, 1.0),
+		Color(0.32, 0.21, 0.10, 1.0),
+		1
+	)
+	input_panel.custom_minimum_size = Vector2(320, 92)
+	input_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	wrapper.add_child(input_panel)
+
+	var input_box: VBoxContainer = VBoxContainer.new()
+	input_box.set_anchors_preset(Control.PRESET_FULL_RECT)
+	input_box.offset_left = 14
+	input_box.offset_top = 12
+	input_box.offset_right = -14
+	input_box.offset_bottom = -12
+	input_box.add_theme_constant_override("separation", 8)
+	input_panel.add_child(input_box)
+
+	input_box.add_child(create_dev_coordinate_row("X", true, current_position.x))
+	input_box.add_child(create_dev_coordinate_row("Y", false, current_position.y))
+
+	dev_teleport_feedback_label = create_label("Coordonnées de grille Vector2i(x, y).", 12, Color(0.70, 0.62, 0.48))
+	dev_teleport_feedback_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	dev_teleport_feedback_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	wrapper.add_child(dev_teleport_feedback_label)
+
+	var teleport_button: Button = create_menu_button("Téléporter")
+	teleport_button.custom_minimum_size = Vector2(220, 36)
+	teleport_button.add_theme_font_size_override("font_size", 15)
+	teleport_button.pressed.connect(on_dev_teleport_pressed)
+	wrapper.add_child(teleport_button)
+
+	var back_button: Button = create_compact_menu_button("Retour menu")
+	back_button.pressed.connect(show_main_screen)
+	wrapper.add_child(back_button)
+
+	var hint_label: Label = create_label("Outil temporaire de développement", 11, Color(0.56, 0.50, 0.42))
+	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	wrapper.add_child(hint_label)
+
+
+# Crée une ligne de saisie pour X ou Y.
+func create_dev_coordinate_row(label_text: String, is_x_input: bool, default_value: int) -> Control:
+	var row: HBoxContainer = HBoxContainer.new()
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_theme_constant_override("separation", 8)
+
+	var label: Label = create_label(label_text, 15, Color(0.95, 0.86, 0.62))
+	label.custom_minimum_size = Vector2(28, 0)
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(label)
+
+	var input: LineEdit = LineEdit.new()
+	input.text = str(default_value)
+	input.custom_minimum_size = Vector2(90, 26)
+	input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	input.placeholder_text = "0"
+	input.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	input.max_length = 4
+	input.focus_mode = Control.FOCUS_ALL
+	row.add_child(input)
+
+	if is_x_input:
+		dev_teleport_x_input = input
+	else:
+		dev_teleport_y_input = input
+
+	return row
+
+
+# Renvoie la position actuelle du joueur si la scène courante l'expose.
+func get_dev_current_player_cell() -> Vector2i:
+	var scene = get_tree().current_scene
+
+	if scene == null:
+		return Vector2i.ZERO
+
+	if not scene.has_method("get_debug_player_cell"):
+		return Vector2i.ZERO
+
+	return scene.get_debug_player_cell()
+
+
+# Valide les valeurs saisies et demande au donjon de déplacer le joueur.
+func on_dev_teleport_pressed() -> void:
+	if dev_teleport_x_input == null or dev_teleport_y_input == null:
+		set_dev_teleport_feedback("Champs de coordonnées introuvables.", true)
+		return
+
+	var x_text: String = dev_teleport_x_input.text.strip_edges()
+	var y_text: String = dev_teleport_y_input.text.strip_edges()
+
+	if not x_text.is_valid_int() or not y_text.is_valid_int():
+		set_dev_teleport_feedback("Coordonnées invalides.", true)
+		return
+
+	var target_cell: Vector2i = Vector2i(int(x_text), int(y_text))
+	var scene = get_tree().current_scene
+
+	if scene == null or not scene.has_method("debug_teleport_to_cell"):
+		set_dev_teleport_feedback("La scène courante ne permet pas la téléportation.", true)
+		return
+
+	var result: Dictionary = scene.debug_teleport_to_cell(target_cell)
+	var success: bool = bool(result.get("success", false))
+	var message: String = str(result.get("message", ""))
+
+	if not success:
+		set_dev_teleport_feedback(message, true)
+		return
+
+	set_dev_teleport_feedback(message, false)
+
+
+func set_dev_teleport_feedback(text: String, is_error: bool) -> void:
+	if dev_teleport_feedback_label == null:
+		return
+
+	dev_teleport_feedback_label.text = text
+
+	if is_error:
+		dev_teleport_feedback_label.add_theme_color_override("font_color", Color(1.0, 0.48, 0.35))
+	else:
+		dev_teleport_feedback_label.add_theme_color_override("font_color", Color(0.70, 0.90, 0.60))
+
 
 # ------------------------------------------------------------
 # OUVERTURE / FERMETURE
@@ -156,27 +363,42 @@ func set_menu_chrome_visible(should_show: bool) -> void:
 # ------------------------------------------------------------
 
 func show_main_screen() -> void:
-	set_menu_chrome_visible(true)
+	set_menu_chrome_visible(false)
 	clear_content()
 
-	title_label.text = "MENU D'AVENTURE"
-	message_label.text = "Échap : fermer le menu"
+	var menu_wrapper: VBoxContainer = VBoxContainer.new()
+	menu_wrapper.custom_minimum_size = Vector2(300, 300)
+	menu_wrapper.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	menu_wrapper.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	menu_wrapper.alignment = BoxContainer.ALIGNMENT_CENTER
+	menu_wrapper.add_theme_constant_override("separation", 12)
+	content_box.add_child(menu_wrapper)
 
 	var inventory_button: Button = create_menu_button("Inventaire")
 	inventory_button.pressed.connect(show_inventory_screen)
-	content_box.add_child(inventory_button)
+	menu_wrapper.add_child(inventory_button)
 
 	var grimoire_button: Button = create_menu_button("Grimoire")
 	grimoire_button.pressed.connect(show_grimoire_screen)
-	content_box.add_child(grimoire_button)
+	menu_wrapper.add_child(grimoire_button)
 
 	var status_button: Button = create_menu_button("Statut")
 	status_button.pressed.connect(show_status_screen)
-	content_box.add_child(status_button)
+	menu_wrapper.add_child(status_button)
+
+	if GameSession.has_method("is_shop_available") and GameSession.is_shop_available():
+		var shop_button: Button = create_menu_button("Boutique")
+		shop_button.pressed.connect(show_shop_screen)
+		menu_wrapper.add_child(shop_button)
 
 	var system_button: Button = create_menu_button("Menu")
 	system_button.pressed.connect(show_system_screen)
-	content_box.add_child(system_button)
+	menu_wrapper.add_child(system_button)
+
+	var hint_label: Label = create_label("Échap : fermer le menu", 12, Color(0.70, 0.62, 0.48))
+	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	menu_wrapper.add_child(hint_label)
 
 
 # ------------------------------------------------------------
@@ -196,12 +418,41 @@ func show_inventory_screen() -> void:
 	inventory_wrapper.add_theme_constant_override("separation", 6)
 	content_box.add_child(inventory_wrapper)
 
+	var gold_panel: Panel = create_panel(
+		Color(0.060, 0.040, 0.030, 1.0),
+		Color(0.32, 0.21, 0.10, 1.0),
+		1
+	)
+	# Cadre compact : assez large pour afficher "Or : 9999" sans occuper toute la largeur.
+	gold_panel.custom_minimum_size = Vector2(150, 34)
+	gold_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	inventory_wrapper.add_child(gold_panel)
+
+	var gold_center: CenterContainer = CenterContainer.new()
+	gold_center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	gold_center.offset_left = 8
+	gold_center.offset_top = 3
+	gold_center.offset_right = -8
+	gold_center.offset_bottom = -3
+	gold_panel.add_child(gold_center)
+
+	var gold_amount: int = 0
+
+	if GameSession.has_method("get_gold"):
+		gold_amount = GameSession.get_gold()
+
+	var gold_label: Label = create_label("Or : " + str(gold_amount), 15, Color(1.0, 0.82, 0.35))
+	gold_label.custom_minimum_size = Vector2(120, 22)
+	gold_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	gold_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	gold_center.add_child(gold_label)
+
 	var list_panel: Panel = create_panel(
 		Color(0.060, 0.040, 0.030, 1.0),
 		Color(0.32, 0.21, 0.10, 1.0),
 		2
 	)
-	list_panel.custom_minimum_size = Vector2(560, 260)
+	list_panel.custom_minimum_size = Vector2(560, 210)
 	list_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	list_panel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	inventory_wrapper.add_child(list_panel)
@@ -298,6 +549,122 @@ func create_inventory_row(item_id: String, quantity: int) -> Control:
 	row.add_child(quantity_label)
 
 	return panel
+
+
+# ------------------------------------------------------------
+# BOUTIQUE
+# Permet de vendre les objets de l'inventaire quand le groupe est sur une case B.
+# ------------------------------------------------------------
+
+func show_shop_screen(feedback_text: String = "") -> void:
+	set_menu_chrome_visible(false)
+	clear_content()
+
+	var shop_wrapper: VBoxContainer = VBoxContainer.new()
+	shop_wrapper.custom_minimum_size = Vector2(600, 380)
+	shop_wrapper.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	shop_wrapper.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	shop_wrapper.alignment = BoxContainer.ALIGNMENT_CENTER
+	shop_wrapper.add_theme_constant_override("separation", 6)
+	content_box.add_child(shop_wrapper)
+
+	var gold_label: Label = create_label("Or : " + str(GameSession.get_gold()), 18, Color(1.0, 0.82, 0.35))
+	gold_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	shop_wrapper.add_child(gold_label)
+
+	if feedback_text != "":
+		var feedback_label: Label = create_label(feedback_text, 13, Color(0.86, 0.76, 0.48))
+		feedback_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		shop_wrapper.add_child(feedback_label)
+
+	var list_panel: Panel = create_panel(
+		Color(0.060, 0.040, 0.030, 1.0),
+		Color(0.32, 0.21, 0.10, 1.0),
+		2
+	)
+	list_panel.custom_minimum_size = Vector2(560, 240)
+	list_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	shop_wrapper.add_child(list_panel)
+
+	var shop_list: VBoxContainer = create_scrollable_list_inside_panel(list_panel)
+	var sellable_count: int = add_sellable_inventory_rows(shop_list)
+
+	if sellable_count <= 0:
+		shop_list.add_child(create_empty_message_label("Aucun objet à vendre."))
+
+	var back_panel: Panel = create_panel(
+		Color(0.060, 0.040, 0.030, 1.0),
+		Color(0.32, 0.21, 0.10, 1.0),
+		1
+	)
+	back_panel.custom_minimum_size = Vector2(560, 38)
+	back_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	shop_wrapper.add_child(back_panel)
+
+	var back_center: CenterContainer = CenterContainer.new()
+	back_center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	back_center.offset_left = 8
+	back_center.offset_top = 4
+	back_center.offset_right = -8
+	back_center.offset_bottom = -4
+	back_panel.add_child(back_center)
+
+	var back_button: Button = create_compact_menu_button("Retour menu")
+	back_button.pressed.connect(show_main_screen)
+	back_center.add_child(back_button)
+
+	var hint_label: Label = create_label("Cliquez sur un objet pour en vendre 1. Échap : retour au jeu", 12, Color(0.70, 0.62, 0.48))
+	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	shop_wrapper.add_child(hint_label)
+
+
+func add_sellable_inventory_rows(shop_list: VBoxContainer) -> int:
+	var inventory = GameSession.get_inventory()
+	var slots: Array = []
+	var sellable_count: int = 0
+
+	if inventory != null and inventory.has_method("get_slots"):
+		slots = inventory.get_slots()
+
+	for slot in slots:
+		if not (slot is Dictionary):
+			continue
+
+		var item_id: String = str(slot.get("item_id", ""))
+		var quantity: int = int(slot.get("quantity", 0))
+
+		if item_id == "" or quantity <= 0:
+			continue
+
+		if not ShopRulesScript.can_sell_item(item_id):
+			continue
+
+		shop_list.add_child(create_shop_sell_button(item_id, quantity))
+		sellable_count += 1
+
+	return sellable_count
+
+
+func create_shop_sell_button(item_id: String, quantity: int) -> Button:
+	var button: Button = Button.new()
+	var display_name: String = ItemDatabaseScript.get_display_name(item_id)
+	var sell_price: int = ShopRulesScript.get_sell_price(item_id)
+
+	button.text = display_name + "     |     " + str(quantity) + "     |     " + str(sell_price) + " or"
+	button.custom_minimum_size = Vector2(520, 28)
+	button.focus_mode = Control.FOCUS_NONE
+	button.add_theme_font_size_override("font_size", 13)
+	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	button.pressed.connect(on_shop_sell_pressed.bind(item_id))
+
+	return button
+
+
+func on_shop_sell_pressed(item_id: String) -> void:
+	var result: Dictionary = GameSession.sell_inventory_item(item_id, 1)
+	var feedback_text: String = str(result.get("message", ""))
+	show_shop_screen(feedback_text)
 
 
 # ------------------------------------------------------------
