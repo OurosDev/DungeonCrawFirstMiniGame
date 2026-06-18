@@ -1,4 +1,4 @@
-# Règles de collaboration avec l’assistant
+# Règles de collaboration avec l'assistant
 
 Ce document regroupe les règles de travail utilisées pour les échanges autour du projet `DungeonCrawFirstMiniGame`.
 
@@ -10,22 +10,22 @@ Il sert à éviter de surcharger `ROADMAP.md` avec des consignes qui concernent 
 
 - Toujours continuer en français.
 - Réponses directes, lisibles et structurées.
-- Signaler clairement les incohérences entre GitHub, les releases et la conversation.
+- Signaler clairement les incohérences entre GitHub, les releases, les audits, les documents et la conversation.
 - Ne pas accélérer artificiellement vers `v1.0`.
-- Préférer des versions pré-1.0 : `v0.8`, `v0.8.1`, `v0.8.2`, `v0.9`, `v0.10`, etc.
+- Préférer des versions pré-1.0 : `v0.8.1`, `v0.8.2`, `v0.9`, `v0.10`, etc.
 
 ---
 
-## 2. Démarrage d’une nouvelle conversation / relais IA
+## 2. Démarrage d'une nouvelle conversation / relais IA
 
-Au premier échange d’une nouvelle conversation de travail sur ce projet, l’assistant doit obligatoirement :
+Au premier échange d'une nouvelle conversation de travail sur ce projet, l'assistant doit obligatoirement :
 
-1. lire `IA_RELAIS.md` s’il existe ;
-2. lire `ASSISTANT_WORKFLOW.md` ;
-3. vérifier l’état actuel du repo public GitHub sur `main` ;
+1. lire `IA_RELAIS.md` s'il existe ;
+2. lire `ASSISTANT_WORKFLOW.md` à la racine ;
+3. vérifier l'état actuel du repo public GitHub sur `main` ;
 4. vérifier la dernière release / le dernier tag disponible ;
 5. consulter les documents de pilotage et de contexte ;
-6. signaler les incohérences entre `IA_RELAIS.md`, le repo, les releases, les audits, les changelogs et la roadmap.
+6. signaler les incohérences entre `IA_RELAIS.md`, le repo, les releases, les audits, les changelogs, la roadmap et les fichiers dupliqués éventuels.
 
 Documents à consulter en priorité :
 
@@ -35,7 +35,7 @@ ASSISTANT_WORKFLOW.md
 README.md
 CHANGELOG/README.md
 CHANGELOG/vX.Y.md le plus récent
-audits/STATE_AUDITvX.Y.md le plus récent
+audits/STATE_AUDITvX.Y.Z.md le plus récent
 ROADMAP.md
 TECHNICAL_DEBT.md
 docs/dungeon/FLOOR_DESIGN.md
@@ -45,29 +45,24 @@ playtests/PLAYTEST_XX_vX.Y.md le plus récent
 project.godot
 ```
 
-L’assistant doit aussi prendre connaissance de l’arborescence complète du repo :
+L'assistant doit aussi prendre connaissance de l'arborescence complète du repo :
 
-```text
 - identifier les dossiers et fichiers présents ;
 - comprendre les liens entre scripts, scènes, assets et documents ;
 - lire les fichiers texte utiles avant toute modification ;
 - repérer les assets binaires par chemin et usage probable ;
-- ne pas prétendre avoir inspecté le contenu interne d’un asset binaire sans l’avoir réellement ouvert ou analysé.
-```
+- ne pas prétendre avoir inspecté le contenu interne d'un asset binaire sans l'avoir réellement ouvert ou analysé.
 
 Pour les scripts, il faut au minimum comprendre les responsabilités des fichiers majeurs avant de proposer une modification.
+Pour les assets binaires, il suffit généralement d'identifier leur emplacement, leur rôle et leurs références, sauf si la tâche concerne directement l'image, l'audio ou la scène.
 
-Pour les assets binaires, il suffit généralement d’identifier leur emplacement, leur rôle et leurs références, sauf si la tâche concerne directement l’image, l’audio ou la scène.
+La première réponse d'une nouvelle conversation doit résumer brièvement :
 
-La première réponse d’une nouvelle conversation doit résumer brièvement :
-
-```text
 - état confirmé du repo ;
 - dernière version/release détectée ;
 - documents clés pris en compte ;
 - incohérences éventuelles ;
 - prochaine action proposée.
-```
 
 ---
 
@@ -75,11 +70,11 @@ La première réponse d’une nouvelle conversation doit résumer brièvement :
 
 Avant de proposer un pack de scripts ou de documentation :
 
-1. vérifier l’état actuel du repo public GitHub ;
+1. vérifier l'état actuel du repo public GitHub ;
 2. vérifier les fichiers concernés sur `main` ;
 3. tenir compte des releases déjà créées ;
-4. signaler si la roadmap, les documents de design ou les scripts ne sont pas alignés ;
-5. éviter de repartir d’un ancien fichier de test ou d’un pack précédent si le repo contient une version plus récente.
+4. signaler si la roadmap, les documents de design, les audits ou les scripts ne sont pas alignés ;
+5. éviter de repartir d'un ancien fichier de test ou d'un pack précédent si le repo contient une version plus récente.
 
 Quand un cache GitHub est suspect, utiliser une URL avec paramètre anti-cache.
 
@@ -92,7 +87,9 @@ Quand des scripts doivent être modifiés :
 - fournir les scripts complets quand raisonnable ;
 - sinon fournir un pack `.zip` de fichiers à remplacer ;
 - éviter les snippets partiels sauf si le fichier est vraiment trop grand ;
-- ajouter des commentaires de sections clairs :
+- ajouter des commentaires de sections clairs quand ils manquent.
+
+Exemples de sections :
 
 ```gdscript
 # CONSTANTES
@@ -115,6 +112,7 @@ Toujours séparer :
 ```text
 Nouveaux fichiers
 Fichiers mis à jour
+Fichiers à supprimer
 À ne pas pousser
 ```
 
@@ -170,13 +168,15 @@ Règles :
 
 - `README.md` reste à la racine ;
 - `IA_RELAIS.md` reste à la racine et sert de passage de main entre conversations ;
-- `ASSISTANT_WORKFLOW.md` peut rester à la racine pour accès rapide ;
+- `ASSISTANT_WORKFLOW.md` reste à la racine pour accès rapide ;
 - `CHANGELOG/` reste à la racine ;
-- `audits/` contient les audits d’état ;
-- `docs/dungeon/` contient les documents de conception et visualisation d’étages ;
+- `audits/` contient les audits d'état ;
+- `docs/dungeon/` contient les documents de conception et visualisation d'étages ;
 - `playtests/` contient les synthèses propres des sessions de test.
 
-Ne pas déplacer immédiatement tous les fichiers Markdown pour le seul rangement. Profiter d’une mise à jour réelle d’un document pour le déplacer au bon emplacement si nécessaire.
+Ne pas déplacer immédiatement tous les fichiers Markdown pour le seul rangement. Profiter d'une mise à jour réelle d'un document pour le déplacer au bon emplacement si nécessaire.
+
+Important : s'il existe un ancien `docs/ASSISTANT_WORKFLOW.md`, le considérer comme obsolète ou comme simple redirection vers `../ASSISTANT_WORKFLOW.md`. La source de vérité est le fichier racine `ASSISTANT_WORKFLOW.md`.
 
 ---
 
@@ -184,8 +184,8 @@ Ne pas déplacer immédiatement tous les fichiers Markdown pour le seul rangemen
 
 - `ROADMAP.md` doit rester court et orienté décisions.
 - Les détails de versions doivent aller dans `CHANGELOG/`.
-- Les règles de construction d’étage doivent rester dans `FLOOR_DESIGN.md`.
-- La validation visuelle des layouts doit rester dans `FLOOR_VISUALIZER.md`.
+- Les règles de construction d'étage doivent rester dans `docs/dungeon/FLOOR_DESIGN.md`.
+- La validation visuelle des layouts doit rester dans `docs/dungeon/FLOOR_VISUALIZER.md`.
 - Les refactorisations et dettes techniques doivent aller dans `TECHNICAL_DEBT.md`.
 - Les consignes de collaboration doivent rester dans ce fichier.
 - Les retours de test doivent aller dans `playtests/`.
@@ -193,9 +193,9 @@ Ne pas déplacer immédiatement tous les fichiers Markdown pour le seul rangemen
 
 ---
 
-## 8. Audits d’état
+## 8. Audits d'état
 
-Les audits d’état doivent être placés dans `audits/`.
+Les audits d'état doivent être placés dans `audits/`.
 
 Convention de nommage :
 
@@ -206,31 +206,31 @@ STATE_AUDITvX.X.X.md
 Exemple :
 
 ```text
-audits/STATE_AUDITv0.8.md
+audits/STATE_AUDITv0.8.1.md
 ```
 
 Chaque audit doit inclure en en-tête :
 
-- date d’audit ;
+- date d'audit ;
 - version de référence ;
 - branche vérifiée ;
-- objectif de l’audit.
+- objectif de l'audit.
 
-Pour déterminer l’état réel du projet, privilégier :
+Pour déterminer l'état réel du projet, privilégier :
 
 1. le repo vérifié sur `main` ;
-2. l’audit d’état le plus récent ;
+2. l'audit d'état le plus récent ;
 3. le changelog ;
 4. `IA_RELAIS.md` ;
 5. la roadmap.
 
-La roadmap sert à orienter les prochaines décisions, mais elle peut être en retard sur l’état réel du dépôt.
+La roadmap sert à orienter les prochaines décisions, mais elle peut être en retard sur l'état réel du dépôt.
 
 ---
 
 ## 9. Préparation documentaire des releases
 
-Lors de la préparation d’une future release, proposer aussi les mises à jour documentaires nécessaires.
+Lors de la préparation d'une future release, proposer aussi les mises à jour documentaires nécessaires.
 
 À vérifier systématiquement :
 
@@ -238,8 +238,8 @@ Lors de la préparation d’une future release, proposer aussi les mises à jour
 - mettre à jour `CHANGELOG/README.md` pour référencer la nouvelle version ;
 - mettre à jour `ROADMAP.md` si la version stable actuelle, la prochaine direction ou les priorités changent ;
 - mettre à jour `TECHNICAL_DEBT.md` si une dette technique est ajoutée, résolue ou reclassée ;
-- mettre à jour `FLOOR_DESIGN.md` si les règles de construction d’étage ou la nomenclature changent ;
-- mettre à jour `FLOOR_VISUALIZER.md` si les layouts, symboles ou variantes de planification changent ;
+- mettre à jour `docs/dungeon/FLOOR_DESIGN.md` si les règles de construction d'étage ou la nomenclature changent ;
+- mettre à jour `docs/dungeon/FLOOR_VISUALIZER.md` si les layouts, symboles ou variantes de planification changent ;
 - mettre à jour `playtests/` si une session de test apporte des informations utiles ;
 - mettre à jour `IA_RELAIS.md` quand une conversation longue se termine ou quand un changement de base doit être transmis ;
 - mettre à jour ce fichier si les règles de collaboration changent.
@@ -250,9 +250,9 @@ Ne pas pousser les `README_PACK.md` générés localement, sauf décision explic
 
 ## 10. Règles spécifiques à FLOOR_VISUALIZER.md
 
-Lors d’une mise à jour de `FLOOR_VISUALIZER.md` :
+Lors d'une mise à jour de `docs/dungeon/FLOOR_VISUALIZER.md` :
 
-- conserver l’affichage des cartes sous forme de tableau / grille ;
+- conserver l'affichage des cartes sous forme de tableau / grille ;
 - respecter les normes de remplissage déjà en place ;
 - afficher les murs en carrés `■` ;
 - laisser les sols / couloirs en cellules vides ;
@@ -323,7 +323,7 @@ Les fichiers `playtests/` doivent utiliser seulement :
 
 ```text
 logs bruts complets
-chemins Windows complets avec noms d’utilisateur
+chemins Windows complets avec noms d'utilisateur
 identifiants machine
 captures système complètes
 sauvegardes locales de testeurs
@@ -351,7 +351,7 @@ dist/
 export/
 ```
 
-Pour les builds Windows destinées aux testeurs, utiliser uniquement le renderer :
+Pour les builds Windows destinées aux testeurs, utiliser par défaut :
 
 ```text
 Compatibility / OpenGL
@@ -360,17 +360,12 @@ Compatibility / OpenGL
 Cette règle vient du playtest `v0.8` :
 
 - un testeur externe a rencontré des crashs natifs Windows avec les builds modernes `Forward+ / D3D12` ;
-- une tentative Vulkan n’a pas résolu le problème ;
+- une tentative Vulkan n'a pas résolu le problème ;
 - le test Vulkan hors OneDrive a également crashé ;
 - la build `Compatibility / OpenGL` a fonctionné correctement ;
-- l’incident est donc considéré comme résolu par procédure d’export.
+- l'incident est donc considéré comme résolu par procédure d'export.
 
-Conclusion pratique :
-
-```text
-Pour les playtests Windows, exporter en Compatibility / OpenGL par défaut.
-Ne pas perdre de temps à distribuer des builds D3D12 / Vulkan aux testeurs modestes sauf test technique volontaire.
-```
+Conclusion pratique : pour les playtests Windows, exporter en `Compatibility / OpenGL` par défaut. Ne pas distribuer de builds D3D12 / Vulkan aux testeurs modestes sauf test technique volontaire.
 
 ---
 
@@ -395,13 +390,12 @@ Ne pas perdre de temps à distribuer des builds D3D12 / Vulkan aux testeurs mode
 
 ## 16. Points de vigilance spécifiques
 
-- Les anciennes sauvegardes peuvent conserver d’anciens layouts mémorisés.
+- Les anciennes sauvegardes peuvent conserver d'anciens layouts mémorisés.
 - Pour tester un changement de layout, utiliser une nouvelle partie ou réinitialiser la sauvegarde de test.
-- L’outil de téléportation de développement est temporaire.
+- L'outil de téléportation de développement est temporaire.
 - Il doit être désactivé ou supprimé avant une version finale propre.
 - En cas de crash testeur non reproductible localement, récupérer les logs Godot avant de modifier le gameplay.
-- Si un crash est résolu par configuration d’export ou renderer, documenter la procédure avant de modifier le code.
-- Ne pas rouvrir le problème des fichiers temporaires `scenes/*.tmp` sans nouvelle preuve : l’utilisateur indique qu’ils ont été supprimés depuis longtemps.
+- Les builds locales `.exe`, `.pck` et `.zip` de playtest ne doivent pas être poussées dans le repo.
 
 ---
 
@@ -411,26 +405,12 @@ Ne pas perdre de temps à distribuer des builds D3D12 / Vulkan aux testeurs mode
 v0.8.1 — Stabilisation playtest et scaling fenêtre
 ```
 
-Contenu majeur :
+Contenu majeur à retenir :
 
-- renderer `Compatibility / OpenGL` ;
-- builds Windows de playtest en Compatibility / OpenGL uniquement ;
-- scaling fenêtre validé avec `canvas_items` + `keep` ;
-- textes lisibles en résolution élevée ;
-- incident crash playtest v0.8 documenté sans logs bruts ;
-- aucune modification gameplay pour ce correctif.
-
-Point de vigilance à vérifier au démarrage d’une nouvelle conversation :
-
-```text
-Confirmer si la release/tag GitHub v0.8.1 a bien été créée après le push des fichiers.
-```
-
-Prochaines pistes probables :
-
-```text
-- compléter les retours finaux du playtest 01 ;
-- décider d’une éventuelle v0.8.2 si les retours imposent un correctif court ;
-- reprendre ensuite le polish/contenu vers v0.9 ;
-- préparer plus tard une passe UI avec bordures texturées 9-slice, plutôt via StyleBoxTexture / thème.
-```
+- base `v0.8` avec commandes souris et clavier AZERTY ;
+- `project.godot` configuré en `GL Compatibility` ;
+- scaling fenêtre corrigé par `canvas_items + keep` ;
+- playtest 01 documenté ;
+- crashs Windows traités comme contrainte renderer/export ;
+- builds, logs et sauvegardes de test hors repo ;
+- audit documentaire `v0.8.1` recommandé comme photographie actuelle du dépôt.
