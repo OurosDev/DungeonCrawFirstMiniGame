@@ -8,6 +8,7 @@ extends Node
 const InventoryDataScript = preload("res://scripts/inventory/InventoryData.gd")
 const ItemDatabaseScript = preload("res://scripts/items/ItemDatabase.gd")
 const EquipmentRulesScript = preload("res://scripts/equipment/EquipmentRules.gd")
+const ShopRulesScript = preload("res://scripts/shop/ShopRules.gd")
 
 
 # ------------------------------------------------------------
@@ -22,6 +23,8 @@ var is_loading_save: bool = false
 var pending_save_data: Dictionary = {}
 
 var inventory = null
+var gold: int = 0
+var shop_available: bool = false
 
 
 # ------------------------------------------------------------
@@ -35,6 +38,8 @@ func prepare_new_game() -> void:
 	is_loading_save = false
 	pending_save_data.clear()
 	reset_inventory()
+	set_gold(0)
+	set_shop_available(false)
 
 
 # ------------------------------------------------------------
@@ -87,6 +92,8 @@ func prepare_loaded_game(save_data: Dictionary) -> void:
 		current_floor_id = int(pending_save_data["current_floor_id"])
 
 	load_inventory_from_save_data(pending_save_data.get("inventory", []))
+	set_gold(int(pending_save_data.get("gold", 0)))
+	set_shop_available(false)
 
 
 func clear_loaded_game_data() -> void:
@@ -154,6 +161,88 @@ func get_inventory_save_data() -> Array:
 func load_inventory_from_save_data(serialized_inventory) -> void:
 	ensure_inventory()
 	inventory.load_from_save_data(serialized_inventory)
+
+
+# ------------------------------------------------------------
+# OR ET BOUTIQUE
+# Gère la monnaie du groupe et l'accès contextuel au marchand.
+# ------------------------------------------------------------
+
+func set_gold(amount: int) -> void:
+	gold = max(0, amount)
+
+
+func get_gold() -> int:
+	return gold
+
+
+func add_gold(amount: int) -> void:
+	gold = max(0, gold + amount)
+
+
+func spend_gold(amount: int) -> bool:
+	var cost: int = max(0, amount)
+
+	if gold < cost:
+		return false
+
+	gold -= cost
+	return true
+
+
+func set_shop_available(available: bool) -> void:
+	shop_available = available
+
+
+func is_shop_available() -> bool:
+	return shop_available
+
+
+# Vend un exemplaire d'un objet présent dans l'inventaire.
+func sell_inventory_item(item_id: String, quantity: int = 1) -> Dictionary:
+	ensure_inventory()
+
+	var result: Dictionary = create_shop_result()
+	var normalized_item_id: String = item_id.strip_edges().to_lower()
+	var sell_quantity: int = max(1, quantity)
+
+	if normalized_item_id == "":
+		result["message"] = "Objet invalide."
+		return result
+
+	if not ShopRulesScript.can_sell_item(normalized_item_id):
+		result["message"] = "Cet objet ne peut pas être vendu."
+		return result
+
+	if get_inventory_item_quantity(normalized_item_id) < sell_quantity:
+		result["message"] = "Objet absent de l'inventaire."
+		return result
+
+	if not remove_inventory_item(normalized_item_id, sell_quantity):
+		result["message"] = "Impossible de retirer l'objet de l'inventaire."
+		return result
+
+	var unit_price: int = ShopRulesScript.get_sell_price(normalized_item_id)
+	var gained_gold: int = unit_price * sell_quantity
+	add_gold(gained_gold)
+
+	result["success"] = true
+	result["item_id"] = normalized_item_id
+	result["quantity"] = sell_quantity
+	result["gold_delta"] = gained_gold
+	result["message"] = ItemDatabaseScript.get_display_name(normalized_item_id) + " vendu pour " + str(gained_gold) + " or."
+
+	return result
+
+
+func create_shop_result() -> Dictionary:
+	return {
+		"success": false,
+		"item_id": "",
+		"quantity": 0,
+		"gold_delta": 0,
+		"message": ""
+	}
 
 
 # ------------------------------------------------------------

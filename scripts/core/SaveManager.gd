@@ -47,12 +47,13 @@ func save_game_from_dungeon(dungeon) -> bool:
 
 	var save_data: Dictionary = {}
 
-	save_data["version"] = 3
+	save_data["version"] = 4
 	save_data["current_floor_id"] = dungeon.current_floor_id
 	save_data["party"] = serialize_party(dungeon.party)
 	save_data["layout"] = dungeon.layout.duplicate()
 	save_data["discovered_map_cells"] = serialize_discovered_map_cells(dungeon.discovered_map_cells)
 	save_data["inventory"] = GameSession.get_inventory_save_data()
+	save_data["gold"] = GameSession.get_gold()
 
 	if dungeon.player != null:
 		save_data["player_cell"] = vector2i_to_dictionary(dungeon.player.grid_cell)
