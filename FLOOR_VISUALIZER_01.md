@@ -4,7 +4,7 @@ Visualisation des layouts du donjon.
 
 Ce fichier sert à relire les étages plus facilement que dans le layout ASCII brut, notamment avant d’ajouter des coffres `C`, des messages `M`, des combats fixes `F` ou des boss `X`.
 
-> Note : ce fichier utilise du HTML avec styles intégrés pour faire un essai de coloration des symboles dans un aperçu Markdown local, par exemple VS Code. Certaines plateformes, dont GitHub selon le rendu appliqué, peuvent retirer les styles HTML et afficher une version moins colorée.
+> Note : ce fichier utilise des tableaux HTML avec styles intégrés. Le rendu est surtout prévu pour un aperçu Markdown local, par exemple VS Code. Certaines plateformes peuvent retirer les couleurs HTML et afficher une version moins lisible.
 
 ---
 
@@ -12,69 +12,844 @@ Ce fichier sert à relire les étages plus facilement que dans le layout ASCII b
 
 | Symbole logique | Affichage dans la grille | Rôle |
 |---|---|---|
-| `#` | `■` | Mur |
-| `.` | espace vide | Sol / couloir |
-| `D` | <span style="color:#b8793a;font-weight:700;">D</span> | Porte fermée |
-| `d` | <span style="color:#d0a05f;font-weight:700;">d</span> | Porte ouverte |
-| `>` | <span style="color:#4f8cff;font-weight:700;">&gt;</span> | Escalier descendant |
-| `<` | <span style="color:#73c7ff;font-weight:700;">&lt;</span> | Escalier montant |
-| `O` | <span style="color:#55c878;font-weight:700;">O</span> | Temple |
-| `B` | <span style="color:#ff9d3b;font-weight:700;">B</span> | Boutique |
-| `C` | <span style="color:#ffd447;font-weight:700;">C</span> | Coffre |
-| `M` | <span style="color:#c77dff;font-weight:700;">M</span> | Message / PNJ neutre / indication |
-| `F` | <span style="color:#c96a4a;font-weight:700;">F</span> | Combat fixe |
-| `X` | <span style="color:#ff4a4a;font-weight:700;">X</span> | Boss / rencontre majeure |
-| `P` | <span style="color:#c76f2b;font-weight:700;">P</span> | Piège |
-| `E` | <span style="color:#35d0c8;font-weight:700;">E</span> | Événement |
-| `R` | <span style="color:#8f8cff;font-weight:700;">R</span> | Rune / sort visible |
-| `L` | <span style="color:#8c52ff;font-weight:700;">L</span> | Porte verrouillée |
-| `S` | <span style="color:#9a9a9a;font-weight:700;">S</span> | Passage secret |
+| `#` | ■ | Mur |
+| `.` | cellule vide | Sol / couloir |
+| `D` | <span style="color:#b9783d; font-weight:bold;">D</span> | Porte fermée |
+| `d` | <span style="color:#d8a35d; font-weight:bold;">d</span> | Porte ouverte |
+| `>` | <span style="color:#4f8cff; font-weight:bold;">&gt;</span> | Escalier descendant |
+| `<` | <span style="color:#6ec6ff; font-weight:bold;">&lt;</span> | Escalier montant |
+| `O` | <span style="color:#58c46b; font-weight:bold;">O</span> | Temple |
+| `B` | <span style="color:#f29a38; font-weight:bold;">B</span> | Boutique |
+| `C` | <span style="color:#d6b13f; font-weight:bold;">C</span> | Coffre |
+| `M` | <span style="color:#b779ff; font-weight:bold;">M</span> | Message / PNJ neutre / indication |
+| `F` | <span style="color:#c76a4a; font-weight:bold;">F</span> | Combat fixe |
+| `X` | <span style="color:#ff4d4d; font-weight:bold;">X</span> | Boss / rencontre majeure |
+| `P` | <span style="color:#c97128; font-weight:bold;">P</span> | Piège |
+| `E` | <span style="color:#4fd1c5; font-weight:bold;">E</span> | Événement |
+| `R` | <span style="color:#8b7cff; font-weight:bold;">R</span> | Rune / sort visible |
+| `L` | <span style="color:#9b5de5; font-weight:bold;">L</span> | Porte verrouillée |
+| `S` | <span style="color:#9ca3af; font-weight:bold;">S</span> | Passage secret |
 
 ---
 
 ## 1. État actuel en jeu
 
 Cette section reflète strictement les layouts actuellement implémentés.
-
 Les cases de sol / couloir sont volontairement laissées vides pour améliorer la lisibilité générale.
 
 ### Étage 1 — Galeries de terre sombre
 
 Dimensions : **31 × 21**.
 
-```text
-   0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
-```
+<table style="border-collapse:collapse; border-spacing:0; margin:8px 0 14px 0;">
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;"></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">0</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">1</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">2</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">3</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">4</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">5</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">6</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">7</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">8</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">9</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">10</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">11</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">12</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">13</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">14</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">15</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">16</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">17</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">18</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">19</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">20</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">21</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">22</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">23</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">24</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">25</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">26</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">27</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">28</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">29</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">30</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;"></td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">0</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">0</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">1</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;"><span style="color:#b9783d; font-weight:bold;">D</span></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;"><span style="color:#58c46b; font-weight:bold;">O</span></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">1</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">2</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">2</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">3</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">3</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">4</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">4</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">5</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">5</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">6</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;"><span style="color:#b9783d; font-weight:bold;">D</span></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">6</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">7</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">7</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">8</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">8</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">9</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">9</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">10</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">10</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">11</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">11</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">12</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">12</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">13</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;"><span style="color:#b9783d; font-weight:bold;">D</span></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">13</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">14</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">14</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">15</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;"><span style="color:#b9783d; font-weight:bold;">D</span></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;"><span style="color:#f29a38; font-weight:bold;">B</span></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">15</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">16</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">16</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">17</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;"><span style="color:#4f8cff; font-weight:bold;">&gt;</span></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">17</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">18</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;"><span style="color:#b9783d; font-weight:bold;">D</span></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">18</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">19</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;"><span style="color:#b9783d; font-weight:bold;">D</span></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">19</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">20</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">20</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;"></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">0</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">1</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">2</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">3</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">4</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">5</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">6</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">7</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">8</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">9</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">10</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">11</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">12</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">13</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">14</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">15</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">16</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">17</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">18</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">19</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">20</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">21</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">22</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">23</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">24</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">25</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">26</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">27</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">28</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">29</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">30</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;"></td>
+  </tr>
+</table>
 
-<pre style="font-family:monospace;line-height:1.15;">
-00 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 00
-01 ■   ■ ■                     <span style="color:#b8793a;font-weight:700;">D</span><span style="color:#55c878;font-weight:700;">O</span>■ 01
-02 ■■■ ■ ■ ■■ ■■ ■■■■■■■■■■■■■■■■■ 02
-03 ■ ■ ■ ■     ■       ■         ■ 03
-04 ■ ■ ■ ■■■ ■■■■■■■■■ ■ ■■■■■■  ■ 04
-05 ■ ■ ■     ■         ■   ■     ■ 05
-06 ■ ■ ■ ■<span style="color:#b8793a;font-weight:700;">D</span>■■■ ■■■ ■■■■■■■ ■ ■■■■■ 06
-07 ■ ■   ■   ■   ■ ■     ■ ■     ■ 07
-08 ■ ■■■ ■■■ ■■■ ■■■ ■ ■■■ ■■■■■ ■ 08
-09 ■     ■     ■   ■ ■         ■ ■ 09
-10 ■ ■ ■ ■■■■■ ■■■ ■ ■■■■■■■■■■■ ■ 10
-11 ■ ■ ■     ■ ■   ■   ■     ■   ■ 11
-12 ■ ■■■■■■■ ■ ■   ■ ■ ■ ■■■ ■ ■■■ 12
-13 ■         ■         ■   ■<span style="color:#b8793a;font-weight:700;">D</span>  ■ ■ 13
-14 ■ ■■■■■■■■■■■■■■■■■ ■■■ ■■■ ■ ■ 14
-15 ■ ■           <span style="color:#b8793a;font-weight:700;">D</span><span style="color:#ff9d3b;font-weight:700;">B</span>■   ■   ■   ■ ■ 15
-16 ■ ■ ■■■■■ ■■■ ■■■ ■ ■ ■■■ ■ ■ ■ 16
-17 ■ ■ ■   ■         ■ ■ ■<span style="color:#4f8cff;font-weight:700;">&gt;</span>■ ■ ■ ■ 17
-18 ■ ■ ■ ■■■ ■■ ■■■■ ■ ■ ■<span style="color:#b8793a;font-weight:700;">D</span>■   ■ ■ 18
-19 ■   ■           ■   <span style="color:#b8793a;font-weight:700;">D</span> ■   ■   ■ 19
-20 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 20
-</pre>
-
-```text
-   0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
-```
-
-### Cases spéciales — étage 1
+#### Cases spéciales — étage 1
 
 | Symbole | Coordonnée | Rôle |
 |---|---:|---|
@@ -94,39 +869,815 @@ Dimensions : **31 × 21**.
 
 Dimensions : **31 × 21**.
 
-```text
-   0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
-```
+<table style="border-collapse:collapse; border-spacing:0; margin:8px 0 14px 0;">
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;"></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">0</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">1</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">2</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">3</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">4</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">5</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">6</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">7</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">8</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">9</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">10</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">11</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">12</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">13</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">14</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">15</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">16</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">17</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">18</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">19</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">20</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">21</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">22</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">23</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">24</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">25</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">26</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">27</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">28</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">29</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">30</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;"></td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">0</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">0</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">1</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;"><span style="color:#b9783d; font-weight:bold;">D</span></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;"><span style="color:#ff4d4d; font-weight:bold;">X</span></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;"><span style="color:#4f8cff; font-weight:bold;">&gt;</span></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">1</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">2</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">2</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">3</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">3</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">4</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">4</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">5</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;"><span style="color:#b9783d; font-weight:bold;">D</span></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;"><span style="color:#f29a38; font-weight:bold;">B</span></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">5</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">6</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">6</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">7</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">7</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">8</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">8</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">9</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">9</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">10</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">10</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">11</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">11</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">12</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">12</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">13</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">13</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">14</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">14</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">15</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;"><span style="color:#b9783d; font-weight:bold;">D</span></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;"><span style="color:#58c46b; font-weight:bold;">O</span></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">15</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">16</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">16</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">17</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;"><span style="color:#6ec6ff; font-weight:bold;">&lt;</span></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">17</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">18</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">18</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">19</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818;">&nbsp;</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">19</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">20</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; background:#181818; font-weight:bold;">■</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">20</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;"></td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">0</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">1</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">2</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">3</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">4</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">5</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">6</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">7</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">8</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">9</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">10</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">11</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">12</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">13</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">14</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">15</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">16</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">17</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">18</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">19</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">20</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">21</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">22</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">23</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">24</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">25</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">26</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">27</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">28</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">29</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;">30</td>
+    <td style="border:1px solid #333; width:22px; height:22px; text-align:center; vertical-align:middle; font-family:monospace; font-size:14px; line-height:22px; padding:0; font-size:11px; color:#888; background:#111;"></td>
+  </tr>
+</table>
 
-<pre style="font-family:monospace;line-height:1.15;">
-00 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 00
-01 ■ <span style="color:#b8793a;font-weight:700;">D</span> <span style="color:#ff4a4a;font-weight:700;">X</span><span style="color:#4f8cff;font-weight:700;">&gt;</span>■         ■     ■       ■ 01
-02 ■ ■■■■■ ■■■■■■■ ■ ■■■ ■ ■■■■■ ■ 02
-03 ■   ■   ■       ■   ■ ■ ■     ■ 03
-04 ■■■ ■ ■ ■ ■■■■■■■ ■ ■ ■ ■ ■■■ ■ 04
-05 ■   ■ ■ ■ ■ <span style="color:#b8793a;font-weight:700;">D</span><span style="color:#ff9d3b;font-weight:700;">B</span>■     ■ ■ ■   ■ ■ 05
-06 ■ ■■■ ■■■ ■ ■ ■■■■■ ■ ■ ■■■ ■ ■ 06
-07 ■   ■       ■       ■ ■ ■   ■ ■ 07
-08 ■ ■ ■■■■■■■■■ ■■■■■■■ ■ ■■■ ■ ■ 08
-09 ■ ■   ■   ■   ■      ■    ■   ■ 09
-10 ■ ■ ■ ■ ■ ■■■ ■ ■■■ ■■■ ■ ■■■ ■ 10
-11 ■   ■   ■   ■ ■           ■ ■ ■ 11
-12 ■■■ ■■■■■ ■ ■■■ ■■■ ■■■■■■■ ■ ■ 12
-13 ■ ■   ■   ■   ■   ■ ■       ■ ■ 13
-14 ■ ■■■ ■ ■ ■■■ ■■■ ■■■ ■ ■ ■ ■ ■ 14
-15 ■ ■ <span style="color:#b8793a;font-weight:700;">D</span><span style="color:#55c878;font-weight:700;">O</span>■   ■     ■     ■ ■ ■   ■ 15
-16 ■ ■ ■■■■■ ■ ■■■■■■■■■■■ ■ ■■■ ■ 16
-17 ■ ■   ■   ■           ■<span style="color:#73c7ff;font-weight:700;">&lt;</span>■ ■   ■ 17
-18 ■ ■■■ ■ ■ ■■■■■ ■ ■■■■■■■ ■ ■ ■ 18
-19 ■       ■       ■             ■ 19
-20 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 20
-</pre>
-
-```text
-   0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
-```
-
-### Cases spéciales — étage 2
+#### Cases spéciales — étage 2
 
 | Symbole | Coordonnée | Rôle |
 |---|---:|---|
@@ -144,7 +1695,6 @@ Dimensions : **31 × 21**.
 ## 2. Variantes de planification
 
 Cette section servira à tester les emplacements futurs sans modifier la lecture de l’état actuel.
-
 À utiliser plus tard pour préparer :
 
 - `C` : coffres ;
@@ -171,8 +1721,8 @@ Cette section servira à tester les emplacements futurs sans modifier la lecture
 - `y` augmente vers le bas.
 - Les coordonnées `x` sont affichées au-dessus et sous chaque grille.
 - Les coordonnées `y` sont affichées à gauche et à droite de chaque grille.
-- Les murs `#` sont affichés comme des carrés sombres `■`.
-- Les cases de sol `.` sont affichées comme des espaces vides.
+- Les murs `#` sont affichés comme des carrés `■` sans couleur dédiée.
+- Les cases de sol `.` sont affichées comme des cellules vides.
 - Les symboles spéciaux sont colorés via HTML/CSS inline pour cet essai.
 - Pour ajouter un coffre, remplacer une case de sol `.` par `C` dans la variante de planification.
 - Pour ajouter un message ou PNJ neutre, remplacer une case de sol `.` par `M` dans la variante de planification.
