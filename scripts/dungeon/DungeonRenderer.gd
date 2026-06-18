@@ -6,6 +6,15 @@ const DungeonThemeDataScript = preload("res://scripts/dungeon/DungeonThemeData.g
 
 
 # ------------------------------------------------------------
+# ORIENTATION DES LIEUX SPÉCIAUX
+# Les modèles temple/boutique sont construits avec leur façade vers +Z.
+# La rotation ci-dessous oriente leur façade vers l'ouest (-X) pour l'étage 1.
+# ------------------------------------------------------------
+
+const SPECIAL_TILE_WEST_FACING_ROTATION_Y: float = -PI * 0.5
+
+
+# ------------------------------------------------------------
 # ÉTAT DU RENDERER
 # ------------------------------------------------------------
 
@@ -40,6 +49,10 @@ var door_handle_material: StandardMaterial3D
 var temple_stone_material: StandardMaterial3D
 var temple_water_material: StandardMaterial3D
 var temple_light_material: StandardMaterial3D
+
+var shop_wood_material: StandardMaterial3D
+var shop_cloth_material: StandardMaterial3D
+var shop_gold_material: StandardMaterial3D
 
 
 # ------------------------------------------------------------
@@ -97,6 +110,8 @@ func build_dungeon(
 					create_open_door_tile(Vector2i(x, y))
 				elif tile == "O":
 					create_healing_temple_tile(Vector2i(x, y))
+				elif tile == "B":
+					create_shop_tile(Vector2i(x, y))
 
 	create_ability_discovery_markers(ability_discovery_locations)
 
@@ -139,6 +154,10 @@ func create_materials() -> void:
 	temple_stone_material = create_material(Color(0.46, 0.42, 0.36, 1.0))
 	temple_water_material = create_material(Color(0.18, 0.55, 0.82, 1.0))
 	temple_light_material = create_material(Color(0.45, 0.95, 1.0, 1.0))
+
+	shop_wood_material = create_material(Color(0.34, 0.19, 0.08, 1.0))
+	shop_cloth_material = create_material(Color(0.42, 0.10, 0.07, 1.0))
+	shop_gold_material = create_material(Color(0.95, 0.68, 0.18, 1.0))
 
 
 func create_material(color: Color) -> StandardMaterial3D:
@@ -829,6 +848,7 @@ func create_healing_temple_tile(cell: Vector2i) -> void:
 		current_theme.floor_y + 0.08,
 		float(cell.y) * cell_size
 	)
+	root.rotation.y = SPECIAL_TILE_WEST_FACING_ROTATION_Y
 
 	generated_root.add_child(root)
 
@@ -886,6 +906,82 @@ func create_healing_temple_tile(cell: Vector2i) -> void:
 	glow.light_color = Color(0.45, 0.95, 1.0, 1.0)
 	glow.light_energy = 0.65
 	glow.omni_range = 2.3
+
+	root.add_child(glow)
+
+
+# ------------------------------------------------------------
+# BOUTIQUE
+# ------------------------------------------------------------
+
+# Crée un petit comptoir de marchand sur une case spéciale "B".
+# Le modèle reste volontairement simple et généré en code pour éviter un asset externe.
+func create_shop_tile(cell: Vector2i) -> void:
+	var root: Node3D = Node3D.new()
+	root.name = "Shop_" + str(cell.x) + "_" + str(cell.y)
+	root.position = Vector3(
+		float(cell.x) * cell_size,
+		current_theme.floor_y + 0.08,
+		float(cell.y) * cell_size
+	)
+	root.rotation.y = SPECIAL_TILE_WEST_FACING_ROTATION_Y
+
+	generated_root.add_child(root)
+
+	create_box(
+		"ShopCounter",
+		Vector3(1.35, 0.34, 0.55),
+		Vector3(0.0, 0.18, 0.18),
+		shop_wood_material,
+		root
+	)
+
+	create_box(
+		"ShopBackShelf",
+		Vector3(1.45, 0.80, 0.18),
+		Vector3(0.0, 0.48, -0.55),
+		shop_wood_material,
+		root
+	)
+
+	create_box(
+		"ShopShelfLine",
+		Vector3(1.45, 0.06, 0.22),
+		Vector3(0.0, 0.58, -0.48),
+		shop_gold_material,
+		root
+	)
+
+	create_box(
+		"ShopCloth",
+		Vector3(1.15, 0.06, 0.50),
+		Vector3(0.0, 0.38, 0.18),
+		shop_cloth_material,
+		root
+	)
+
+	create_box(
+		"ShopCoinA",
+		Vector3(0.16, 0.06, 0.16),
+		Vector3(-0.34, 0.44, 0.05),
+		shop_gold_material,
+		root
+	)
+
+	create_box(
+		"ShopCoinB",
+		Vector3(0.14, 0.06, 0.14),
+		Vector3(-0.16, 0.44, 0.10),
+		shop_gold_material,
+		root
+	)
+
+	var glow: OmniLight3D = OmniLight3D.new()
+	glow.name = "ShopWarmGlow"
+	glow.position = Vector3(0.0, 1.0, 0.0)
+	glow.light_color = Color(1.0, 0.62, 0.28, 1.0)
+	glow.light_energy = 0.38
+	glow.omni_range = 2.0
 
 	root.add_child(glow)
 

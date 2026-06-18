@@ -2,6 +2,7 @@ extends Node3D
 
 const CELL_SIZE: float = 2.0
 const HEALING_TEMPLE_TILE: String = "O"
+const SHOP_TILE: String = "B"
 
 const DungeonThemeDataScript = preload("res://scripts/dungeon/DungeonThemeData.gd")
 const FloorDatabaseScript = preload("res://scripts/dungeon/FloorDatabase.gd")
@@ -103,6 +104,7 @@ func toggle_adventure_menu() -> void:
 	if game_ui == null:
 		return
 
+	GameSession.set_shop_available(is_shop_cell(player.grid_cell))
 	game_ui.toggle_in_game_menu(party)
 
 
@@ -363,8 +365,9 @@ func try_move_to_cell(target: Vector2i) -> void:
 	var found_discovery: bool = check_ability_discovery()
 	var found_stairs: bool = check_stairs()
 	var found_temple: bool = check_healing_temple()
+	var found_shop: bool = check_shop()
 
-	if not found_discovery and not found_stairs and not found_temple:
+	if not found_discovery and not found_stairs and not found_temple and not found_shop:
 		if combat_manager != null:
 			combat_manager.check_random_encounter(party)
 
@@ -458,6 +461,26 @@ func restore_party_at_temple() -> void:
 
 
 # ------------------------------------------------------------
+# BOUTIQUE
+# ------------------------------------------------------------
+
+# Vérifie si le joueur vient d'entrer sur une case de boutique.
+# La boutique est un lieu sûr : aucune rencontre aléatoire ne doit s'y déclencher.
+func check_shop() -> bool:
+	if not is_shop_cell(player.grid_cell):
+		return false
+
+	if combat_manager != null:
+		combat_manager.battle_log = "Un marchand s'est installé dans une alcôve.\nOuvrez le menu d'aventure pour accéder à la boutique."
+
+	return true
+
+
+func is_shop_cell(cell: Vector2i) -> bool:
+	return get_layout_tile(cell) == SHOP_TILE
+
+
+# ------------------------------------------------------------
 # LECTURE DE LA CARTE
 # ------------------------------------------------------------
 
@@ -488,6 +511,69 @@ func get_layout_tile(cell: Vector2i) -> String:
 		return "#"
 
 	return layout[cell.y].substr(cell.x, 1)
+
+
+# ------------------------------------------------------------
+# OUTIL TEMPORAIRE DE DÉVELOPPEMENT
+# Téléportation manuelle pour accélérer les tests de layout.
+# À supprimer ou désactiver avant une version finale.
+# ------------------------------------------------------------
+
+# Renvoie la position actuelle du joueur pour préremplir le menu de test.
+func get_debug_player_cell() -> Vector2i:
+	if player == null:
+		return Vector2i.ZERO
+
+	return player.grid_cell
+
+
+# Déplace instantanément le joueur vers une case marchable sans rencontre aléatoire.
+# Cette fonction est volontairement réservée au menu temporaire de développement.
+func debug_teleport_to_cell(target_cell: Vector2i) -> Dictionary:
+	if combat_manager != null and combat_manager.in_combat:
+		return {
+			"success": false,
+			"message": "Téléportation impossible pendant un combat."
+		}
+
+	if not is_inside_map(target_cell):
+		return {
+			"success": false,
+			"message": "Coordonnée hors carte : " + str(target_cell)
+		}
+
+	if not is_walkable(target_cell):
+		return {
+			"success": false,
+			"message": "Case non marchable : " + str(target_cell)
+		}
+
+	if is_closed_door_cell(target_cell):
+		open_door_at(target_cell)
+
+	player.move_to_cell(target_cell)
+	discover_around_player()
+
+	var found_discovery: bool = check_ability_discovery()
+	var found_stairs: bool = check_stairs()
+	var found_temple: bool = check_healing_temple()
+	var found_shop: bool = check_shop()
+
+	if not found_discovery and not found_stairs and not found_temple and not found_shop:
+		if combat_manager != null:
+			combat_manager.battle_log = "Téléportation de test vers " + str(target_cell) + "."
+
+	GameSession.set_shop_available(is_shop_cell(player.grid_cell))
+
+	if game_ui != null and game_ui.has_method("close_in_game_menu"):
+		game_ui.close_in_game_menu()
+
+	refresh_ui()
+
+	return {
+		"success": true,
+		"message": "Téléporté vers X " + str(target_cell.x) + " / Y " + str(target_cell.y)
+	}
 
 
 # ------------------------------------------------------------
