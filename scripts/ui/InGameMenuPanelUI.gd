@@ -24,6 +24,8 @@ const InventoryMenuViewScript = preload("res://scripts/ui/menu/InventoryMenuView
 const ShopMenuViewScript = preload("res://scripts/ui/menu/ShopMenuView.gd")
 const StatusEquipmentMenuViewScript = preload("res://scripts/ui/menu/StatusEquipmentMenuView.gd")
 const GrimoireMenuViewScript = preload("res://scripts/ui/menu/GrimoireMenuView.gd")
+const CombatGrimoireMenuViewScript = preload("res://scripts/ui/menu/CombatGrimoireMenuView.gd")
+const DungeonInputControllerScript = preload("res://scripts/dungeon/DungeonInputController.gd")
 const HeroFrameSelectionControllerScript = preload("res://scripts/ui/hero_selection/HeroFrameSelectionController.gd")
 
 
@@ -61,6 +63,7 @@ var dev_teleport_y_input: LineEdit = null
 var dev_teleport_feedback_label: Label = null
 
 var hero_selection_controller = null
+var menu_input_controller = null
 
 
 # ------------------------------------------------------------
@@ -74,6 +77,16 @@ var ui_built: bool = false
 var pending_grimoire_heal_caster_index: int = -1
 var pending_grimoire_heal_ability_id: String = ""
 var pending_grimoire_heal_amount: int = 0
+
+var hero_selection_context: String = ""
+var combat_overlay_active: bool = false
+var combat_manager_ref = null
+var combat_focus_buttons: Array[Button] = []
+var combat_selected_button_index: int = 0
+
+var pending_combat_heal_caster_index: int = -1
+var pending_combat_heal_ability_id: String = ""
+var pending_combat_heal_amount: int = 0
 
 
 # ------------------------------------------------------------
@@ -89,17 +102,16 @@ func _input(event: InputEvent) -> void:
 	if not is_menu_open():
 		return
 
-	if hero_selection_controller == null:
-		return
+	if hero_selection_controller != null:
+		if hero_selection_controller.has_method("is_active"):
+			if hero_selection_controller.is_active():
+				if hero_selection_controller.handle_input(event):
+					get_viewport().set_input_as_handled()
+					return
 
-	if not hero_selection_controller.has_method("is_active"):
-		return
-
-	if not hero_selection_controller.is_active():
-		return
-
-	if hero_selection_controller.handle_input(event):
-		get_viewport().set_input_as_handled()
+	if combat_overlay_active:
+		if handle_combat_overlay_input(event):
+			get_viewport().set_input_as_handled()
 
 
 func build_ui() -> void:
@@ -211,6 +223,7 @@ func open_menu(party: Array) -> void:
 
 func close_menu() -> void:
 	cancel_hero_frame_selection()
+	clear_combat_overlay_state()
 	visible = false
 
 
@@ -385,8 +398,10 @@ func start_hero_frame_selection(
 	selected_index: int,
 	heal_preview_by_index: Dictionary = {},
 	mana_preview_hero_index: int = -1,
-	mana_preview_cost: int = 0
+	mana_preview_cost: int = 0,
+	context: String = "grimoire_heal"
 ) -> void:
+	hero_selection_context = context
 	if hero_selection_controller == null:
 		hero_selection_controller = HeroFrameSelectionControllerScript.new()
 		hero_selection_controller.setup(self)
@@ -419,16 +434,20 @@ func update_hero_frame_selection(
 
 func cancel_hero_frame_selection() -> void:
 	if hero_selection_controller == null:
+		hero_selection_context = ""
 		return
 
 	hero_selection_controller.cancel_selection()
+	hero_selection_context = ""
 
 
 func finish_hero_frame_selection() -> void:
 	if hero_selection_controller == null:
+		hero_selection_context = ""
 		return
 
 	hero_selection_controller.finish_selection()
+	hero_selection_context = ""
 
 
 func play_hero_frame_selection_confirm_flash(hero_index: int) -> void:
@@ -439,6 +458,10 @@ func play_hero_frame_selection_confirm_flash(hero_index: int) -> void:
 
 
 func on_hero_frame_selection_confirmed(hero_index: int) -> void:
+	if hero_selection_context == "combat_heal":
+		CombatGrimoireMenuViewScript.on_combat_heal_target_confirmed(self, hero_index)
+		return
+
 	GrimoireMenuViewScript.on_grimoire_heal_pressed(
 		self,
 		pending_grimoire_heal_caster_index,
@@ -448,6 +471,11 @@ func on_hero_frame_selection_confirmed(hero_index: int) -> void:
 
 
 func on_hero_frame_selection_cancelled() -> void:
+	if hero_selection_context == "combat_heal":
+		cancel_hero_frame_selection()
+		close_combat_overlay()
+		return
+
 	cancel_hero_frame_selection()
 	show_grimoire_screen()
 
@@ -459,6 +487,173 @@ func on_grimoire_heal_pressed(caster_index: int, ability_id: String, target_inde
 		ability_id,
 		target_index
 	)
+
+
+# ------------------------------------------------------------
+# GRIMOIRE DE COMBAT
+# Overlay temporaire utilisé pendant un combat.
+# Ne passe pas par le menu d'aventure et ne modifie pas la sauvegarde.
+# ------------------------------------------------------------
+
+func open_combat_grimoire(party: Array, combat_manager) -> void:
+	ensure_ui_ready()
+	current_party = party
+	combat_manager_ref = combat_manager
+	combat_overlay_active = true
+	visible = true
+	set_combat_overlay_panel_visible(true)
+	show_combat_grimoire_screen()
+
+
+func open_combat_heal_target_selection(party: Array, combat_manager) -> void:
+	ensure_ui_ready()
+	current_party = party
+	combat_manager_ref = combat_manager
+	combat_overlay_active = true
+	visible = true
+	show_combat_heal_target_selection()
+
+
+func set_combat_overlay_panel_visible(should_show: bool) -> void:
+	if root_panel != null:
+		root_panel.visible = should_show
+
+	mouse_filter = Control.MOUSE_FILTER_STOP if should_show else Control.MOUSE_FILTER_IGNORE
+
+
+func show_combat_grimoire_screen(feedback_text: String = "") -> void:
+	CombatGrimoireMenuViewScript.show_combat_grimoire_screen(self, feedback_text)
+
+
+func show_combat_heal_target_selection(feedback_text: String = "") -> void:
+	CombatGrimoireMenuViewScript.show_combat_heal_target_screen(self, feedback_text)
+
+
+func on_combat_grimoire_ability_pressed(ability_id: String) -> void:
+	CombatGrimoireMenuViewScript.on_combat_grimoire_ability_pressed(self, ability_id)
+
+
+func close_combat_overlay() -> void:
+	cancel_hero_frame_selection()
+	set_combat_overlay_panel_visible(true)
+	clear_combat_overlay_state()
+	visible = false
+	refresh_current_scene_ui()
+
+
+func clear_combat_overlay_state() -> void:
+	combat_overlay_active = false
+	combat_manager_ref = null
+	reset_combat_focus_buttons()
+	pending_combat_heal_caster_index = -1
+	pending_combat_heal_ability_id = ""
+	pending_combat_heal_amount = 0
+
+
+func refresh_current_scene_ui() -> void:
+	var scene = get_tree().current_scene
+	if scene == null:
+		return
+	if scene.has_method("refresh_ui"):
+		scene.refresh_ui()
+
+
+# ------------------------------------------------------------
+# INPUT DE L'OVERLAY DE COMBAT
+# Réutilise DungeonInputController pour conserver ZQSD/A/E.
+# ------------------------------------------------------------
+
+func handle_combat_overlay_input(event: InputEvent) -> bool:
+	ensure_menu_input_controller()
+	if menu_input_controller == null:
+		return false
+
+	if menu_input_controller.is_back_input_event(event):
+		close_combat_overlay()
+		return true
+
+	if combat_focus_buttons.is_empty():
+		return false
+
+	if menu_input_controller.is_confirm_input_event(event):
+		press_selected_combat_focus_button()
+		return true
+
+	if menu_input_controller.is_move_forward_input_event(event):
+		move_combat_focus(-1)
+		return true
+
+	if menu_input_controller.is_turn_left_input_event(event):
+		move_combat_focus(-1)
+		return true
+
+	if menu_input_controller.is_move_back_input_event(event):
+		move_combat_focus(1)
+		return true
+
+	if menu_input_controller.is_turn_right_input_event(event):
+		move_combat_focus(1)
+		return true
+
+	return false
+
+
+func ensure_menu_input_controller() -> void:
+	if menu_input_controller != null:
+		return
+	menu_input_controller = DungeonInputControllerScript.new()
+
+
+func reset_combat_focus_buttons() -> void:
+	combat_focus_buttons.clear()
+	combat_selected_button_index = 0
+
+
+func register_combat_focus_button(button: Button) -> void:
+	if button == null:
+		return
+	combat_focus_buttons.append(button)
+	if combat_focus_buttons.size() == 1:
+		button.grab_focus()
+
+
+func refresh_combat_focus_buttons() -> void:
+	if combat_focus_buttons.is_empty():
+		return
+	combat_selected_button_index = clamp(combat_selected_button_index, 0, combat_focus_buttons.size() - 1)
+	for i in range(combat_focus_buttons.size()):
+		var button: Button = combat_focus_buttons[i]
+		if button == null or not is_instance_valid(button):
+			continue
+		var base_text: String = str(button.get_meta("base_text", button.text))
+		if i == combat_selected_button_index:
+			button.text = "> " + base_text
+			button.grab_focus()
+		else:
+			button.text = "  " + base_text
+
+
+func move_combat_focus(direction: int) -> void:
+	if combat_focus_buttons.is_empty():
+		return
+	combat_selected_button_index += direction
+	if combat_selected_button_index < 0:
+		combat_selected_button_index = combat_focus_buttons.size() - 1
+	if combat_selected_button_index >= combat_focus_buttons.size():
+		combat_selected_button_index = 0
+	refresh_combat_focus_buttons()
+
+
+func press_selected_combat_focus_button() -> void:
+	if combat_focus_buttons.is_empty():
+		return
+	combat_selected_button_index = clamp(combat_selected_button_index, 0, combat_focus_buttons.size() - 1)
+	var button: Button = combat_focus_buttons[combat_selected_button_index]
+	if button == null or not is_instance_valid(button):
+		return
+	if button.disabled:
+		return
+	button.pressed.emit()
 
 
 # ------------------------------------------------------------

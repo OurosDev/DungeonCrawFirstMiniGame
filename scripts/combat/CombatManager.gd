@@ -9,6 +9,7 @@ signal battle_finished(result_status: String, enemy)
 # ------------------------------------------------------------
 
 const MonsterDatabaseScript = preload("res://scripts/monsters/MonsterDatabase.gd")
+const AbilityDatabaseScript = preload("res://scripts/abilities/AbilityDatabase.gd")
 const CombatTurnOrderScript = preload("res://scripts/combat/CombatTurnOrder.gd")
 const CombatRewardsScript = preload("res://scripts/combat/CombatRewards.gd")
 const CombatActorAccessScript = preload("res://scripts/combat/CombatActorAccess.gd")
@@ -30,6 +31,7 @@ var turn_order_controller = null
 var rewards_controller = null
 var battle_log: String = ""
 var random_encounter_chance: float = 0.18
+var active_combat_spell_ids_by_party_index: Dictionary = {}
 
 # ------------------------------------------------------------
 # ATTENTE DE VALIDATION DES DÉGÂTS
@@ -83,6 +85,7 @@ func start_battle(p_party: Array, enemy = null) -> void:
 
 	turn_order_controller.reset()
 	turn_order_controller.rebuild(party, true)
+	reset_active_combat_spells()
 	battle_log = "Un " + get_enemy_name() + " apparaît."
 
 
@@ -168,6 +171,7 @@ func ensure_rewards_controller() -> void:
 func reset_combat_state() -> void:
 	in_combat = false
 	current_enemy = null
+	active_combat_spell_ids_by_party_index.clear()
 	reset_pending_damage_acknowledgement()
 	clear_dodge_feedback()
 	reset_turn_order()
@@ -278,10 +282,22 @@ func get_current_commands(active_hero_override = null) -> Array[String]:
 	if active_hero == null:
 		return []
 
+	var commands: Array[String] = []
 	if active_hero.has_method("get_combat_commands"):
-		return active_hero.get_combat_commands()
+		var raw_commands: Array = active_hero.get_combat_commands()
+		for raw_command in raw_commands:
+			commands.append(str(raw_command))
+	else:
+		commands = ["Attaquer", "Fuir"]
 
-	return ["Attaquer", "Fuir"]
+	if can_hero_use_combat_grimoire(active_hero) and not commands.has("Grimoire"):
+		var insert_index: int = commands.find("Fuir")
+		if insert_index < 0:
+			commands.append("Grimoire")
+		else:
+			commands.insert(insert_index, "Grimoire")
+
+	return commands
 
 
 func get_current_enemy():
@@ -294,6 +310,190 @@ func get_battle_log() -> String:
 
 func is_battle_active() -> bool:
 	return in_combat
+
+
+# ------------------------------------------------------------
+# GRIMOIRE DE COMBAT / SORTS ACTIFS TEMPORAIRES
+# Les sorts actifs sont réinitialisés à chaque entrée en combat.
+# Aucun choix n'est sauvegardé pour le moment.
+# ------------------------------------------------------------
+
+func reset_active_combat_spells() -> void:
+	active_combat_spell_ids_by_party_index.clear()
+	for hero_index in range(party.size()):
+		var hero = party[hero_index]
+		if hero == null:
+			continue
+		active_combat_spell_ids_by_party_index[hero_index] = {
+			"damage": get_default_combat_ability_id(hero, "damage"),
+			"heal": get_default_combat_ability_id(hero, "heal")
+		}
+
+
+func get_default_combat_ability_id(hero, requested_kind: String) -> String:
+	var ability = get_first_available_ability(hero, requested_kind)
+	if ability == null:
+		return ""
+	return get_string_property(ability, "ability_id", "")
+
+
+func can_hero_use_combat_grimoire(hero) -> bool:
+	return not get_available_combat_abilities(hero).is_empty()
+
+
+func get_available_combat_abilities(hero) -> Array:
+	var result: Array = []
+	if hero == null:
+		return result
+
+	var ability_ids: Array = get_hero_ability_ids(hero)
+	for raw_ability_id in ability_ids:
+		var ability_id: String = str(raw_ability_id)
+		var ability = AbilityDatabaseScript.get_ability_data(ability_id)
+		if ability == null:
+			continue
+
+		var ability_kind: String = get_string_property(ability, "ability_kind", "")
+		if ability_kind != "damage" and ability_kind != "heal":
+			continue
+
+		if not is_ability_available_for_basic_use(hero, ability):
+			continue
+
+		result.append(ability)
+
+	return result
+
+
+func get_available_combat_abilities_by_kind(hero, requested_kind: String) -> Array:
+	var result: Array = []
+	for ability in get_available_combat_abilities(hero):
+		if get_string_property(ability, "ability_kind", "") == requested_kind:
+			result.append(ability)
+	return result
+
+
+func get_party_index_for_hero(hero) -> int:
+	if hero == null:
+		return -1
+	for hero_index in range(party.size()):
+		if party[hero_index] == hero:
+			return hero_index
+	return -1
+
+
+func ensure_active_combat_spell_entry(hero) -> void:
+	var hero_index: int = get_party_index_for_hero(hero)
+	if hero_index < 0:
+		return
+	if not active_combat_spell_ids_by_party_index.has(hero_index):
+		active_combat_spell_ids_by_party_index[hero_index] = {
+			"damage": get_default_combat_ability_id(hero, "damage"),
+			"heal": get_default_combat_ability_id(hero, "heal")
+		}
+
+
+func get_active_combat_spell_id(hero, requested_kind: String) -> String:
+	ensure_active_combat_spell_entry(hero)
+	var hero_index: int = get_party_index_for_hero(hero)
+	if hero_index < 0:
+		return ""
+
+	var spell_data = active_combat_spell_ids_by_party_index.get(hero_index, {})
+	if not (spell_data is Dictionary):
+		return get_default_combat_ability_id(hero, requested_kind)
+
+	var ability_id: String = str(spell_data.get(requested_kind, ""))
+	var ability = AbilityDatabaseScript.get_ability_data(ability_id)
+	if ability != null:
+		if get_string_property(ability, "ability_kind", "") == requested_kind:
+			if is_ability_available_for_basic_use(hero, ability):
+				return ability_id
+
+	ability_id = get_default_combat_ability_id(hero, requested_kind)
+	spell_data[requested_kind] = ability_id
+	active_combat_spell_ids_by_party_index[hero_index] = spell_data
+	return ability_id
+
+
+func get_active_combat_ability(hero, requested_kind: String):
+	var ability_id: String = get_active_combat_spell_id(hero, requested_kind)
+	if ability_id == "":
+		return null
+	return AbilityDatabaseScript.get_ability_data(ability_id)
+
+
+func is_active_combat_spell_id(hero, ability_id: String) -> bool:
+	if hero == null or ability_id == "":
+		return false
+	var ability = AbilityDatabaseScript.get_ability_data(ability_id)
+	if ability == null:
+		return false
+	var ability_kind: String = get_string_property(ability, "ability_kind", "")
+	if ability_kind == "":
+		return false
+	return get_active_combat_spell_id(hero, ability_kind) == ability_id
+
+
+func set_active_combat_spell_id(hero, ability_id: String) -> bool:
+	if hero == null or ability_id == "":
+		return false
+
+	var ability = AbilityDatabaseScript.get_ability_data(ability_id)
+	if ability == null:
+		return false
+
+	var ability_kind: String = get_string_property(ability, "ability_kind", "")
+	if ability_kind != "damage" and ability_kind != "heal":
+		return false
+
+	if not is_ability_available_for_basic_use(hero, ability):
+		return false
+
+	ensure_active_combat_spell_entry(hero)
+	var hero_index: int = get_party_index_for_hero(hero)
+	if hero_index < 0:
+		return false
+
+	var spell_data = active_combat_spell_ids_by_party_index.get(hero_index, {})
+	if not (spell_data is Dictionary):
+		spell_data = {}
+
+	spell_data[ability_kind] = ability_id
+	active_combat_spell_ids_by_party_index[hero_index] = spell_data
+	return true
+
+
+func hero_prepare_active_combat_spell(ability_id: String) -> void:
+	if not can_hero_act():
+		return
+
+	var active_hero = get_active_hero()
+	var ability = AbilityDatabaseScript.get_ability_data(ability_id)
+	if ability == null or ability_id == "":
+		battle_log = "Sort introuvable."
+		return
+
+	if not is_ability_available_for_basic_use(active_hero, ability):
+		battle_log = get_hero_name(active_hero) + " ne peut pas préparer ce sort."
+		return
+
+	if is_active_combat_spell_id(active_hero, ability_id):
+		battle_log = get_hero_name(active_hero) + " conserve " + get_ability_name(ability) + "."
+		return
+
+	if not set_active_combat_spell_id(active_hero, ability_id):
+		battle_log = get_hero_name(active_hero) + " ne peut pas préparer ce sort."
+		return
+
+	var log_parts: Array[String] = []
+	log_parts.append(get_hero_name(active_hero) + " prépare " + get_ability_name(ability) + ".")
+
+	var counter_log: String = enemy_attack()
+	if counter_log != "":
+		log_parts.append(counter_log)
+
+	handle_after_enemy_action(log_parts)
 
 
 # ------------------------------------------------------------
@@ -354,11 +554,15 @@ func hero_attack() -> void:
 
 
 func hero_use_first_available_magic() -> void:
+	hero_use_active_magic()
+
+
+func hero_use_active_magic() -> void:
 	if not can_hero_act():
 		return
 
 	var active_hero = get_active_hero()
-	var ability = get_first_available_ability(active_hero, "damage")
+	var ability = get_active_combat_ability(active_hero, "damage")
 	if ability == null:
 		battle_log = get_hero_name(active_hero) + " ne connaît aucun sort offensif utilisable."
 		return
@@ -399,13 +603,25 @@ func hero_use_first_available_magic() -> void:
 
 	handle_after_enemy_action(log_parts)
 
-
 func hero_use_first_available_heal() -> void:
 	if not can_hero_act():
 		return
 
+	var heal_target = get_most_wounded_living_hero()
+	if heal_target == null:
+		battle_log = "Aucun héros ne peut être soigné."
+		return
+
+	var target_index: int = get_party_index_for_hero(heal_target)
+	hero_use_active_heal_on_target_index(target_index)
+
+
+func hero_use_active_heal_on_target_index(target_index: int, forced_heal_amount: int = -1) -> void:
+	if not can_hero_act():
+		return
+
 	var active_hero = get_active_hero()
-	var ability = get_first_available_ability(active_hero, "heal")
+	var ability = get_active_combat_ability(active_hero, "heal")
 	if ability == null:
 		battle_log = get_hero_name(active_hero) + " ne connaît aucun soin utilisable."
 		return
@@ -414,16 +630,35 @@ func hero_use_first_available_heal() -> void:
 		battle_log = get_hero_name(active_hero) + " n'a pas assez de magie."
 		return
 
-	var heal_target = get_most_wounded_living_hero()
+	if target_index < 0 or target_index >= party.size():
+		battle_log = "Cible de soin introuvable."
+		return
+
+	var heal_target = party[target_index]
 	if heal_target == null:
-		battle_log = "Aucun héros ne peut être soigné."
+		battle_log = "Cible de soin introuvable."
+		return
+
+	if not is_hero_alive(heal_target):
+		battle_log = get_hero_name(heal_target) + " ne peut pas être soigné pour le moment."
+		return
+
+	var before_hp: int = get_int_property(heal_target, "hp", 0)
+	var max_hp: int = get_int_property(heal_target, "max_hp", before_hp)
+	if before_hp >= max_hp:
+		battle_log = get_hero_name(heal_target) + " est déjà au maximum de PV."
 		return
 
 	hero_pay_ability_cost(active_hero, ability)
 
 	var log_parts: Array[String] = []
-	var heal_amount: int = roll_hero_spell_power(active_hero, ability)
+	var heal_amount: int = forced_heal_amount
+	if heal_amount <= 0:
+		heal_amount = roll_hero_spell_power(active_hero, ability)
+
 	apply_heal_to_hero(heal_target, heal_amount)
+	var after_hp: int = get_int_property(heal_target, "hp", before_hp)
+	var actual_heal: int = max(0, after_hp - before_hp)
 
 	AudioManager.play_sfx("heal")
 	log_parts.append(
@@ -432,7 +667,11 @@ func hero_use_first_available_heal() -> void:
 		+ get_ability_name(ability)
 		+ " sur "
 		+ get_hero_name(heal_target)
-		+ "."
+		+ ". "
+		+ get_hero_name(heal_target)
+		+ " récupère "
+		+ str(actual_heal)
+		+ " PV."
 	)
 
 	var counter_log: String = enemy_attack()
@@ -440,7 +679,6 @@ func hero_use_first_available_heal() -> void:
 		log_parts.append(counter_log)
 
 	handle_after_enemy_action(log_parts)
-
 
 func try_escape() -> void:
 	if not can_hero_act():
@@ -473,10 +711,13 @@ func perform_active_hero_command(command_name: String) -> void:
 		hero_attack()
 		return
 	if command_name == "Magie":
-		hero_use_first_available_magic()
+		hero_use_active_magic()
 		return
 	if command_name == "Soin":
 		hero_use_first_available_heal()
+		return
+	if command_name == "Grimoire":
+		battle_log = "Le grimoire de combat doit être ouvert depuis l'interface."
 		return
 	if command_name == "Fuir":
 		try_escape()

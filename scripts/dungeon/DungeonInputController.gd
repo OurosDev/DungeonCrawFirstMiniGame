@@ -9,14 +9,15 @@ const ACTION_UI_ACCEPT: String = "ui_accept"
 const ACTION_UI_CANCEL: String = "ui_cancel"
 
 # Ces actions sont déclarées dans project.godot pour documenter les contrôles,
-# mais les touches de lettres sont lues avec keycode plutôt qu'avec
-# physical_keycode. Cela respecte le clavier AZERTY réel : Z/Q/S/D.
+# mais les touches de lettres sont lues avec keycode plutôt qu'avec physical_keycode.
+# Cela respecte le clavier AZERTY réel : Z/Q/S/D.
 const ACTION_MOVE_FORWARD: String = "move_forward"
 const ACTION_MOVE_BACK: String = "move_back"
 const ACTION_TURN_LEFT: String = "turn_left"
 const ACTION_TURN_RIGHT: String = "turn_right"
 const ACTION_CONFIRM: String = "confirm_action"
 const ACTION_BACK: String = "back_action"
+
 
 # ------------------------------------------------------------
 # CONSTANTES — COMMANDES UI
@@ -28,6 +29,7 @@ const COMMAND_TURN_LEFT: String = "turn_left"
 const COMMAND_TURN_RIGHT: String = "turn_right"
 const COMMAND_MENU: String = "menu"
 
+
 # ------------------------------------------------------------
 # INPUT PRIORITAIRE
 # Sert aux clics globaux qui doivent passer avant l'interface.
@@ -36,16 +38,12 @@ const COMMAND_MENU: String = "menu"
 func handle_priority_input(dungeon, event: InputEvent) -> bool:
 	if dungeon == null:
 		return false
-
 	if is_in_game_menu_open(dungeon):
 		return false
-
 	if not is_primary_mouse_click_event(event):
 		return false
-
 	if dungeon.combat_manager == null:
 		return false
-
 	if not dungeon.combat_manager.in_combat:
 		return false
 
@@ -55,6 +53,7 @@ func handle_priority_input(dungeon, event: InputEvent) -> bool:
 
 	return false
 
+
 # ------------------------------------------------------------
 # INPUT PRINCIPAL
 # ------------------------------------------------------------
@@ -62,16 +61,12 @@ func handle_priority_input(dungeon, event: InputEvent) -> bool:
 func handle_input(dungeon, event: InputEvent) -> void:
 	if handle_debug_save_input(dungeon, event):
 		return
-
 	if handle_back_input(dungeon, event):
 		return
-
 	if is_in_game_menu_open(dungeon):
 		return
-
 	if dungeon.party.is_empty():
 		return
-
 	if dungeon.combat_manager == null:
 		return
 
@@ -81,6 +76,7 @@ func handle_input(dungeon, event: InputEvent) -> void:
 
 	handle_exploration_input(dungeon, event)
 
+
 # ------------------------------------------------------------
 # INPUTS SYSTÈME
 # ------------------------------------------------------------
@@ -88,7 +84,6 @@ func handle_input(dungeon, event: InputEvent) -> void:
 func handle_debug_save_input(dungeon, event: InputEvent) -> bool:
 	if not is_key_pressed(event, KEY_F5):
 		return false
-
 	dungeon.save_current_game()
 	return true
 
@@ -96,13 +91,10 @@ func handle_debug_save_input(dungeon, event: InputEvent) -> bool:
 func handle_back_input(dungeon, event: InputEvent) -> bool:
 	if not is_back_input_event(event):
 		return false
-
 	if event is InputEventKey:
 		var key_event: InputEventKey = event as InputEventKey
-
 		if key_event.echo:
 			return true
-
 		if not key_event.pressed:
 			return true
 
@@ -114,11 +106,10 @@ func handle_back_input(dungeon, event: InputEvent) -> bool:
 func is_in_game_menu_open(dungeon) -> bool:
 	if dungeon.game_ui == null:
 		return false
-
 	if not dungeon.game_ui.has_method("is_in_game_menu_open"):
 		return false
-
 	return dungeon.game_ui.is_in_game_menu_open()
+
 
 # ------------------------------------------------------------
 # INPUT EXPLORATION
@@ -128,21 +119,19 @@ func handle_exploration_input(dungeon, event: InputEvent) -> bool:
 	if is_move_forward_input_event(event):
 		execute_exploration_command(dungeon, COMMAND_MOVE_FORWARD)
 		return true
-
 	if is_move_back_input_event(event):
 		execute_exploration_command(dungeon, COMMAND_MOVE_BACK)
 		return true
-
 	if is_turn_left_input_event(event):
 		execute_exploration_command(dungeon, COMMAND_TURN_LEFT)
 		return true
-
 	if is_turn_right_input_event(event):
 		execute_exploration_command(dungeon, COMMAND_TURN_RIGHT)
 		return true
 
-	# A imite Espace / Entrée. En exploration, ces touches n'avaient pas encore
-	# d'action dédiée ; on conserve donc ce comportement neutre.
+	# A imite Espace / Entrée.
+	# En exploration, ces touches n'avaient pas encore d'action dédiée ;
+	# on conserve donc ce comportement neutre.
 	if is_confirm_input_event(event):
 		return true
 
@@ -152,10 +141,8 @@ func handle_exploration_input(dungeon, event: InputEvent) -> bool:
 func execute_exploration_command(dungeon, command_id: String) -> bool:
 	if dungeon == null:
 		return false
-
 	if dungeon.combat_manager != null and dungeon.combat_manager.in_combat:
 		return false
-
 	if is_in_game_menu_open(dungeon):
 		return false
 
@@ -178,6 +165,7 @@ func execute_exploration_command(dungeon, command_id: String) -> bool:
 		_:
 			return false
 
+
 # ------------------------------------------------------------
 # INPUT COMBAT
 # ------------------------------------------------------------
@@ -185,18 +173,15 @@ func execute_exploration_command(dungeon, command_id: String) -> bool:
 func handle_combat_input(dungeon, event: InputEvent) -> bool:
 	if dungeon.combat_manager == null:
 		return false
-
 	if not dungeon.combat_manager.in_combat:
 		return false
 
 	if has_pending_combat_damage_acknowledgement(dungeon):
 		if is_confirm_input_event(event):
 			acknowledge_pending_combat_damage(dungeon)
-
-		return true
+			return true
 
 	var commands: Array[String] = get_active_combat_commands(dungeon)
-
 	if commands.is_empty():
 		dungeon.refresh_ui()
 		return true
@@ -205,19 +190,15 @@ func handle_combat_input(dungeon, event: InputEvent) -> bool:
 
 	if is_turn_left_input_event(event):
 		dungeon.selected_combat_command -= 1
-
 		if dungeon.selected_combat_command < 0:
 			dungeon.selected_combat_command = commands.size() - 1
-
 		dungeon.refresh_ui()
 		return true
 
 	if is_turn_right_input_event(event):
 		dungeon.selected_combat_command += 1
-
 		if dungeon.selected_combat_command >= commands.size():
 			dungeon.selected_combat_command = 0
-
 		dungeon.refresh_ui()
 		return true
 
@@ -231,10 +212,8 @@ func handle_combat_input(dungeon, event: InputEvent) -> bool:
 func execute_combat_command_by_index(dungeon, command_index: int) -> bool:
 	if dungeon == null:
 		return false
-
 	if dungeon.combat_manager == null:
 		return false
-
 	if not dungeon.combat_manager.in_combat:
 		return false
 
@@ -243,11 +222,9 @@ func execute_combat_command_by_index(dungeon, command_index: int) -> bool:
 		return true
 
 	var commands: Array[String] = get_active_combat_commands(dungeon)
-
 	if commands.is_empty():
 		dungeon.refresh_ui()
 		return true
-
 	if command_index < 0 or command_index >= commands.size():
 		return false
 
@@ -260,8 +237,10 @@ func get_active_combat_commands(dungeon) -> Array[String]:
 	if dungeon.combat_manager == null:
 		return []
 
-	var active_hero = dungeon.combat_manager.get_active_hero()
+	if dungeon.combat_manager.has_method("get_current_commands"):
+		return dungeon.combat_manager.get_current_commands()
 
+	var active_hero = dungeon.combat_manager.get_active_hero()
 	if active_hero == null:
 		dungeon.refresh_ui()
 		return []
@@ -273,10 +252,8 @@ func clamp_selected_combat_command(dungeon, commands: Array[String]) -> void:
 	if commands.is_empty():
 		dungeon.selected_combat_command = 0
 		return
-
 	if dungeon.selected_combat_command < 0:
 		dungeon.selected_combat_command = 0
-
 	if dungeon.selected_combat_command >= commands.size():
 		dungeon.selected_combat_command = commands.size() - 1
 
@@ -286,20 +263,77 @@ func execute_selected_combat_command(dungeon, commands: Array[String]) -> void:
 		return
 
 	clamp_selected_combat_command(dungeon, commands)
-
 	var selected_command: String = commands[dungeon.selected_combat_command]
 
 	if selected_command == "Attaquer":
 		dungeon.combat_manager.hero_attack()
-	elif selected_command == "Magie":
-		dungeon.combat_manager.hero_use_first_available_magic()
-	elif selected_command == "Soin":
+		dungeon.selected_combat_command = 0
+		dungeon.refresh_ui()
+		return
+
+	if selected_command == "Magie":
+		if dungeon.combat_manager.has_method("hero_use_active_magic"):
+			dungeon.combat_manager.hero_use_active_magic()
+		else:
+			dungeon.combat_manager.hero_use_first_available_magic()
+		dungeon.selected_combat_command = 0
+		dungeon.refresh_ui()
+		return
+
+	if selected_command == "Soin":
+		if open_combat_heal_target_selection(dungeon):
+			return
 		dungeon.combat_manager.hero_use_first_available_heal()
-	elif selected_command == "Fuir":
+		dungeon.selected_combat_command = 0
+		dungeon.refresh_ui()
+		return
+
+	if selected_command == "Grimoire":
+		if open_combat_grimoire(dungeon):
+			return
+		dungeon.refresh_ui()
+		return
+
+	if selected_command == "Fuir":
 		dungeon.combat_manager.try_escape()
+		dungeon.selected_combat_command = 0
+		dungeon.refresh_ui()
+		return
 
 	dungeon.selected_combat_command = 0
 	dungeon.refresh_ui()
+
+
+func open_combat_grimoire(dungeon) -> bool:
+	var panel = get_in_game_menu_panel(dungeon)
+	if panel == null:
+		return false
+	if not panel.has_method("open_combat_grimoire"):
+		return false
+	panel.open_combat_grimoire(dungeon.party, dungeon.combat_manager)
+	return true
+
+
+func open_combat_heal_target_selection(dungeon) -> bool:
+	var panel = get_in_game_menu_panel(dungeon)
+	if panel == null:
+		return false
+	if not panel.has_method("open_combat_heal_target_selection"):
+		return false
+	panel.open_combat_heal_target_selection(dungeon.party, dungeon.combat_manager)
+	return true
+
+
+func get_in_game_menu_panel(dungeon):
+	if dungeon == null:
+		return null
+	if dungeon.game_ui == null:
+		return null
+	var dungeon_viewport = dungeon.game_ui.dungeon_viewport
+	if dungeon_viewport == null:
+		return null
+	return dungeon_viewport.in_game_menu_panel
+
 
 # ------------------------------------------------------------
 # VALIDATION DES DÉGÂTS
@@ -308,10 +342,8 @@ func execute_selected_combat_command(dungeon, commands: Array[String]) -> void:
 func has_pending_combat_damage_acknowledgement(dungeon) -> bool:
 	if dungeon.combat_manager == null:
 		return false
-
 	if not dungeon.combat_manager.has_method("has_pending_damage_acknowledgement"):
 		return false
-
 	return dungeon.combat_manager.has_pending_damage_acknowledgement()
 
 
@@ -323,7 +355,7 @@ func acknowledge_pending_combat_damage(dungeon) -> bool:
 			if dungeon.game_ui.has_pending_damage_acknowledgement():
 				if dungeon.game_ui.has_method("acknowledge_damage_portraits"):
 					dungeon.game_ui.acknowledge_damage_portraits()
-					acknowledged = true
+				acknowledged = true
 
 	if dungeon.combat_manager != null:
 		if dungeon.combat_manager.has_method("acknowledge_pending_damage"):
@@ -332,6 +364,7 @@ func acknowledge_pending_combat_damage(dungeon) -> bool:
 
 	dungeon.refresh_ui()
 	return acknowledged
+
 
 # ------------------------------------------------------------
 # OUTILS INPUT — MOUVEMENT AZERTY
@@ -356,14 +389,12 @@ func is_turn_right_input_event(event: InputEvent) -> bool:
 func is_confirm_input_event(event: InputEvent) -> bool:
 	if is_action_pressed_safe(event, ACTION_UI_ACCEPT):
 		return true
-
 	return is_key_pressed(event, KEY_A)
 
 
 func is_back_input_event(event: InputEvent) -> bool:
 	if is_action_pressed_safe(event, ACTION_UI_CANCEL):
 		return true
-
 	return is_key_pressed(event, KEY_ESCAPE) or is_key_pressed(event, KEY_E)
 
 
@@ -372,10 +403,8 @@ func is_key_pressed(event: InputEvent, expected_keycode: int) -> bool:
 		return false
 
 	var key_event: InputEventKey = event as InputEventKey
-
 	if not key_event.pressed:
 		return false
-
 	if key_event.echo:
 		return false
 
@@ -393,5 +422,4 @@ func is_primary_mouse_click_event(event: InputEvent) -> bool:
 func is_action_pressed_safe(event: InputEvent, action_name: String) -> bool:
 	if not InputMap.has_action(action_name):
 		return false
-
 	return event.is_action_pressed(action_name)
