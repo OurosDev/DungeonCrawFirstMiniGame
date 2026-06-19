@@ -1,5 +1,6 @@
 extends Panel
 class_name CommandOverlayUI
+const UIFrameStyleScript = preload("res://scripts/ui/theme/UIFrameStyle.gd")
 
 # ------------------------------------------------------------
 # SIGNAUX
@@ -50,14 +51,10 @@ func build_ui() -> void:
 	# L'overlay doit recevoir la souris pour rendre les commandes cliquables.
 	mouse_filter = Control.MOUSE_FILTER_STOP
 
-	add_theme_stylebox_override(
-		"panel",
-		create_panel_style(
-			Color(0.045, 0.030, 0.020, 0.88),
-			Color(0.55, 0.34, 0.12, 1.0),
-			2
-		)
-	)
+	# Le conteneur des commandes reste invisible.
+	# Les boutons portent maintenant leur propre cadre texturé, donc le
+	# long panneau de fond n'est plus nécessaire visuellement.
+	add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 
 	anchor_left = 0.08
 	anchor_top = 1.0
@@ -191,11 +188,11 @@ func create_command_button(
 
 	button.add_theme_stylebox_override(
 		"normal",
-		create_panel_style(panel_color, border_color, 2)
+		UIFrameStyleScript.create_button_style(panel_color, border_color, 2)
 	)
 	button.add_theme_stylebox_override(
 		"hover",
-		create_panel_style(
+		UIFrameStyleScript.create_button_style(
 			Color(panel_color.r + 0.04, panel_color.g + 0.03, panel_color.b + 0.02, panel_color.a),
 			Color(0.78, 0.50, 0.16, 1.0),
 			2
@@ -203,7 +200,7 @@ func create_command_button(
 	)
 	button.add_theme_stylebox_override(
 		"pressed",
-		create_panel_style(
+		UIFrameStyleScript.create_button_style(
 			Color(0.36, 0.21, 0.08, 0.98),
 			Color(1.0, 0.78, 0.22, 1.0),
 			2
@@ -211,27 +208,11 @@ func create_command_button(
 	)
 	button.add_theme_stylebox_override(
 		"disabled",
-		create_panel_style(Color(0.06, 0.04, 0.03, 0.80), Color(0.18, 0.12, 0.06, 1.0), 2)
+		UIFrameStyleScript.create_button_style(Color(0.06, 0.04, 0.03, 0.80), Color(0.18, 0.12, 0.06, 1.0), 2)
 	)
 
 	return button
 
-
-func create_panel_style(
-	background_color: Color,
-	border_color: Color,
-	border_width: int
-) -> StyleBoxFlat:
-	var style: StyleBoxFlat = StyleBoxFlat.new()
-	style.bg_color = background_color
-	style.border_color = border_color
-	style.set_border_width_all(border_width)
-	style.corner_radius_top_left = 2
-	style.corner_radius_top_right = 2
-	style.corner_radius_bottom_left = 2
-	style.corner_radius_bottom_right = 2
-
-	return style
 
 # ------------------------------------------------------------
 # OUTILS

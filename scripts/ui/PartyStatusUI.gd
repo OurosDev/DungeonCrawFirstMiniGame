@@ -1,6 +1,7 @@
 extends Control
 
 class_name PartyStatusUI
+const UIFrameStyleScript = preload("res://scripts/ui/theme/UIFrameStyle.gd")
 
 # ------------------------------------------------------------
 # SIGNAUX
@@ -538,16 +539,14 @@ func create_portrait_holder(
 	holder.custom_minimum_size = PORTRAIT_FRAME_SIZE
 	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-	var frame_style: StyleBoxFlat = StyleBoxFlat.new()
-	frame_style.bg_color = PORTRAIT_FRAME_BACKGROUND_COLOR
-	frame_style.border_color = PORTRAIT_FRAME_BORDER_COLOR
-	frame_style.set_border_width_all(PORTRAIT_FRAME_BORDER_WIDTH)
-	frame_style.corner_radius_top_left = 2
-	frame_style.corner_radius_top_right = 2
-	frame_style.corner_radius_bottom_left = 2
-	frame_style.corner_radius_bottom_right = 2
-
-	holder.add_theme_stylebox_override("panel", frame_style)
+	holder.add_theme_stylebox_override(
+		"panel",
+		UIFrameStyleScript.create_panel_style(
+			PORTRAIT_FRAME_BACKGROUND_COLOR,
+			PORTRAIT_FRAME_BORDER_COLOR,
+			PORTRAIT_FRAME_BORDER_WIDTH
+		)
+	)
 
 	if hero == null:
 		return holder
@@ -821,17 +820,15 @@ func create_panel(
 	border_width: int
 ) -> Panel:
 	var panel: Panel = Panel.new()
-	var style: StyleBoxFlat = StyleBoxFlat.new()
 
-	style.bg_color = background_color
-	style.border_color = border_color
-	style.set_border_width_all(border_width)
-	style.corner_radius_top_left = 2
-	style.corner_radius_top_right = 2
-	style.corner_radius_bottom_left = 2
-	style.corner_radius_bottom_right = 2
-
-	panel.add_theme_stylebox_override("panel", style)
+	panel.add_theme_stylebox_override(
+		"panel",
+		UIFrameStyleScript.create_panel_style(
+			background_color,
+			border_color,
+			border_width
+		)
+	)
 
 	return panel
 

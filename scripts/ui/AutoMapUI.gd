@@ -1,5 +1,6 @@
 extends Panel
 class_name AutoMapUI
+const UIFrameStyleScript = preload("res://scripts/ui/theme/UIFrameStyle.gd")
 
 const VISIBLE_RADIUS_X: int = 7
 const VISIBLE_RADIUS_Y: int = 5
@@ -225,7 +226,7 @@ func create_map_cell(
 	panel.custom_minimum_size = Vector2(cell_pixel_size, cell_pixel_size)
 	panel.add_theme_stylebox_override(
 		"panel",
-		create_panel_style(background_color, border_color, 1)
+		create_map_cell_style(background_color, border_color, 1)
 	)
 
 	var label: Label = create_label(symbol, 8, text_color)
@@ -284,16 +285,24 @@ func create_panel_style(
 	background_color: Color,
 	border_color: Color,
 	border_width: int
+) -> StyleBox:
+	return UIFrameStyleScript.create_panel_style(
+		background_color,
+		border_color,
+		border_width
+	)
+
+
+func create_map_cell_style(
+	background_color: Color,
+	border_color: Color,
+	border_width: int
 ) -> StyleBoxFlat:
-	var style: StyleBoxFlat = StyleBoxFlat.new()
-	style.bg_color = background_color
-	style.border_color = border_color
-	style.set_border_width_all(border_width)
-	style.corner_radius_top_left = 1
-	style.corner_radius_top_right = 1
-	style.corner_radius_bottom_left = 1
-	style.corner_radius_bottom_right = 1
-	return style
+	return UIFrameStyleScript.create_flat_style(
+		background_color,
+		border_color,
+		border_width
+	)
 
 
 func create_label(text: String, font_size: int, font_color: Color) -> Label:

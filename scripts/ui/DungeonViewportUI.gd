@@ -1,5 +1,6 @@
 extends Panel
 class_name DungeonViewportUI
+const UIFrameStyleScript = preload("res://scripts/ui/theme/UIFrameStyle.gd")
 
 const CommandOverlayUIScript = preload("res://scripts/ui/CommandOverlayUI.gd")
 const CombatMonsterDisplayUIScript = preload("res://scripts/ui/CombatMonsterDisplayUI.gd")
@@ -550,17 +551,12 @@ func create_panel_style(
 	background_color: Color,
 	border_color: Color,
 	border_width: int
-) -> StyleBoxFlat:
-	var style: StyleBoxFlat = StyleBoxFlat.new()
-	style.bg_color = background_color
-	style.border_color = border_color
-	style.set_border_width_all(border_width)
-	style.corner_radius_top_left = 2
-	style.corner_radius_top_right = 2
-	style.corner_radius_bottom_left = 2
-	style.corner_radius_bottom_right = 2
-
-	return style
+) -> StyleBox:
+	return UIFrameStyleScript.create_panel_style(
+		background_color,
+		border_color,
+		border_width
+	)
 
 
 func create_label(

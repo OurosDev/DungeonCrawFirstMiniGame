@@ -1,5 +1,6 @@
 extends CanvasLayer
 class_name GameUI
+const UIFrameStyleScript = preload("res://scripts/ui/theme/UIFrameStyle.gd")
 
 const ClassDatabaseScript = preload("res://scripts/characters/ClassDatabase.gd")
 const LogPanelUIScript = preload("res://scripts/ui/LogPanelUI.gd")
@@ -495,16 +496,14 @@ func create_panel(
 ) -> Panel:
 	var panel: Panel = Panel.new()
 
-	var style: StyleBoxFlat = StyleBoxFlat.new()
-	style.bg_color = background_color
-	style.border_color = border_color
-	style.set_border_width_all(border_width)
-	style.corner_radius_top_left = 2
-	style.corner_radius_top_right = 2
-	style.corner_radius_bottom_left = 2
-	style.corner_radius_bottom_right = 2
-
-	panel.add_theme_stylebox_override("panel", style)
+	panel.add_theme_stylebox_override(
+		"panel",
+		UIFrameStyleScript.create_panel_style(
+			background_color,
+			border_color,
+			border_width
+		)
+	)
 
 	return panel
 

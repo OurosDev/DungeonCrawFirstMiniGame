@@ -1,5 +1,6 @@
 extends Panel
 class_name LogPanelUI
+const UIFrameStyleScript = preload("res://scripts/ui/theme/UIFrameStyle.gd")
 
 # ------------------------------------------------------------
 # CONSTANTES
@@ -12,10 +13,20 @@ const LOG_SYSTEM: String = "system"
 const TONE_DEFAULT: String = "default"
 const TONE_SYSTEM: String = "system"
 const TONE_COMBAT: String = "combat"
+const TONE_ENEMY_DAMAGE: String = "enemy_damage"
 const TONE_IMPORTANT: String = "important"
 const TONE_MAGIC: String = "magic"
 const TONE_HEAL: String = "heal"
 const TONE_WARNING: String = "warning"
+
+const ENEMY_LOG_NAME_PREFIXES: Array[String] = [
+	"zombie",
+	"gobelin",
+	"chauve-souris",
+	"chauve souris",
+	"troll",
+	"gardien"
+]
 
 # ------------------------------------------------------------
 # NŒUDS UI
@@ -193,7 +204,7 @@ func build_visible_log_text() -> String:
 		if selected_log_channel == LOG_ALL:
 			result += format_log_prefix(channel) + " "
 
-		result += format_log_message(message, tone)
+		result += format_log_message(message, tone, channel)
 		added_count += 1
 
 	return result
@@ -213,7 +224,31 @@ func format_log_prefix(channel: String) -> String:
 	return "[color=" + prefix_color + "]" + escape_bbcode_text(prefix_text) + "[/color]"
 
 
-func format_log_message(message: String, tone: String) -> String:
+func format_log_message(message: String, tone: String, channel: String = LOG_JOURNAL) -> String:
+	# Le canal Combat peut contenir plusieurs lignes dans une seule entrée
+	# héroïque + riposte ennemie. On colore donc ligne par ligne.
+	if channel == LOG_COMBAT:
+		return format_multiline_combat_message(message)
+
+	return format_colored_log_line(message, tone)
+
+
+func format_multiline_combat_message(message: String) -> String:
+	var formatted_lines: Array[String] = []
+	var raw_lines: PackedStringArray = message.split("\n", false)
+
+	for raw_line in raw_lines:
+		var line: String = str(raw_line).strip_edges()
+		if line == "":
+			continue
+
+		var line_tone: String = detect_log_tone(LOG_COMBAT, line)
+		formatted_lines.append(format_colored_log_line(line, line_tone))
+
+	return "\n".join(formatted_lines)
+
+
+func format_colored_log_line(message: String, tone: String) -> String:
 	var color_hex: String = get_tone_color(tone)
 	return "[color=" + color_hex + "]" + escape_bbcode_text(message) + "[/color]"
 
@@ -286,22 +321,17 @@ func detect_log_tone(channel: String, message: String) -> String:
 	if channel == LOG_SYSTEM:
 		return TONE_SYSTEM
 
-	if lower_text.contains("impossible"):
-		return TONE_WARNING
-	if lower_text.contains("verrouillée"):
-		return TONE_WARNING
-	if lower_text.contains("introuvable"):
-		return TONE_WARNING
-	if lower_text.contains("plein"):
-		return TONE_WARNING
-	if lower_text.contains("pm insuffisants"):
+	if is_warning_message(lower_text):
 		return TONE_WARNING
 
-	if lower_text.contains("grimoire"):
-		return TONE_HEAL
-	if lower_text.contains("récupère") and lower_text.contains("hp"):
-		return TONE_HEAL
-	if lower_text.contains("se recueille au temple"):
+	if channel == LOG_COMBAT:
+		if is_heal_message(lower_text):
+			return TONE_HEAL
+		if is_enemy_damage_message(lower_text):
+			return TONE_ENEMY_DAMAGE
+		return TONE_COMBAT
+
+	if is_heal_message(lower_text):
 		return TONE_HEAL
 
 	if lower_text.contains("clé"):
@@ -330,10 +360,58 @@ func detect_log_tone(channel: String, message: String) -> String:
 	if lower_text.contains("découvre le sort"):
 		return TONE_MAGIC
 
-	if channel == LOG_COMBAT:
-		return TONE_COMBAT
-
 	return TONE_DEFAULT
+
+
+func is_warning_message(lower_text: String) -> bool:
+	if lower_text.contains("impossible"):
+		return true
+	if lower_text.contains("verrouillée"):
+		return true
+	if lower_text.contains("introuvable"):
+		return true
+	if lower_text.contains("plein"):
+		return true
+	if lower_text.contains("maximum de pv"):
+		return true
+	if lower_text.contains("pm insuffisants"):
+		return true
+	if lower_text.contains("n'a pas assez"):
+		return true
+	if lower_text.contains("ne connaît aucun"):
+		return true
+	if lower_text.contains("ne peut pas"):
+		return true
+	if lower_text.contains("aucun héros"):
+		return true
+	return false
+
+
+func is_heal_message(lower_text: String) -> bool:
+	if lower_text.contains("récupère") and (lower_text.contains(" pv") or lower_text.contains(" hp")):
+		return true
+	if lower_text.contains("lance") and lower_text.contains("soin"):
+		return true
+	if lower_text.contains("grimoire") and lower_text.contains("soin"):
+		return true
+	if lower_text.contains("se recueille au temple"):
+		return true
+	return false
+
+
+func is_enemy_damage_message(lower_text: String) -> bool:
+	if lower_text.contains(" frappe ") and lower_text.contains(" dégâts"):
+		return true
+	if lower_text.contains(" attaque ") and lower_text.contains(", mais") and lower_text.contains(" esquive"):
+		return starts_with_known_enemy_name(lower_text)
+	return false
+
+
+func starts_with_known_enemy_name(lower_text: String) -> bool:
+	for enemy_prefix in ENEMY_LOG_NAME_PREFIXES:
+		if lower_text.begins_with(enemy_prefix + " "):
+			return true
+	return false
 
 
 func get_tone_color(tone: String) -> String:
@@ -341,6 +419,8 @@ func get_tone_color(tone: String) -> String:
 		return "#AFC8FF"
 	if tone == TONE_COMBAT:
 		return "#FFB06A"
+	if tone == TONE_ENEMY_DAMAGE:
+		return "#FF6E5F"
 	if tone == TONE_IMPORTANT:
 		return "#FFD766"
 	if tone == TONE_MAGIC:
@@ -358,36 +438,42 @@ func create_panel_style(
 	background_color: Color,
 	border_color: Color,
 	border_width: int
-) -> StyleBoxFlat:
-	var style: StyleBoxFlat = StyleBoxFlat.new()
-	style.bg_color = background_color
-	style.border_color = border_color
-	style.set_border_width_all(border_width)
-	style.corner_radius_top_left = 2
-	style.corner_radius_top_right = 2
-	style.corner_radius_bottom_left = 2
-	style.corner_radius_bottom_right = 2
-	return style
+) -> StyleBox:
+	return UIFrameStyleScript.create_panel_style(
+		background_color,
+		border_color,
+		border_width
+	)
 
 
 func apply_button_style(button: Button) -> void:
-	var normal_style: StyleBoxFlat = StyleBoxFlat.new()
-	normal_style.bg_color = Color(0.11, 0.07, 0.04, 1.0)
-	normal_style.border_color = Color(0.30, 0.18, 0.08, 1.0)
-	normal_style.set_border_width_all(1)
+	button.add_theme_stylebox_override(
+		"normal",
+		UIFrameStyleScript.create_button_style(
+			Color(0.11, 0.07, 0.04, 1.0),
+			Color(0.30, 0.18, 0.08, 1.0),
+			1
+		)
+	)
 
-	var pressed_style: StyleBoxFlat = StyleBoxFlat.new()
-	pressed_style.bg_color = Color(0.28, 0.16, 0.06, 1.0)
-	pressed_style.border_color = Color(0.95, 0.72, 0.28, 1.0)
-	pressed_style.set_border_width_all(2)
+	button.add_theme_stylebox_override(
+		"pressed",
+		UIFrameStyleScript.create_button_style(
+			Color(0.28, 0.16, 0.06, 1.0),
+			Color(0.95, 0.72, 0.28, 1.0),
+			2
+		)
+	)
 
-	var hover_style: StyleBoxFlat = StyleBoxFlat.new()
-	hover_style.bg_color = Color(0.18, 0.10, 0.05, 1.0)
-	hover_style.border_color = Color(0.55, 0.34, 0.13, 1.0)
-	hover_style.set_border_width_all(1)
+	button.add_theme_stylebox_override(
+		"hover",
+		UIFrameStyleScript.create_button_style(
+			Color(0.18, 0.10, 0.05, 1.0),
+			Color(0.55, 0.34, 0.13, 1.0),
+			1
+		)
+	)
 
-	button.add_theme_stylebox_override("normal", normal_style)
-	button.add_theme_stylebox_override("pressed", pressed_style)
-	button.add_theme_stylebox_override("hover", hover_style)
 	button.add_theme_color_override("font_color", Color(0.90, 0.80, 0.58))
+	button.add_theme_color_override("font_hover_color", Color(1.0, 0.90, 0.55))
 	button.add_theme_color_override("font_pressed_color", Color(1.0, 0.92, 0.48))
