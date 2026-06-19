@@ -150,6 +150,42 @@ func show_in_game_menu_message(text: String) -> void:
 		dungeon_viewport.show_in_game_menu_message(text)
 
 
+func open_exploration_map(
+	layout: Array[String],
+	discovered_map_cells: Dictionary,
+	position: Vector2i,
+	facing_name: String
+) -> void:
+	if dungeon_viewport == null:
+		return
+
+	if dungeon_viewport.has_method("open_exploration_map_overlay"):
+		dungeon_viewport.open_exploration_map_overlay(
+			layout,
+			discovered_map_cells,
+			position,
+			facing_name
+		)
+
+
+func close_exploration_map() -> void:
+	if dungeon_viewport == null:
+		return
+
+	if dungeon_viewport.has_method("close_exploration_map_overlay"):
+		dungeon_viewport.close_exploration_map_overlay()
+
+
+func is_exploration_map_open() -> bool:
+	if dungeon_viewport == null:
+		return false
+
+	if not dungeon_viewport.has_method("is_exploration_map_overlay_open"):
+		return false
+
+	return dungeon_viewport.is_exploration_map_overlay_open()
+
+
 func on_in_game_menu_save_requested() -> void:
 	in_game_menu_save_requested.emit()
 
@@ -377,6 +413,14 @@ func show_exploration(
 		dungeon_viewport.hide_enemy()
 		dungeon_viewport.show_exploration_commands()
 
+		if dungeon_viewport.has_method("update_exploration_map_data"):
+			dungeon_viewport.update_exploration_map_data(
+				layout,
+				discovered_map_cells,
+				position,
+				facing_name
+			)
+
 	if party_status_ui != null:
 		party_status_ui.update_party(party, null)
 
@@ -430,6 +474,9 @@ func show_combat(
 		)
 
 	if dungeon_viewport != null:
+		if dungeon_viewport.has_method("close_exploration_map_overlay"):
+			dungeon_viewport.close_exploration_map_overlay(false)
+
 		dungeon_viewport.show_combat_commands(
 			commands,
 			selected_command_index

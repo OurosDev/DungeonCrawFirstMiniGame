@@ -18,9 +18,11 @@ const EXPLORATION_COMMAND_BACK: String = "move_back"
 const EXPLORATION_COMMAND_TURN_LEFT: String = "turn_left"
 const EXPLORATION_COMMAND_TURN_RIGHT: String = "turn_right"
 const EXPLORATION_COMMAND_MENU: String = "menu"
+const EXPLORATION_COMMAND_MAP: String = "map"
 
 const BUTTON_MIN_SIZE: Vector2 = Vector2(94, 30)
 const MENU_BUTTON_MIN_SIZE: Vector2 = Vector2(78, 30)
+const MAP_BUTTON_MIN_SIZE: Vector2 = Vector2(78, 30)
 
 # ------------------------------------------------------------
 # RÉFÉRENCES UI
@@ -90,6 +92,7 @@ func show_exploration_commands() -> void:
 	add_exploration_command_button("S ↓ Reculer", EXPLORATION_COMMAND_BACK, BUTTON_MIN_SIZE)
 	add_exploration_command_button("Q ← Tourner", EXPLORATION_COMMAND_TURN_LEFT, BUTTON_MIN_SIZE)
 	add_exploration_command_button("D → Tourner", EXPLORATION_COMMAND_TURN_RIGHT, BUTTON_MIN_SIZE)
+	add_exploration_command_button("Carte", EXPLORATION_COMMAND_MAP, MAP_BUTTON_MIN_SIZE)
 	add_exploration_command_button("E Menu", EXPLORATION_COMMAND_MENU, MENU_BUTTON_MIN_SIZE)
 
 

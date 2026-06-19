@@ -1,8 +1,8 @@
 # IDEAS — DungeonCrawFirstMiniGame
 
-Date de création : 2026-06-19
+Date de mise à jour : 2026-06-19
 
-Base de référence : `v0.11 — Cadres UI NineSlice et correction Prêtre`
+Base de référence : `v0.11.1 — Carte agrandie et automap améliorée`
 
 ## Rôle du document
 
@@ -24,10 +24,6 @@ Une idée ne doit être retirée que si :
 2. l'utilisateur confirme explicitement que l'information peut être retirée de IDEAS.md.
 ```
 
-Si une idée devient prioritaire, elle peut être copiée ou promue dans `ROADMAP.md`, mais elle ne doit pas forcément être supprimée de `IDEAS.md` immédiatement.
-
-Si une idée est abandonnée ou repoussée très loin, elle doit être déplacée dans une section adaptée plutôt que supprimée sans confirmation.
-
 ## Interface et identité visuelle
 
 ```text
@@ -40,6 +36,17 @@ Si une idée est abandonnée ou repoussée très loin, elle doit être déplacé
 - Améliorer progressivement les icônes ou marqueurs UI si nécessaire.
 - Créer une texture dédiée aux boutons, distincte de la texture de cadre principale.
 - Créer éventuellement des variantes de cadres pour les états actifs, dégâts, soin ou sélection.
+- Améliorer encore l'apparence des tooltips si la carte devient plus utilisée.
+```
+
+## Carte, automap et exploration
+
+```text
+- Continuer à vérifier que la carte n'affiche jamais les zones non découvertes.
+- Ajouter éventuellement une petite légende de carte si les symboles deviennent trop nombreux.
+- Ajouter éventuellement un mode de recentrage ou d'inspection clavier plus tard.
+- Ajouter éventuellement des marqueurs implicites déjà découverts, sans journal de quête.
+- Vérifier la lisibilité de la carte si un étage plus grand arrive plus tard.
 ```
 
 ## Grimoire, magie et sorts
@@ -95,39 +102,17 @@ Si une idée est abandonnée ou repoussée très loin, elle doit être déplacé
 - Équipement lié à des passages, indices ou mini-objectifs.
 ```
 
-## Messages, feedbacks et lisibilité
-
-```text
-- Messages typés pour remplacer la détection textuelle si les couleurs deviennent fragiles.
-- Couleurs spécifiques pour objet clé, inscription, sauvegarde, avertissement, soin, dégâts ennemis.
-- Feedback plus clair après boss vaincu.
-- Feedback plus clair quand une porte verrouillée est ouverte.
-- Feedback plus clair quand un coffre est déjà ouvert.
-- Feedback de montée de niveau plus visible.
-- Résumé de victoire plus lisible si nécessaire.
-```
-
 ## Playtests et exports
 
 ```text
-- Playtest 02 post-v0.11.
+- Playtest 02 post-v0.11.1.
 - Tests complets Mage + Prêtre après les grimoires.
 - Tests UI en résolution native et en stretch.
+- Tests carte agrandie et automap compacte.
 - Tests boss / K.O. / sauvegarde / chargement après combats.
 - Exports Compatibility / OpenGL par défaut pour les testeurs.
 - Documentation des playtests sans logs bruts.
 - Synthèse des problèmes matériels / renderer si nouveaux cas.
-```
-
-## Technique et architecture
-
-```text
-- Ne pas relancer de grosse refactorisation sans raison concrète.
-- Surveiller les systèmes magie, input, journal de combat et PartyStatusUI.
-- Surveiller UIFrameStyle.gd si plusieurs variantes de cadres apparaissent.
-- Évaluer proprement les impacts sauvegarde avant tout système persistant de sorts.
-- Si un système de messages typés est ajouté, centraliser les types au lieu de multiplier les heuristiques texte.
-- Continuer à privilégier les helpers / vues dédiées quand un contrôleur recommence à grossir.
 ```
 
 ## Idées explicitement reportées pour le moment

@@ -6,7 +6,7 @@ Le projet sert aussi de terrain d'apprentissage pour la gestion d'un petit proje
 
 ## État actuel
 
-Version stable récente : `v0.11 — Cadres UI NineSlice et correction Prêtre`.
+Version stable récente : `v0.11.1 — Carte agrandie et automap améliorée`.
 
 Cette base contient une première boucle jouable :
 
@@ -29,9 +29,11 @@ Cette base contient une première boucle jouable :
 - soin en combat avec ciblage direct par cadres ;
 - journal Combat coloré pour distinguer dégâts ennemis et soins ;
 - cadres et boutons principaux de l'interface habillés avec une texture NineSlice sombre ;
-- correction du libellé de classe `Prêtre` pour Eldric.
+- classe `Prêtre` corrigée pour Eldric ;
+- carte agrandie d'exploration dans le viewport ;
+- automap compacte améliorée avec survol souris des coordonnées.
 
-`v0.11` améliore principalement l'identité visuelle de l'interface sans changer la boucle de gameplay. La version ajoute aussi un petit hotfix de cohérence de libellé : la classe d'Eldric est désormais `Prêtre`. Le jeu ne propose pas de journal de quête ni d'objets consommables à ce stade.
+`v0.11.1` ajoute une amélioration de qualité de vie issue du playtest : le joueur peut ouvrir une carte agrandie de l'étage découvert pour planifier ses déplacements. Cette carte ne révèle rien de plus que l'automap compacte. Le jeu ne propose pas de journal de quête ni d'objets consommables à ce stade.
 
 ## Renderer et affichage
 
@@ -64,6 +66,20 @@ Cette règle vient du premier playtest externe : les builds modernes `Forward+ /
 - `E` : retour / équivalent `Échap`
 - Souris : boutons d'action affichés à l'écran
 
+La commande `Carte` ouvre une carte agrandie de l'étage découvert dans le viewport. `Retour`, `E` ou `Échap` ferment la carte et reviennent à l'exploration.
+
+### Carte et automap
+
+La carte agrandie et l'automap compacte utilisent le même état :
+
+- étage courant ;
+- cellules découvertes ;
+- position du joueur ;
+- orientation du joueur ;
+- symboles déjà connus par l'automap.
+
+Elles ne révèlent pas les zones non découvertes. Les coordonnées s'affichent au survol souris sur les cases découvertes non-mur. Les cases non découvertes et les murs ne montrent pas de coordonnées.
+
 ### Combat
 
 Les commandes de combat sont utilisables à la souris.
@@ -95,7 +111,7 @@ La cible reçoit une bordure verte et une prévisualisation du soin prévu sur s
 
 ## Interface
 
-L'interface principale utilise maintenant une texture de cadre NineSlice :
+L'interface principale utilise une texture de cadre NineSlice :
 
 ```text
 assets/ui/frames/texture_cadre_ui.png

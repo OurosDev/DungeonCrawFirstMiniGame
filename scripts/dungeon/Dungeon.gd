@@ -208,8 +208,48 @@ func toggle_adventure_menu() -> void:
 	if game_ui == null:
 		return
 
+	if is_exploration_map_open():
+		close_exploration_map()
+		return
+
 	GameSession.set_shop_available(is_shop_cell(player.grid_cell))
 	game_ui.toggle_in_game_menu(party)
+
+
+func open_exploration_map() -> void:
+	if combat_manager != null:
+		if combat_manager.in_combat:
+			return
+	if game_ui == null:
+		return
+	if player == null:
+		return
+
+	if game_ui.has_method("open_exploration_map"):
+		game_ui.open_exploration_map(
+			layout,
+			discovered_map_cells,
+			player.grid_cell,
+			player.get_facing_name()
+		)
+
+
+func close_exploration_map() -> void:
+	if game_ui == null:
+		return
+
+	if game_ui.has_method("close_exploration_map"):
+		game_ui.close_exploration_map()
+
+
+func is_exploration_map_open() -> bool:
+	if game_ui == null:
+		return false
+
+	if not game_ui.has_method("is_exploration_map_open"):
+		return false
+
+	return game_ui.is_exploration_map_open()
 
 
 func connect_in_game_menu_signals() -> void:

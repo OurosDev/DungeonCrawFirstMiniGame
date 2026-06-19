@@ -2,7 +2,7 @@
 
 Date de mise à jour : 2026-06-19
 
-Base de reprise : `v0.11 — Cadres UI NineSlice et correction Prêtre`
+Base de reprise : `v0.11.1 — Carte agrandie et automap améliorée`
 
 ## Prompt court de reprise
 
@@ -14,7 +14,7 @@ Ensuite vérifie l'état actuel du repo GitHub sur main, les changelogs, les aud
 
 Travaille en français, signale les incohérences, et fournis des packs complets de fichiers à remplacer quand tu modifies le projet.
 
-La base récente est v0.11 : amélioration visuelle de l'UI par texture NineSlice, cadres principaux et boutons texturés, menus harmonisés, long cadre de commandes supprimé derrière les boutons, et correction du libellé de classe Prêtre.
+La base récente est v0.11.1 : UI NineSlice de v0.11, correction Prêtre, carte agrandie d'exploration dans le viewport, automap compacte améliorée, et coordonnées au survol souris des cases découvertes non-mur.
 ```
 
 ## État actuel confirmé
@@ -39,6 +39,8 @@ contrôles souris et clavier AZERTY
 grimoire hors combat
 grimoire de combat
 interface principale texturée par NineSlice
+carte agrandie d'exploration
+automap compacte améliorée
 ```
 
 ## Versions récentes
@@ -48,25 +50,40 @@ v0.8.1 — Stabilisation playtest et scaling fenêtre
 v0.8.2 — Refactorisations internes et stabilisation technique
 v0.9 — Grimoire hors combat et sélection de cible
 v0.10 — Grimoire de combat et ciblage des soins
-v0.11 — Cadres UI NineSlice et correction Prêtre
+v0.11-Polish — Cadres UI NineSlice et correction Prêtre
+v0.11.1 — Carte agrandie et automap améliorée
 ```
 
-## Points v0.11 validés
+## Points v0.11.1 validés
 
 ```text
-- ajout de l'asset assets/ui/frames/texture_cadre_ui.png ;
-- création du helper scripts/ui/theme/UIFrameStyle.gd ;
-- application du cadre NineSlice aux panneaux principaux ;
-- application de la texture aux cadres des héros ;
-- application de la texture au viewport, au journal et à l'automap ;
-- application de la texture aux boutons principaux ;
-- application de la texture aux cadres et boutons des menus ;
-- suppression du long cadre derrière les commandes d'exploration ;
-- suppression du long cadre derrière les commandes de combat ;
-- lisibilité générale conservée ;
-- boutons encore utilisables, même si une texture dédiée aux boutons reste souhaitable plus tard ;
-- correction de la classe d'Eldric : Prêtre au lieu de Prêtresse ;
-- compatibilité des anciennes sauvegardes via normalisation du nom de classe.
+- bouton Carte en exploration ;
+- carte agrandie affichée dans le viewport ;
+- fermeture par Retour, E ou Échap ;
+- déplacements bloqués pendant l'affichage de la carte ;
+- carte non disponible en combat ;
+- carte agrandie synchronisée avec l'état de l'automap ;
+- aucune révélation de zones non découvertes ;
+- cadre de carte texturé selon les règles UI v0.11 ;
+- bouton Retour texturé et placé dans le coin bas gauche du cadre de carte ;
+- tooltip de coordonnées au survol souris des cases découvertes non-mur ;
+- tooltip également disponible sur l'automap compacte ;
+- pas de coordonnées affichées sur les murs ni sur les cases non découvertes ;
+- titre AUTOMAP retiré pour gagner de la place ;
+- automap compacte légèrement zoomée tout en conservant 15 cases par 11.
+```
+
+## Points v0.11 conservés
+
+```text
+- asset assets/ui/frames/texture_cadre_ui.png ;
+- helper scripts/ui/theme/UIFrameStyle.gd ;
+- cadres principaux texturés ;
+- boutons principaux texturés ;
+- menus harmonisés ;
+- long cadre derrière les commandes supprimé ;
+- correction de la classe d'Eldric : Prêtre ;
+- compatibilité anciennes sauvegardes via normalisation du nom de classe.
 ```
 
 ## Points v0.10 conservés
@@ -84,20 +101,7 @@ v0.11 — Cadres UI NineSlice et correction Prêtre
 - prévisualisation PV sur la cible ;
 - prévisualisation PM sur le lanceur ;
 - contrôles souris, flèches, ZQSD, A/E ;
-- journal Combat : dégâts ennemis en rouge, soins en vert, dégâts joueur conservés.
-```
-
-## Points v0.9 conservés
-
-```text
-- grimoire hors combat accessible depuis le menu en jeu ;
-- soins hors combat ;
-- sélection par cadres de héros ;
-- bordure verte ;
-- prévisualisation PV/PM ;
-- son de soin et flash vert ;
-- pas de journal de quête ;
-- pas de consommables.
+- journal Combat : dégâts ennemis en rouge, soins verts, dégâts joueur conservés.
 ```
 
 ## Règles de design importantes
@@ -107,29 +111,11 @@ v0.11 — Cadres UI NineSlice et correction Prêtre
 - Pas de potions.
 - Pas de journal de quête ni moniteur d'objectif.
 - L'absence de suivi explicite fait partie de la difficulté voulue.
+- Les cartes ne doivent pas révéler d'informations non découvertes.
 - Les informations importantes passent plutôt par le canal de messages, avec variations de couleur si utile.
 - Ne pas viser l'étage 3 comme priorité immédiate.
 - Enrichir d'abord la boucle complète existante avec des fonctionnalités.
 - Éviter les contours blancs et halos clairs sur les assets.
-```
-
-## UI NineSlice
-
-État actuel :
-
-```text
-asset principal : assets/ui/frames/texture_cadre_ui.png
-helper : scripts/ui/theme/UIFrameStyle.gd
-panneaux : marge NineSlice 16 px
-boutons : marge NineSlice réduite 8 px
-```
-
-Évolution future probable :
-
-```text
-texture dédiée aux boutons
-éventuelle variante de cadre pour certains états actifs
-éventuel atlas/ninesheet si plusieurs familles de cadres apparaissent
 ```
 
 ## Sorts et grimoires
@@ -141,23 +127,6 @@ grimoire hors combat : action magique hors combat, notamment soins ;
 grimoire de combat : propre au héros actif, sert à vérifier/changer le sort actif temporaire ;
 Magie : lance directement le sort offensif actif ;
 Soin : lance directement le sort de soin actif avec ciblage par cadres.
-```
-
-Règles de combat :
-
-```text
-sélectionner le sort déjà actif -> fermer le grimoire sans perdre le tour ;
-revenir en arrière -> fermer le grimoire sans perdre le tour ;
-changer de sort actif -> action du tour consommée.
-```
-
-Évolution future possible :
-
-```text
-grimoire hors combat individuel par héros ;
-choix des sorts actifs avant combat ;
-sorts utilisables seulement en combat visibles mais grisés ;
-système sauvegardé de sorts connus/découverts si nécessaire.
 ```
 
 ## Refactorisations validées
@@ -176,8 +145,8 @@ PartyCreationUI.gd -> scripts/ui/party_creation/*
 ASSISTANT_WORKFLOW.md
 README.md
 CHANGELOG/README.md
-CHANGELOG/v0.11.md
-audits/STATE_AUDITv0.11.md
+CHANGELOG/v0.11.1.md
+audits/STATE_AUDITv0.11.1.md
 docs/informations/ROADMAP.md
 docs/informations/TECHNICAL_DEBT.md
 docs/informations/IDEAS.md

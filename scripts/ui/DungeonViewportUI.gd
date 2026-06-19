@@ -5,6 +5,7 @@ const UIFrameStyleScript = preload("res://scripts/ui/theme/UIFrameStyle.gd")
 const CommandOverlayUIScript = preload("res://scripts/ui/CommandOverlayUI.gd")
 const CombatMonsterDisplayUIScript = preload("res://scripts/ui/CombatMonsterDisplayUI.gd")
 const InGameMenuPanelUIScript = preload("res://scripts/ui/InGameMenuPanelUI.gd")
+const AutoMapUIScript = preload("res://scripts/ui/AutoMapUI.gd")
 
 const DEFAULT_CAMERA_FAR_DISTANCE: float = 24.0
 
@@ -28,6 +29,15 @@ var view_status_label: Label = null
 var view_status_bar: ProgressBar = null
 
 var command_overlay = null
+var exploration_map_overlay_root: Control = null
+var exploration_map_overlay_panel: Panel = null
+var exploration_map_auto_map = null
+var exploration_map_return_button: Button = null
+
+var stored_map_layout: Array[String] = []
+var stored_map_discovered_cells: Dictionary = {}
+var stored_map_player_position: Vector2i = Vector2i.ZERO
+var stored_map_facing_name: String = ""
 
 var ui_built: bool = false
 
@@ -80,6 +90,7 @@ func build_ui() -> void:
 	build_monster_display()
 	build_enemy_status_overlay()
 	build_command_overlay()
+	build_exploration_map_overlay()
 	build_in_game_menu_panel()
 
 
@@ -95,6 +106,7 @@ func build_in_game_menu_panel() -> void:
 
 func open_in_game_menu(party: Array) -> void:
 	ensure_ui_ready()
+	close_exploration_map_overlay(false)
 
 	if command_overlay != null:
 		command_overlay.visible = false
@@ -143,6 +155,170 @@ func on_in_game_menu_save_requested() -> void:
 
 func on_in_game_menu_quit_requested() -> void:
 	in_game_menu_quit_requested.emit()
+
+
+
+# ------------------------------------------------------------
+# CARTE AGRANDIE D'EXPLORATION
+# Affiche la même carte découverte que l'automap, mais dans le viewport.
+# ------------------------------------------------------------
+
+func build_exploration_map_overlay() -> void:
+	exploration_map_overlay_root = Control.new()
+	exploration_map_overlay_root.name = "ExplorationMapOverlayRoot"
+	exploration_map_overlay_root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	exploration_map_overlay_root.mouse_filter = Control.MOUSE_FILTER_STOP
+	exploration_map_overlay_root.visible = false
+	add_child(exploration_map_overlay_root)
+
+	exploration_map_overlay_panel = Panel.new()
+	exploration_map_overlay_panel.name = "ExplorationMapOverlay"
+	exploration_map_overlay_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+	exploration_map_overlay_panel.offset_left = 14
+	exploration_map_overlay_panel.offset_top = 14
+	exploration_map_overlay_panel.offset_right = -14
+	exploration_map_overlay_panel.offset_bottom = -14
+	exploration_map_overlay_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	exploration_map_overlay_panel.add_theme_stylebox_override(
+		"panel",
+		create_panel_style(
+			Color(0.035, 0.024, 0.016, 0.98),
+			Color(0.58, 0.36, 0.14, 1.0),
+			4
+		)
+	)
+	exploration_map_overlay_root.add_child(exploration_map_overlay_panel)
+
+	var margin: MarginContainer = MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 10)
+	margin.add_theme_constant_override("margin_top", 10)
+	margin.add_theme_constant_override("margin_right", 10)
+	margin.add_theme_constant_override("margin_bottom", 8)
+	exploration_map_overlay_panel.add_child(margin)
+
+	exploration_map_auto_map = AutoMapUIScript.new()
+	exploration_map_auto_map.name = "ExplorationMapFullAutoMap"
+	exploration_map_auto_map.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	exploration_map_auto_map.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	margin.add_child(exploration_map_auto_map)
+
+	exploration_map_return_button = Button.new()
+	exploration_map_return_button.text = "Retour"
+	exploration_map_return_button.custom_minimum_size = Vector2(62, 22)
+	exploration_map_return_button.focus_mode = Control.FOCUS_NONE
+	exploration_map_return_button.z_index = 20
+	exploration_map_return_button.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	exploration_map_return_button.offset_left = 8
+	exploration_map_return_button.offset_top = -28
+	exploration_map_return_button.offset_right = 70
+	exploration_map_return_button.offset_bottom = -6
+	exploration_map_return_button.add_theme_font_size_override("font_size", 11)
+	exploration_map_return_button.add_theme_color_override("font_color", Color(0.90, 0.80, 0.58))
+	exploration_map_return_button.add_theme_color_override("font_hover_color", Color(1.0, 0.90, 0.55))
+	exploration_map_return_button.add_theme_color_override("font_pressed_color", Color(1.0, 0.92, 0.48))
+	exploration_map_return_button.add_theme_stylebox_override(
+		"normal",
+		UIFrameStyleScript.create_button_style(
+			Color(0.11, 0.07, 0.04, 1.0),
+			Color(0.30, 0.18, 0.08, 1.0),
+			1
+		)
+	)
+	exploration_map_return_button.add_theme_stylebox_override(
+		"hover",
+		UIFrameStyleScript.create_button_style(
+			Color(0.18, 0.10, 0.05, 1.0),
+			Color(0.55, 0.34, 0.13, 1.0),
+			1
+		)
+	)
+	exploration_map_return_button.add_theme_stylebox_override(
+		"pressed",
+		UIFrameStyleScript.create_button_style(
+			Color(0.28, 0.16, 0.06, 1.0),
+			Color(0.95, 0.72, 0.28, 1.0),
+			2
+		)
+	)
+	exploration_map_return_button.pressed.connect(close_exploration_map_overlay)
+	exploration_map_overlay_panel.add_child(exploration_map_return_button)
+
+
+func update_exploration_map_data(
+	layout: Array[String],
+	discovered_cells: Dictionary,
+	player_position: Vector2i,
+	facing_name: String
+) -> void:
+	stored_map_layout = layout.duplicate()
+	stored_map_discovered_cells = discovered_cells.duplicate(true)
+	stored_map_player_position = player_position
+	stored_map_facing_name = facing_name
+
+	if is_exploration_map_overlay_open():
+		refresh_exploration_map_overlay()
+	call_deferred("refresh_exploration_map_overlay")
+
+
+func open_exploration_map_overlay(
+	layout: Array[String],
+	discovered_cells: Dictionary,
+	player_position: Vector2i,
+	facing_name: String
+) -> void:
+	ensure_ui_ready()
+
+	update_exploration_map_data(
+		layout,
+		discovered_cells,
+		player_position,
+		facing_name
+	)
+
+	if exploration_map_overlay_root != null:
+		exploration_map_overlay_root.visible = true
+
+	if command_overlay != null:
+		command_overlay.visible = false
+
+	if view_status_panel != null:
+		view_status_panel.visible = false
+
+	if monster_display != null:
+		monster_display.visible = false
+
+	refresh_exploration_map_overlay()
+
+
+func close_exploration_map_overlay(restore_exploration_commands: bool = true) -> void:
+	ensure_ui_ready()
+
+	if exploration_map_overlay_root != null:
+		exploration_map_overlay_root.visible = false
+
+	if restore_exploration_commands:
+		show_exploration_commands()
+
+
+func is_exploration_map_overlay_open() -> bool:
+	if exploration_map_overlay_root == null:
+		return false
+
+	return exploration_map_overlay_root.visible
+
+
+func refresh_exploration_map_overlay() -> void:
+	if exploration_map_auto_map == null:
+		return
+
+	if exploration_map_auto_map.has_method("update_full_map"):
+		exploration_map_auto_map.update_full_map(
+			stored_map_layout,
+			stored_map_discovered_cells,
+			stored_map_player_position,
+			stored_map_facing_name
+		)
 
 
 func build_monster_display() -> void:
@@ -528,6 +704,7 @@ func show_combat_commands(
 	selected_command_index: int
 ) -> void:
 	ensure_ui_ready()
+	close_exploration_map_overlay(false)
 
 	if command_overlay != null:
 		command_overlay.show_combat_commands(

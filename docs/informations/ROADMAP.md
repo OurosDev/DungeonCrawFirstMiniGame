@@ -2,7 +2,7 @@
 
 Date de mise à jour : 2026-06-19
 
-Version stable actuelle : `v0.11 — Cadres UI NineSlice et correction Prêtre`
+Version stable actuelle : `v0.11.1 — Carte agrandie et automap améliorée`
 
 ## Rôle du document
 
@@ -13,8 +13,6 @@ Les idées non priorisées, reportées ou encore à discuter doivent être conse
 ```text
 docs/informations/IDEAS.md
 ```
-
-Règle importante : lorsqu'une idée sort de la roadmap parce qu'elle n'est pas prioritaire, elle doit être déplacée ou conservée dans `IDEAS.md` plutôt que supprimée définitivement.
 
 ## Vision du projet
 
@@ -35,10 +33,9 @@ grimoires hors combat et combat
 sauvegarde / chargement
 contrôles souris + AZERTY
 interface texturée NineSlice
+carte agrandie et automap améliorée
 Compatibility / OpenGL
 ```
-
-Le contenu supplémentaire, comme l'étage 3, doit arriver seulement quand la boucle actuelle est suffisamment riche, stable et agréable à rejouer.
 
 ## Principes de design
 
@@ -48,6 +45,7 @@ Le contenu supplémentaire, comme l'étage 3, doit arriver seulement quand la bo
 - L'inventaire doit rester centré sur l'équipement, l'or et les objets clés.
 - Pas de journal de quête ni moniteur d'objectif explicite.
 - L'absence de suivi de quête fait partie de la difficulté voulue.
+- Les cartes ne doivent pas révéler d'informations non découvertes.
 - Les indices doivent passer par le donjon, les messages, les couleurs et les feedbacks.
 - Ne pas viser l'étage 3 comme priorité immédiate.
 - Enrichir d'abord les systèmes autour de la boucle déjà complète.
@@ -57,35 +55,6 @@ Le contenu supplémentaire, comme l'étage 3, doit arriver seulement quand la bo
 ```
 
 ## Versions récentes
-
-### v0.8.1 — Stabilisation playtest et scaling fenêtre
-
-```text
-- Renderer Compatibility / OpenGL.
-- Scaling fenêtre canvas_items + keep.
-- Playtest 01 documenté.
-- Logs et builds hors repo.
-```
-
-### v0.8.2 — Refactorisations internes et stabilisation technique
-
-```text
-- Refactorisation du menu en jeu.
-- Refactorisation du combat.
-- Refactorisation du donjon.
-- Refactorisation de GameSession.
-- Refactorisation de la création d'équipe.
-```
-
-### v0.9 — Grimoire hors combat et sélection de cible
-
-```text
-- Grimoire hors combat.
-- Soins hors combat.
-- Sélection de cible par cadres de héros.
-- Prévisualisation PV/PM.
-- Messages importants plus lisibles.
-```
 
 ### v0.10 — Grimoire de combat et ciblage des soins
 
@@ -97,7 +66,7 @@ Le contenu supplémentaire, comme l'étage 3, doit arriver seulement quand la bo
 - Journal Combat plus lisible : dégâts ennemis rouges, soins verts.
 ```
 
-### v0.11 — Cadres UI NineSlice et correction Prêtre
+### v0.11-Polish — Cadres UI NineSlice et correction Prêtre
 
 ```text
 - Texture de cadre UI NineSlice.
@@ -108,37 +77,38 @@ Le contenu supplémentaire, comme l'étage 3, doit arriver seulement quand la bo
 - Correction du libellé de classe : Prêtre.
 ```
 
+### v0.11.1 — Carte agrandie et automap améliorée
+
+```text
+- Bouton Carte en exploration.
+- Carte agrandie dans le viewport.
+- Carte synchronisée avec l'automap.
+- Aucune révélation de zones non découvertes.
+- Coordonnées au survol souris des cases découvertes non-mur.
+- Automap compacte sans titre et légèrement zoomée.
+```
+
 ## Prochaines phases proposées
 
-Ces phases sont une proposition d'ordre de travail. Elles peuvent évoluer, mais il faut conserver une vision de 3 à 5 étapes pour éviter de perdre le cap long terme.
+### Phase 1 — Finition UI post-carte
 
-### Phase 1 — Finition UI NineSlice et boutons dédiés
-
-Objectif : consolider le polish visuel introduit par `v0.11`.
+Objectif : consolider le polish visuel introduit par `v0.11` et `v0.11.1`.
 
 Pistes :
 
 ```text
+- vérifier le rendu de la carte en résolution native et en stretch ;
+- vérifier l'automap compacte après plusieurs changements de fenêtre ;
 - créer une texture dédiée aux boutons ;
-- vérifier tous les états hover / pressed / disabled ;
+- vérifier les états hover / pressed / disabled ;
 - améliorer éventuellement les cadres actifs, dégâts, soin et sélection ;
 - harmoniser les marges internes des panneaux ;
-- vérifier le rendu en résolution native et en stretch ;
 - conserver la lisibilité en basse résolution.
 ```
 
-Points de vigilance :
+### Phase 2 — Playtest 02 post-v0.11.1
 
-```text
-- ne pas casser le scaling canvas_items + keep ;
-- ne pas rendre les cadres trop chargés ;
-- ne pas réduire la lisibilité des textes ;
-- garder les boutons immédiatement reconnaissables et cliquables.
-```
-
-### Phase 2 — Playtest 02 post-v0.11
-
-Objectif : vérifier que la boucle complète reste stable après l'ajout des grimoires, du ciblage des soins et du nouveau rendu UI.
+Objectif : vérifier que la boucle complète reste stable après l'ajout des grimoires, du polish UI et de la carte agrandie.
 
 À tester :
 
@@ -153,6 +123,9 @@ combat prêtre
 journal Combat coloré
 boutons texturés
 menus texturés
+carte agrandie
+automap compacte
+tooltips coordonnées
 victoire
 fuite
 K.O.
@@ -166,7 +139,7 @@ changement d'étage
 Sortie attendue :
 
 ```text
-playtests/PLAYTEST_02_v0.11.md
+playtests/PLAYTEST_02_v0.11.1.md
 ```
 
 Ne pas pousser les logs bruts, builds exportées ou sauvegardes locales.
@@ -187,15 +160,6 @@ Pistes compatibles avec l'état actuel :
 - choix de sorts actifs avant combat, seulement quand il y aura assez de sorts pour le justifier.
 ```
 
-Dette potentielle à traiter avant ou pendant cette phase :
-
-```text
-- système de sorts connus / découverts ;
-- compatibilité des anciennes sauvegardes si de nouveaux champs sont ajoutés ;
-- éventuel stockage des préférences de sorts actifs ;
-- éviter d'improviser directement dans SaveManager ou CharacterData sans conception préalable.
-```
-
 ### Phase 4 — Événements fixes et interactions de donjon
 
 Objectif : enrichir les deux premiers étages sans ajouter immédiatement un nouvel étage.
@@ -210,8 +174,6 @@ Pistes :
 - récompenses non consommables ;
 - petits choix ou mini-objectifs sans journal de quête explicite.
 ```
-
-Règle de design : l'information doit rester dans le donjon et les messages, pas dans une checklist.
 
 ### Phase 5 — Équipement, objets clés et récompenses structurantes
 
@@ -228,19 +190,6 @@ Pistes :
 - feedbacks plus clairs quand un objet ne peut pas être vendu ou équipé.
 ```
 
-## Priorités plus tardives
-
-```text
-- messages typés pour remplacer la coloration textuelle si le journal devient fragile ;
-- nouveaux monstres ou variations de monstres ;
-- boss plus structurés ;
-- nouveaux sprites ou animations ;
-- sons et musiques additionnels ;
-- étage 3 quand la boucle actuelle aura été davantage enrichie ;
-- exports de playtest plus encadrés ;
-- meilleure documentation joueur à terme.
-```
-
 ## Éléments volontairement non prioritaires
 
 ```text
@@ -253,21 +202,6 @@ Pistes :
 - accélération artificielle vers v1.0.
 ```
 
-Ces éléments peuvent être rediscutés plus tard, mais ils ne doivent pas être proposés comme prochaine étape par défaut.
-
-## Lien avec IDEAS.md
-
-`docs/informations/IDEAS.md` contient les pistes non priorisées ou reportées.
-
-Règles :
-
-```text
-- La roadmap garde le cap et les prochaines phases probables.
-- IDEAS.md conserve les idées à ne pas perdre.
-- Une idée peut remonter de IDEAS.md vers la roadmap si elle devient prioritaire.
-- Une idée retirée de la roadmap doit être conservée dans IDEAS.md sauf si elle est abandonnée explicitement.
-```
-
 ## Notes de versioning
 
 Le projet reste en pré-1.0. Ne pas accélérer artificiellement vers `v1.0`.
@@ -275,7 +209,7 @@ Le projet reste en pré-1.0. Ne pas accélérer artificiellement vers `v1.0`.
 Les versions peuvent continuer ainsi :
 
 ```text
-v0.11
+v0.11.1
 v0.12
 v0.13
 ...

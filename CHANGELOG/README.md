@@ -4,6 +4,7 @@ Index des versions publiques et de travail du projet.
 
 ## Versions récentes
 
+- [`v0.11.1 — Carte agrandie et automap améliorée`](v0.11.1.md)
 - [`v0.11 — Cadres UI NineSlice et correction Prêtre`](v0.11.md)
 - [`v0.10 — Grimoire de combat et ciblage des soins`](v0.10.md)
 - [`v0.9 — Grimoire hors combat et sélection de cible`](v0.9.md)

@@ -2,13 +2,13 @@
 
 Date de mise à jour : 2026-06-19
 
-Base actuelle : `v0.11 — Cadres UI NineSlice et correction Prêtre`
+Base actuelle : `v0.11.1 — Carte agrandie et automap améliorée`
 
 ## Résumé
 
-La dette technique principale du projet a été réduite par la série de refactorisations `v0.8.2`, puis la base a été enrichie par `v0.9` et `v0.10` avec les grimoires et la sélection de cible.
+La dette technique principale du projet a été réduite par la série de refactorisations `v0.8.2`, puis la base a été enrichie par les grimoires, le polish UI et la carte agrandie.
 
-`v0.11` ajoute une première base visuelle NineSlice pour l'interface et corrige le libellé de classe `Prêtre`. La priorité technique actuelle n'est pas de refactoriser massivement à nouveau, mais de consolider progressivement l'UI texturée, puis de surveiller les systèmes de magie, d'input et de journal de combat pendant les prochains tests.
+`v0.11.1` ajoute une amélioration de qualité de vie sans nouveau format de sauvegarde. La carte agrandie réutilise les données existantes de l'automap.
 
 ## Dette résolue ou fortement réduite
 
@@ -22,23 +22,9 @@ GameSession.gd -> scripts/core/session/*
 PartyCreationUI.gd -> scripts/ui/party_creation/*
 ```
 
-Ces refactorisations ont été testées localement et stabilisées avant release.
-
-### Scaling et renderer
-
-La configuration `Compatibility / OpenGL` et le scaling `canvas_items + keep` restent la base recommandée pour les builds de test Windows.
-
-### Grimoire hors combat v0.9
-
-Le grimoire hors combat fonctionne sans nouveau format de sauvegarde. Les PV/PM modifiés sont déjà persistés avec les héros.
-
-### Grimoire de combat v0.10
-
-Le grimoire de combat utilise des sorts actifs temporaires réinitialisés à chaque combat. Il n'ajoute pas encore de persistance.
-
 ### UI NineSlice v0.11
 
-Une première base de rendu texturé est centralisée dans :
+Base de rendu texturé centralisée dans :
 
 ```text
 scripts/ui/theme/UIFrameStyle.gd
@@ -50,17 +36,38 @@ Asset principal :
 assets/ui/frames/texture_cadre_ui.png
 ```
 
-Cette base évite de disperser les paramètres `StyleBoxTexture` dans chaque script et permet d'améliorer les cadres progressivement.
+### Carte agrandie v0.11.1
 
-### Correction Prêtre v0.11
+La carte agrandie reste une extension de l'automap :
 
-Le nom de classe `Prêtre` est centralisé via `ClassDatabase.gd`, avec normalisation pour les anciennes valeurs.
+```text
+layout
+discovered_map_cells
+player.grid_cell
+player.get_facing_name()
+```
+
+Aucun nouvel état persistant n'est ajouté.
 
 ## Points de vigilance actuels
 
-### 1. Texture dédiée aux boutons
+### 1. Carte agrandie et automap
 
-Les boutons utilisent actuellement la même texture que les panneaux, avec des marges NineSlice réduites à 8 px.
+À surveiller :
+
+```text
+redimensionnement de fenêtre
+position du tooltip
+clarté des coordonnées
+absence de tooltip sur murs
+absence de tooltip sur cases non découvertes
+alignement du bouton Retour
+lisibilité sur étage 1 et étage 2
+```
+
+### 2. Texture dédiée aux boutons
+
+Les boutons utilisent actuellement la même texture que les panneaux, avec des marges NineSlice réduites.
 
 Cela fonctionne et reste lisible, mais une texture dédiée serait plus propre.
 
@@ -70,18 +77,7 @@ Piste future :
 assets/ui/frames/texture_bouton_ui.png
 ```
 
-ou nom équivalent.
-
-À surveiller :
-
-```text
-hauteur des boutons
-états hover / pressed / disabled
-lisibilité des textes courts et longs
-cohérence entre menus et combat
-```
-
-### 2. UI texturée et états visuels
+### 3. UI texturée et états visuels
 
 L'application du NineSlice ne doit pas masquer les feedbacks importants :
 
@@ -92,11 +88,10 @@ prévisualisation PV/PM
 dégâts reçus
 soins
 boutons désactivés
+tooltips carte
 ```
 
-Les futures améliorations UI doivent rester compatibles avec la lisibilité basse résolution.
-
-### 3. CombatManager.gd
+### 4. CombatManager.gd
 
 Même refactorisé, `CombatManager.gd` reste sensible car il orchestre :
 
@@ -113,7 +108,7 @@ ciblage des soins
 
 Les prochaines évolutions de magie doivent rester progressives et testables.
 
-### 4. Sorts actifs
+### 5. Sorts actifs
 
 Pour le moment :
 
@@ -132,39 +127,9 @@ choix persistant des sorts actifs
 compatibilité anciennes sauvegardes
 ```
 
-Cette évolution ne doit pas être improvisée dans `CharacterData.gd` ou `SaveManager.gd` sans conception préalable.
-
-### 5. Sélection par cadres héros
-
-`HeroFrameSelectionController.gd` est une brique UI réutilisable. Elle sert déjà :
-
-```text
-soins hors combat
-soins en combat
-```
-
-À surveiller si elle sert plus tard à :
-
-```text
-sorts de protection
-inspection de héros
-actions spéciales
-objets clés ou événements ciblés
-```
-
-Elle doit continuer à respecter :
-
-```text
-souris
-flèches
-ZQSD
-A / Entrée
-E / Échap
-```
-
 ### 6. Journal Combat
 
-`LogPanelUI.gd` colore maintenant certaines lignes de combat selon leur texte.
+`LogPanelUI.gd` colore certaines lignes de combat selon leur texte.
 
 Risque : si les messages de combat deviennent plus variés, l'analyse textuelle peut devenir fragile.
 
@@ -179,21 +144,6 @@ key_item
 message_tile
 ```
 
-Ce n'est pas nécessaire immédiatement, mais c'est une bonne direction si la coloration devient difficile à maintenir.
-
-### 7. Documentation dungeon
-
-Pour `FLOOR_VISUALIZER.md`, ne jamais remplacer la grille/tableau par un bloc ASCII ou un format CSS expérimental sans demande explicite.
-
-Avant modification :
-
-```text
-1. lire ASSISTANT_WORKFLOW.md ;
-2. lire docs/dungeon/FLOOR_DESIGN.md ;
-3. vérifier scripts/dungeon/FloorDatabase.gd ;
-4. conserver le format tableau/grille avec coordonnées.
-```
-
 ## À ne pas faire pour le moment
 
 ```text
@@ -201,35 +151,23 @@ Avant modification :
 - ajouter des potions ;
 - créer un journal de quête ;
 - créer un moniteur d'objectif ;
+- révéler des informations non découvertes sur la carte ;
 - ajouter l'étage 3 avant d'enrichir davantage la boucle actuelle ;
 - changer le format de sauvegarde sans nécessité claire ;
 - préparer une grosse refactorisation générale non motivée.
 ```
 
-## Dette technique future probable
-
-```text
-texture dédiée aux boutons
-variantes de cadres UI si nécessaire
-système de sorts connus / découverts
-grimoire individuel par héros
-sauvegarde des préférences de sorts actifs
-messages typés au lieu de détection textuelle
-meilleur découpage si CombatManager grossit à nouveau
-playtest 02 post-v0.11
-```
-
 ## Recommandation immédiate
 
-Après `v0.11`, privilégier :
+Après `v0.11.1`, privilégier :
 
 ```text
-1. vérifier la finition UI NineSlice ;
-2. créer une texture dédiée aux boutons si le besoin visuel reste confirmé ;
-3. tester la boucle complète en résolution native et redimensionnée ;
-4. tester Mage + Prêtre ;
-5. tester boss et K.O. ;
-6. sauvegarder / charger après plusieurs combats ;
-7. éventuellement documenter un Playtest 02 post-v0.11 ;
+1. vérifier la carte agrandie en résolution native et redimensionnée ;
+2. tester étage 1 et étage 2 ;
+3. vérifier l'automap compacte après plusieurs déplacements ;
+4. tester les tooltips coordonnées ;
+5. tester la boucle complète avec Mage + Prêtre ;
+6. éventuellement documenter un Playtest 02 post-v0.11.1 ;
+7. créer une texture dédiée aux boutons si le besoin visuel reste confirmé ;
 8. ensuite seulement, concevoir les prochains sorts.
 ```

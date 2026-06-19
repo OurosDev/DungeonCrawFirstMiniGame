@@ -28,6 +28,7 @@ const COMMAND_MOVE_BACK: String = "move_back"
 const COMMAND_TURN_LEFT: String = "turn_left"
 const COMMAND_TURN_RIGHT: String = "turn_right"
 const COMMAND_MENU: String = "menu"
+const COMMAND_MAP: String = "map"
 
 
 # ------------------------------------------------------------
@@ -65,6 +66,8 @@ func handle_input(dungeon, event: InputEvent) -> void:
 		return
 	if is_in_game_menu_open(dungeon):
 		return
+	if is_exploration_map_open(dungeon):
+		return
 	if dungeon.party.is_empty():
 		return
 	if dungeon.combat_manager == null:
@@ -98,6 +101,11 @@ func handle_back_input(dungeon, event: InputEvent) -> bool:
 		if not key_event.pressed:
 			return true
 
+	if is_exploration_map_open(dungeon):
+		if dungeon.has_method("close_exploration_map"):
+			dungeon.close_exploration_map()
+		return true
+
 	# E imite le comportement actuel d'Échap : ouvrir / fermer le menu d'aventure.
 	dungeon.toggle_adventure_menu()
 	return true
@@ -109,6 +117,15 @@ func is_in_game_menu_open(dungeon) -> bool:
 	if not dungeon.game_ui.has_method("is_in_game_menu_open"):
 		return false
 	return dungeon.game_ui.is_in_game_menu_open()
+
+
+func is_exploration_map_open(dungeon) -> bool:
+	if dungeon == null:
+		return false
+	if not dungeon.has_method("is_exploration_map_open"):
+		return false
+
+	return dungeon.is_exploration_map_open()
 
 
 # ------------------------------------------------------------
@@ -145,6 +162,12 @@ func execute_exploration_command(dungeon, command_id: String) -> bool:
 		return false
 	if is_in_game_menu_open(dungeon):
 		return false
+	if is_exploration_map_open(dungeon):
+		if command_id == COMMAND_MAP:
+			if dungeon.has_method("close_exploration_map"):
+				dungeon.close_exploration_map()
+				return true
+		return false
 
 	match command_id:
 		COMMAND_MOVE_FORWARD:
@@ -159,6 +182,11 @@ func execute_exploration_command(dungeon, command_id: String) -> bool:
 		COMMAND_TURN_RIGHT:
 			dungeon.turn_right()
 			return true
+		COMMAND_MAP:
+			if dungeon.has_method("open_exploration_map"):
+				dungeon.open_exploration_map()
+				return true
+			return false
 		COMMAND_MENU:
 			dungeon.toggle_adventure_menu()
 			return true
