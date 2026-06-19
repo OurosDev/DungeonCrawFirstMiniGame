@@ -3,6 +3,7 @@ class_name MainMenu
 
 const PARTY_CREATION_SCENE_PATH: String = "res://scenes/PartyCreation.tscn"
 const DUNGEON_SCENE_PATH: String = "res://scenes/Dungeon.tscn"
+const UIFrameStyleScript = preload("res://scripts/ui/theme/UIFrameStyle.gd")
 
 var root_panel: Panel = null
 var main_box: VBoxContainer = null
@@ -47,6 +48,9 @@ func build_ui() -> void:
 		4
 	)
 	root_panel.name = "MainPanel"
+	# Le menu principal n'a plus besoin d'un grand cadre autour du titre :
+	# les boutons texturés suffisent à porter l'identité visuelle.
+	root_panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	root_panel.anchor_left = 0.5
 	root_panel.anchor_top = 0.5
 	root_panel.anchor_right = 0.5
@@ -291,6 +295,8 @@ func create_menu_button(text: String) -> Button:
 	button.focus_mode = Control.FOCUS_NONE
 	button.add_theme_font_size_override("font_size", 17)
 
+	apply_textured_button_style(button)
+
 	return button
 
 
@@ -315,15 +321,63 @@ func create_panel(
 ) -> Panel:
 	var panel: Panel = Panel.new()
 
-	var style: StyleBoxFlat = StyleBoxFlat.new()
-	style.bg_color = background_color
-	style.border_color = border_color
-	style.set_border_width_all(border_width)
-	style.corner_radius_top_left = 3
-	style.corner_radius_top_right = 3
-	style.corner_radius_bottom_left = 3
-	style.corner_radius_bottom_right = 3
-
-	panel.add_theme_stylebox_override("panel", style)
+	panel.theme = UIFrameStyleScript.create_menu_theme()
+	panel.add_theme_stylebox_override(
+		"panel",
+		UIFrameStyleScript.create_panel_style(
+			background_color,
+			border_color,
+			border_width
+		)
+	)
 
 	return panel
+
+
+func apply_textured_button_style(button: Button) -> void:
+	button.add_theme_color_override("font_color", Color(0.90, 0.80, 0.58))
+	button.add_theme_color_override("font_hover_color", Color(1.0, 0.90, 0.55))
+	button.add_theme_color_override("font_pressed_color", Color(1.0, 0.92, 0.48))
+	button.add_theme_color_override("font_focus_color", Color(1.0, 0.90, 0.55))
+	button.add_theme_color_override("font_disabled_color", Color(0.42, 0.36, 0.28))
+
+	button.add_theme_stylebox_override(
+		"normal",
+		UIFrameStyleScript.create_button_style(
+			Color(0.11, 0.07, 0.04, 1.0),
+			Color(0.30, 0.18, 0.08, 1.0),
+			1
+		)
+	)
+	button.add_theme_stylebox_override(
+		"hover",
+		UIFrameStyleScript.create_button_style(
+			Color(0.18, 0.10, 0.05, 1.0),
+			Color(0.55, 0.34, 0.13, 1.0),
+			1
+		)
+	)
+	button.add_theme_stylebox_override(
+		"pressed",
+		UIFrameStyleScript.create_button_style(
+			Color(0.28, 0.16, 0.06, 1.0),
+			Color(0.95, 0.72, 0.28, 1.0),
+			2
+		)
+	)
+	button.add_theme_stylebox_override(
+		"focus",
+		UIFrameStyleScript.create_button_style(
+			Color(0.20, 0.12, 0.05, 1.0),
+			Color(0.86, 0.62, 0.20, 1.0),
+			2
+		)
+	)
+	button.add_theme_stylebox_override(
+		"disabled",
+		UIFrameStyleScript.create_button_style(
+			Color(0.06, 0.04, 0.03, 0.80),
+			Color(0.18, 0.12, 0.06, 1.0),
+			1
+		)
+	)

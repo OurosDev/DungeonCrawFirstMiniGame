@@ -4,12 +4,24 @@ class_name DungeonRenderer
 const DungeonThemeDataScript = preload("res://scripts/dungeon/DungeonThemeData.gd")
 
 # ------------------------------------------------------------
-# ORIENTATION DES LIEUX SPÉCIAUX
-# Les modèles temple/boutique sont construits avec leur façade vers +Z.
-# La rotation ci-dessous oriente leur façade vers l'ouest (-X) pour l'étage 1.
+# ORIENTATION DES MODÈLES SPÉCIAUX
+# ------------------------------------------------------------
+# Les modèles lisibles ou interactifs doivent éviter de faire face à un mur.
+#
+# Règle :
+# 1. garder l'orientation naturelle du modèle si elle regarde déjà une case ".";
+# 2. sinon, choisir en priorité une case "." adjacente ;
+# 3. sinon, choisir une case praticable non-mur ;
+# 4. sinon, conserver l'orientation naturelle.
+#
+# Modèles à façade -Z : coffres, stèles de message.
+# Modèles à façade +Z : temple, boutique.
 # ------------------------------------------------------------
 
-const SPECIAL_TILE_WEST_FACING_ROTATION_Y: float = -PI * 0.5
+const FACING_NORTH: Vector2i = Vector2i(0, -1)
+const FACING_SOUTH: Vector2i = Vector2i(0, 1)
+const FACING_WEST: Vector2i = Vector2i(-1, 0)
+const FACING_EAST: Vector2i = Vector2i(1, 0)
 
 
 # ------------------------------------------------------------
@@ -874,7 +886,7 @@ func create_healing_temple_tile(cell: Vector2i) -> void:
 		current_theme.floor_y + 0.08,
 		float(cell.y) * cell_size
 	)
-	root.rotation.y = SPECIAL_TILE_WEST_FACING_ROTATION_Y
+	root.rotation.y = get_positive_z_front_special_rotation_y(cell, FACING_WEST)
 	generated_root.add_child(root)
 
 	create_box("TempleBase", Vector3(1.15, 0.18, 1.15), Vector3(0.0, 0.09, 0.0), temple_stone_material, root)
@@ -907,7 +919,7 @@ func create_shop_tile(cell: Vector2i) -> void:
 		current_theme.floor_y + 0.08,
 		float(cell.y) * cell_size
 	)
-	root.rotation.y = SPECIAL_TILE_WEST_FACING_ROTATION_Y
+	root.rotation.y = get_positive_z_front_special_rotation_y(cell, FACING_WEST)
 	generated_root.add_child(root)
 
 	create_box("ShopCounter", Vector3(1.35, 0.34, 0.55), Vector3(0.0, 0.18, 0.18), shop_wood_material, root)
@@ -939,6 +951,7 @@ func create_chest_tile(cell: Vector2i) -> void:
 		current_theme.floor_y + 0.08,
 		float(cell.y) * cell_size
 	)
+	root.rotation.y = get_negative_z_front_special_rotation_y(cell, FACING_NORTH)
 	generated_root.add_child(root)
 
 	create_box("ChestBase", Vector3(0.86, 0.36, 0.62), Vector3(0.0, 0.18, 0.0), chest_wood_material, root)
@@ -961,6 +974,7 @@ func create_message_tile(cell: Vector2i) -> void:
 		current_theme.floor_y + 0.08,
 		float(cell.y) * cell_size
 	)
+	root.rotation.y = get_negative_z_front_special_rotation_y(cell, FACING_NORTH)
 	generated_root.add_child(root)
 
 	create_box("MessageBase", Vector3(0.65, 0.12, 0.48), Vector3(0.0, 0.06, 0.0), message_stone_material, root)
@@ -1060,15 +1074,94 @@ func hide_discovery_marker(cell: Vector2i) -> void:
 
 
 # ------------------------------------------------------------
+# ORIENTATION DES CASES SPÉCIALES
+# ------------------------------------------------------------
+
+func get_negative_z_front_special_rotation_y(cell: Vector2i, natural_direction: Vector2i) -> float:
+	var facing_direction: Vector2i = get_special_tile_facing_direction(cell, natural_direction)
+
+	if facing_direction == FACING_NORTH:
+		return 0.0
+	if facing_direction == FACING_SOUTH:
+		return PI
+	if facing_direction == FACING_WEST:
+		return PI * 0.5
+	if facing_direction == FACING_EAST:
+		return -PI * 0.5
+
+	return 0.0
+
+
+func get_positive_z_front_special_rotation_y(cell: Vector2i, natural_direction: Vector2i) -> float:
+	var facing_direction: Vector2i = get_special_tile_facing_direction(cell, natural_direction)
+
+	if facing_direction == FACING_SOUTH:
+		return 0.0
+	if facing_direction == FACING_NORTH:
+		return PI
+	if facing_direction == FACING_WEST:
+		return -PI * 0.5
+	if facing_direction == FACING_EAST:
+		return PI * 0.5
+
+	return 0.0
+
+
+func get_special_tile_facing_direction(cell: Vector2i, natural_direction: Vector2i) -> Vector2i:
+	# Si l'orientation naturelle regarde déjà un vrai chemin, on la conserve.
+	if get_layout_tile(cell + natural_direction) == ".":
+		return natural_direction
+
+	# Sinon, on cherche d'abord une case "." pour éviter les modèles face aux murs.
+	for direction in get_special_tile_direction_priority():
+		if direction == natural_direction:
+			continue
+		if get_layout_tile(cell + direction) == ".":
+			return direction
+
+	# Si aucun chemin "." n'existe, on accepte une case non-mur :
+	# porte, escalier, case spéciale, etc.
+	if is_non_wall_cell(cell + natural_direction):
+		return natural_direction
+
+	for direction in get_special_tile_direction_priority():
+		if direction == natural_direction:
+			continue
+		if is_non_wall_cell(cell + direction):
+			return direction
+
+	return natural_direction
+
+
+func get_special_tile_direction_priority() -> Array[Vector2i]:
+	# L'ouest est volontairement prioritaire après l'orientation naturelle :
+	# cela corrige le premier message rencontré et favorise souvent le sens
+	# d'arrivée dans les couloirs actuels.
+	return [
+		FACING_WEST,
+		FACING_SOUTH,
+		FACING_EAST,
+		FACING_NORTH
+	]
+
+
+func is_non_wall_cell(cell: Vector2i) -> bool:
+	return get_layout_tile(cell) != "#"
+
+
+func get_layout_tile(cell: Vector2i) -> String:
+	if cell.y < 0 or cell.y >= current_layout.size():
+		return "#"
+
+	if cell.x < 0 or cell.x >= current_layout[cell.y].length():
+		return "#"
+
+	return current_layout[cell.y].substr(cell.x, 1)
+
+
+# ------------------------------------------------------------
 # LECTURE DE LA CARTE
 # ------------------------------------------------------------
 
 func is_wall_cell(cell: Vector2i) -> bool:
-	if cell.y < 0 or cell.y >= current_layout.size():
-		return true
-
-	if cell.x < 0 or cell.x >= current_layout[cell.y].length():
-		return true
-
-	var tile: String = current_layout[cell.y].substr(cell.x, 1)
-	return tile == "#"
+	return get_layout_tile(cell) == "#"
