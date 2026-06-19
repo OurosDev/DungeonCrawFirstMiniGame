@@ -9,6 +9,7 @@ class_name PartyCreationUI
 const CharacterDataScript = preload("res://scripts/characters/CharacterData.gd")
 const StatRollerScript = preload("res://scripts/characters/StatRoller.gd")
 const ClassDatabaseScript = preload("res://scripts/characters/ClassDatabase.gd")
+const UIFrameStyleScript = preload("res://scripts/ui/theme/UIFrameStyle.gd")
 
 
 # ------------------------------------------------------------
@@ -57,6 +58,9 @@ var store_button: Button = null
 var restore_button: Button = null
 var validate_button: Button = null
 var back_to_menu_button: Button = null
+
+var help_tooltip_panel: Panel = null
+var help_tooltip_label: Label = null
 
 
 func _ready() -> void:
@@ -135,14 +139,26 @@ func build_ui() -> void:
 
 	reroll_button = create_button("Relancer")
 	reroll_button.pressed.connect(reroll_current_stats)
+	attach_help_tooltip(
+		reroll_button,
+		"Relance les stats affichées.\nLe roll actuel est remplacé."
+	)
 	roll_buttons_box.add_child(reroll_button)
 
 	store_button = create_button("Stocker")
 	store_button.pressed.connect(store_current_roll)
+	attach_help_tooltip(
+		store_button,
+		"Garde le roll actuel en réserve.\nUtile pour comparer avant de choisir."
+	)
 	roll_buttons_box.add_child(store_button)
 
 	restore_button = create_button("Reprendre")
 	restore_button.pressed.connect(restore_stored_roll)
+	attach_help_tooltip(
+		restore_button,
+		"Remplace les stats actuelles\npar le roll stocké."
+	)
 	roll_buttons_box.add_child(restore_button)
 
 	stored_roll_label = create_label(
@@ -201,6 +217,8 @@ func build_ui() -> void:
 	validate_button.pressed.connect(validate_current_hero)
 	main_box.add_child(validate_button)
 
+	build_help_tooltip()
+
 
 # ------------------------------------------------------------
 # NAVIGATION
@@ -215,6 +233,16 @@ func on_back_to_menu_pressed() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		on_back_to_menu_pressed()
+
+
+func _process(_delta: float) -> void:
+	if help_tooltip_panel == null:
+		return
+
+	if not help_tooltip_panel.visible:
+		return
+
+	update_help_tooltip_position()
 
 
 # ------------------------------------------------------------
@@ -403,6 +431,75 @@ func update_party_summary() -> void:
 
 
 # ------------------------------------------------------------
+# AIDE CONTEXTUELLE
+# Affiche une petite fenêtre près du curseur pour les boutons de roll.
+# ------------------------------------------------------------
+
+func build_help_tooltip() -> void:
+	help_tooltip_panel = create_panel(
+		Color(0.035, 0.024, 0.016, 0.96),
+		Color(0.58, 0.36, 0.14, 1.0),
+		2
+	)
+	help_tooltip_panel.visible = false
+	help_tooltip_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	help_tooltip_panel.z_index = 100
+	help_tooltip_panel.custom_minimum_size = Vector2(260, 54)
+	add_child(help_tooltip_panel)
+
+	help_tooltip_label = create_label(
+		"",
+		13,
+		Color(0.92, 0.82, 0.62)
+	)
+	help_tooltip_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	help_tooltip_label.set_anchors_preset(Control.PRESET_FULL_RECT)
+	help_tooltip_label.offset_left = 10
+	help_tooltip_label.offset_top = 7
+	help_tooltip_label.offset_right = -10
+	help_tooltip_label.offset_bottom = -7
+	help_tooltip_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	help_tooltip_panel.add_child(help_tooltip_label)
+
+
+func attach_help_tooltip(button: Button, tooltip_text: String) -> void:
+	button.mouse_entered.connect(func(): show_help_tooltip(tooltip_text))
+	button.mouse_exited.connect(hide_help_tooltip)
+
+
+func show_help_tooltip(tooltip_text: String) -> void:
+	if help_tooltip_panel == null or help_tooltip_label == null:
+		return
+
+	help_tooltip_label.text = tooltip_text
+	help_tooltip_panel.visible = true
+	update_help_tooltip_position()
+
+
+func hide_help_tooltip() -> void:
+	if help_tooltip_panel == null:
+		return
+
+	help_tooltip_panel.visible = false
+
+
+func update_help_tooltip_position() -> void:
+	if help_tooltip_panel == null:
+		return
+
+	var target_position: Vector2 = get_local_mouse_position() + Vector2(16, 16)
+	var tooltip_size: Vector2 = help_tooltip_panel.custom_minimum_size
+
+	var max_x: float = max(0.0, size.x - tooltip_size.x - 8.0)
+	var max_y: float = max(0.0, size.y - tooltip_size.y - 8.0)
+
+	help_tooltip_panel.position = Vector2(
+		clamp(target_position.x, 8.0, max_x),
+		clamp(target_position.y, 8.0, max_y)
+	)
+
+
+# ------------------------------------------------------------
 # COMPOSANTS UI
 # Crée les boutons, labels et panneaux utilisés dans l’écran.
 # ------------------------------------------------------------
@@ -413,6 +510,9 @@ func create_button(text: String) -> Button:
 	button.text = text
 	button.custom_minimum_size = Vector2(150, 38)
 	button.focus_mode = Control.FOCUS_NONE
+	button.add_theme_font_size_override("font_size", 14)
+
+	apply_textured_button_style(button)
 
 	return button
 
@@ -438,19 +538,67 @@ func create_panel(
 	border_width: int
 ) -> Panel:
 	var panel: Panel = Panel.new()
-	var style: StyleBoxFlat = StyleBoxFlat.new()
 
-	style.bg_color = background_color
-	style.border_color = border_color
-	style.set_border_width_all(border_width)
-	style.corner_radius_top_left = 3
-	style.corner_radius_top_right = 3
-	style.corner_radius_bottom_left = 3
-	style.corner_radius_bottom_right = 3
-
-	panel.add_theme_stylebox_override("panel", style)
+	panel.theme = UIFrameStyleScript.create_menu_theme()
+	panel.add_theme_stylebox_override(
+		"panel",
+		UIFrameStyleScript.create_panel_style(
+			background_color,
+			border_color,
+			border_width
+		)
+	)
 
 	return panel
+
+
+func apply_textured_button_style(button: Button) -> void:
+	button.add_theme_color_override("font_color", Color(0.90, 0.80, 0.58))
+	button.add_theme_color_override("font_hover_color", Color(1.0, 0.90, 0.55))
+	button.add_theme_color_override("font_pressed_color", Color(1.0, 0.92, 0.48))
+	button.add_theme_color_override("font_focus_color", Color(1.0, 0.90, 0.55))
+	button.add_theme_color_override("font_disabled_color", Color(0.42, 0.36, 0.28))
+
+	button.add_theme_stylebox_override(
+		"normal",
+		UIFrameStyleScript.create_button_style(
+			Color(0.11, 0.07, 0.04, 1.0),
+			Color(0.30, 0.18, 0.08, 1.0),
+			1
+		)
+	)
+	button.add_theme_stylebox_override(
+		"hover",
+		UIFrameStyleScript.create_button_style(
+			Color(0.18, 0.10, 0.05, 1.0),
+			Color(0.55, 0.34, 0.13, 1.0),
+			1
+		)
+	)
+	button.add_theme_stylebox_override(
+		"pressed",
+		UIFrameStyleScript.create_button_style(
+			Color(0.28, 0.16, 0.06, 1.0),
+			Color(0.95, 0.72, 0.28, 1.0),
+			2
+		)
+	)
+	button.add_theme_stylebox_override(
+		"focus",
+		UIFrameStyleScript.create_button_style(
+			Color(0.20, 0.12, 0.05, 1.0),
+			Color(0.86, 0.62, 0.20, 1.0),
+			2
+		)
+	)
+	button.add_theme_stylebox_override(
+		"disabled",
+		UIFrameStyleScript.create_button_style(
+			Color(0.06, 0.04, 0.03, 0.80),
+			Color(0.18, 0.12, 0.06, 1.0),
+			1
+		)
+	)
 
 
 # ------------------------------------------------------------
