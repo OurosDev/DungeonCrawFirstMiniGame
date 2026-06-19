@@ -2,7 +2,7 @@
 
 Date de mise à jour : 2026-06-19
 
-Version de référence : `v0.9 — Grimoire hors combat et sélection de cible`
+Version de référence : `v0.10 — Grimoire de combat et ciblage des soins`
 
 ## 1. Règle de démarrage d'une conversation
 
@@ -19,8 +19,8 @@ Documents à vérifier selon le besoin :
 ```text
 README.md
 CHANGELOG/README.md
-CHANGELOG/v0.9.md
-audits/STATE_AUDITv0.9.md
+CHANGELOG/v0.10.md
+audits/STATE_AUDITv0.10.md
 docs/informations/ROADMAP.md
 docs/informations/TECHNICAL_DEBT.md
 docs/dungeon/FLOOR_DESIGN.md
@@ -90,19 +90,63 @@ Ne pas mélanger dans un premier pack de refactorisation :
 
 La documentation arrive à la fin, quand l'ensemble des refactorisations utiles est terminé ou quand l'utilisateur le demande explicitement.
 
-## 5. Base actuelle v0.9
+## 5. Base actuelle v0.10
+
+`v0.10` ajoute le grimoire de combat et le ciblage des soins en combat.
+
+Fonctionnalités validées :
+
+```text
+- bouton Grimoire pendant le combat ;
+- grimoire de combat propre au héros actif ;
+- sorts actifs temporaires réinitialisés à chaque combat ;
+- sélection du sort déjà actif sans perte de tour ;
+- retour depuis le grimoire sans perte de tour ;
+- changement réel de sort actif consommant l'action du tour ;
+- bouton Magie lançant directement le sort offensif actif ;
+- bouton Soin lançant directement le sort de soin actif ;
+- soin en combat avec sélection directe par cadres de héros ;
+- prévisualisation PV sur la cible ;
+- prévisualisation PM sur le lanceur ;
+- contrôles souris ;
+- contrôles flèches / Entrée / Échap ;
+- contrôles AZERTY ZQSD / A / E ;
+- canal Combat coloré ligne par ligne : dégâts ennemis rouges, soins verts, dégâts joueur conservés.
+```
+
+Règles de design associées :
+
+```text
+- le grimoire hors combat reste dédié aux sorts hors combat ;
+- le grimoire de combat est distinct et propre au héros actif ;
+- les boutons Magie et Soin doivent rester rapides et directs ;
+- la sélection par cadres est une brique UI réutilisable ;
+- pas de sauvegarde des sorts actifs pour le moment ;
+- pas d'objets consommables pour le moment ;
+- pas de journal de quête ;
+- pas de moniteur de quête explicite.
+```
+
+Scripts concernés par `v0.10` :
+
+```text
+scripts/ui/menu/CombatGrimoireMenuView.gd
+scripts/combat/CombatManager.gd
+scripts/dungeon/DungeonInputController.gd
+scripts/ui/InGameMenuPanelUI.gd
+scripts/ui/LogPanelUI.gd
+```
+
+## 6. Base héritée de v0.9
 
 `v0.9` ajoute le grimoire hors combat et une sélection de cible par cadres de héros.
 
-Fonctionnalités validées :
+Fonctionnalités conservées :
 
 ```text
 - grimoire accessible depuis le menu en jeu ;
 - sorts de soin hors combat ;
 - sélection de cible via cadres héros latéraux ;
-- contrôle souris ;
-- contrôle flèches / Entrée / Échap ;
-- contrôle AZERTY ZQSD / A / E ;
 - bordure verte sur la cible ;
 - prévisualisation PV sur la cible ;
 - prévisualisation PM sur le lanceur ;
@@ -110,28 +154,9 @@ Fonctionnalités validées :
 - canal de messages coloré pour les messages importants.
 ```
 
-Règles de design associées :
+Le grimoire ne doit pas devenir un journal de quête. Les informations importantes peuvent être mieux colorées dans le canal de messages existant, mais sans checklist ni suivi d'objectifs explicite.
 
-```text
-- le grimoire sert prioritairement aux sorts hors combat ;
-- il ne doit pas devenir un journal de quête ;
-- pas de moniteur de quête explicite ;
-- pas d'objets consommables pour le moment ;
-- privilégier le canal de messages existant pour les informations importantes ;
-- les couleurs de messages peuvent améliorer la lisibilité sans donner une checklist au joueur.
-```
-
-Scripts concernés par v0.9 :
-
-```text
-scripts/ui/menu/GrimoireMenuView.gd
-scripts/ui/hero_selection/HeroFrameSelectionController.gd
-scripts/ui/InGameMenuPanelUI.gd
-scripts/ui/LogPanelUI.gd
-scripts/ui/PartyStatusUI.gd
-```
-
-## 6. Base technique héritée de v0.8.2
+## 7. Base technique héritée de v0.8.2
 
 `v0.8.2` reste la base de refactorisation interne.
 
@@ -154,7 +179,7 @@ Règles conservées :
 - tests locaux validés par l'utilisateur avant release.
 ```
 
-## 7. Renderer et builds de test
+## 8. Renderer et builds de test
 
 La base `v0.8.1` reste valide pour le renderer :
 
@@ -174,7 +199,7 @@ Règles :
 - ne pas pousser les logs bruts ;
 - documenter seulement des synthèses nettoyées dans `playtests/`.
 
-## 8. Documentation et chemins actuels
+## 9. Documentation et chemins actuels
 
 Chemins actuels importants :
 
@@ -195,7 +220,7 @@ playtests/PLAYTEST_XX_vX.Y.md
 
 `ROADMAP.md` et `TECHNICAL_DEBT.md` doivent être considérés comme localisés dans `docs/informations/`, pas à la racine.
 
-## 9. Gestion des playtests
+## 10. Gestion des playtests
 
 Les playtests doivent être documentés dans `playtests/`.
 
@@ -211,10 +236,10 @@ Nommage conseillé :
 
 ```text
 playtests/PLAYTEST_01_v0.8.md
-playtests/PLAYTEST_02_v0.9.md
+playtests/PLAYTEST_02_v0.10.md
 ```
 
-## 10. Donjon et layouts
+## 11. Donjon et layouts
 
 Avant toute modification de layout ou de symboles :
 
@@ -228,7 +253,7 @@ Ne pas remplacer le visualiseur par un simple bloc ASCII, un format monospacé b
 
 Les anciennes sauvegardes peuvent conserver des layouts mémorisés. Pour tester un nouveau layout, utiliser une nouvelle partie ou réinitialiser la sauvegarde de test.
 
-## 11. Assets
+## 12. Assets
 
 Ne pas traiter les halos blancs autour des portraits ou sprites comme un style voulu. Ce sont des artefacts à éviter.
 
@@ -240,7 +265,7 @@ Pour les futurs assets :
 - cohérence avec le style rétro sombre ;
 - prudence avec les variations trop fortes entre frames.
 
-## 12. Fichiers à ne pas pousser
+## 13. Fichiers à ne pas pousser
 
 ```text
 packs .zip générés
@@ -262,7 +287,7 @@ export/
 
 Les zips locaux de sécurité restent hors repo.
 
-## 13. Préparation de release
+## 14. Préparation de release
 
 Quand l'utilisateur valide qu'une série de changements est terminée :
 
@@ -287,7 +312,7 @@ Titre de release conseillé
 Texte de release conseillé
 ```
 
-## 14. Versioning
+## 15. Versioning
 
 Ne pas accélérer artificiellement vers `v1.0`.
 

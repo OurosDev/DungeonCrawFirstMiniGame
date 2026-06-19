@@ -6,7 +6,7 @@ Le projet sert aussi de terrain d'apprentissage pour la gestion d'un petit proje
 
 ## État actuel
 
-Version stable récente : `v0.9 — Grimoire hors combat et sélection de cible`.
+Version stable récente : `v0.10 — Grimoire de combat et ciblage des soins`.
 
 Cette base contient une première boucle jouable :
 
@@ -23,9 +23,13 @@ Cette base contient une première boucle jouable :
 - configuration de playtest stabilisée en `Compatibility / OpenGL` ;
 - refactorisations internes validées des grands contrôleurs de menu, combat, donjon, session et création d'équipe ;
 - grimoire hors combat permettant d'utiliser des sorts de soin ;
-- sélection de cible par cadres de héros avec prévisualisation PV/PM.
+- sélection de cible par cadres de héros avec prévisualisation PV/PM ;
+- grimoire de combat lié au héros actif ;
+- sorts actifs temporaires réinitialisés à chaque combat ;
+- soin en combat avec ciblage direct par cadres ;
+- journal Combat coloré pour distinguer dégâts ennemis et soins.
 
-`v0.9` ajoute une fonctionnalité de gameplay sans modifier volontairement le format de sauvegarde : le grimoire devient une interface d'action magique hors combat. Le jeu ne propose pas de journal de quête ni de consommables à ce stade.
+`v0.10` ajoute une amélioration de gameplay centrée sur le combat magique. Le jeu ne propose pas de journal de quête ni d'objets consommables à ce stade.
 
 ## Renderer et affichage
 
@@ -58,11 +62,27 @@ Pour les builds Windows destinées aux testeurs, utiliser `Compatibility / OpenG
 
 ### Combat
 
-Les commandes de combat sont utilisables à la souris. Un clic peut aussi valider certains messages d'attente, notamment après l'affichage de dégâts.
+Les commandes de combat sont utilisables à la souris.
 
-### Grimoire
+Selon le héros actif, les commandes peuvent inclure :
 
-Depuis le menu en jeu, le grimoire permet d'utiliser certains sorts hors combat.
+- `Attaquer`
+- `Magie`
+- `Soin`
+- `Grimoire`
+- `Fuir`
+
+Le bouton `Grimoire` permet au héros actif de vérifier ou changer son sort actif temporaire. Changer réellement de sort actif consomme l'action du tour ; valider le sort déjà actif ou revenir en arrière ne consomme pas le tour.
+
+Le bouton `Magie` lance directement le sort offensif actif. Le bouton `Soin` lance directement le sort de soin actif et passe en sélection de cible par cadres.
+
+Un clic peut aussi valider certains messages d'attente, notamment après l'affichage de dégâts.
+
+### Grimoire et sélection de cible
+
+Depuis le menu en jeu, le grimoire hors combat permet d'utiliser certains sorts hors combat.
+
+En combat, le grimoire est distinct : il est propre au héros actif et sert à gérer son sort actif temporaire pour le combat en cours.
 
 Pour la sélection de cible :
 

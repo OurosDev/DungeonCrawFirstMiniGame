@@ -2,244 +2,171 @@
 
 Date de mise à jour : 2026-06-19
 
-Version de référence : `v0.9 — Grimoire hors combat et sélection de cible`
+Base actuelle : `v0.10 — Grimoire de combat et ciblage des soins`
 
-## 1. État général
+## Résumé
 
-La base `v0.9` est une base jouable avec une fonctionnalité de grimoire hors combat.
+La dette technique principale du projet a été réduite par la série de refactorisations `v0.8.2`, puis la base a été enrichie par `v0.9` et `v0.10` avec les grimoires et la sélection de cible.
 
-La dette la plus lourde des contrôleurs principaux a été réduite en `v0.8.2` :
+La priorité technique actuelle n'est pas de refactoriser massivement à nouveau, mais de surveiller les nouveaux systèmes de magie, d'input et de journal de combat pendant les prochains playtests.
+
+## Dette résolue ou fortement réduite
+
+### Refactorisations internes v0.8.2
 
 ```text
-- menu en jeu refactorisé ;
-- combat refactorisé ;
-- donjon refactorisé ;
-- GameSession refactorisé ;
-- création d'équipe refactorisée.
+InGameMenuPanelUI.gd -> scripts/ui/menu/*
+CombatManager.gd -> scripts/combat/Combat*Resolver/Helper/Access/Selector
+Dungeon.gd -> DungeonMapHelper / DungeonFloorStateHelper / DungeonAutoMapHelper
+GameSession.gd -> scripts/core/session/*
+PartyCreationUI.gd -> scripts/ui/party_creation/*
 ```
 
-`v0.9` ajoute une couche UI plus avancée : sélection de cible par cadres héros, prévisualisation PV/PM, grimoire hors combat et messages colorés.
+Ces refactorisations ont été testées localement et stabilisées avant release.
 
-## 2. Dette réglée ou fortement réduite
+### Scaling et renderer
 
-### Refactorisations v0.8.2
+La configuration `Compatibility / OpenGL` et le scaling `canvas_items + keep` restent la base recommandée pour les builds de test Windows.
 
-Les grands scripts suivants ont été allégés par extraction de helpers :
+### Grimoire hors combat v0.9
+
+Le grimoire hors combat fonctionne sans nouveau format de sauvegarde. Les PV/PM modifiés sont déjà persistés avec les héros.
+
+### Grimoire de combat v0.10
+
+Le grimoire de combat utilise des sorts actifs temporaires réinitialisés à chaque combat. Il n'ajoute pas encore de persistance.
+
+## Points de vigilance actuels
+
+### 1. CombatManager.gd
+
+Même refactorisé, `CombatManager.gd` reste sensible car il orchestre :
 
 ```text
-scripts/ui/InGameMenuPanelUI.gd
-scripts/combat/CombatManager.gd
-scripts/dungeon/Dungeon.gd
-scripts/core/GameSession.gd
-scripts/ui/PartyCreationUI.gd
+tour des héros
+actions ennemies
+victoire / fuite / défaite
+boss
+récompenses
+sorts actifs temporaires
+grimoire de combat
+ciblage des soins
 ```
 
-Statut : validé localement avant release `v0.8.2`.
+Les prochaines évolutions de magie doivent rester progressives et testables.
 
-### Renderer / crash playtest
+### 2. Sorts actifs
 
-Le problème de crash Windows du playtest `v0.8` a été traité par l'utilisation de `Compatibility / OpenGL` pour les builds de test.
-
-Statut : résolu pour la procédure de build/playtest.
-
-### Scaling fenêtre
-
-Le scaling `canvas_items + keep` est la base validée.
-
-Statut : résolu pour la base actuelle.
-
-## 3. Dette nouvelle ou à surveiller après v0.9
-
-### `PartyStatusUI.gd`
-
-`PartyStatusUI.gd` gère maintenant plus de responsabilités visuelles :
+Pour le moment :
 
 ```text
-- affichage des héros ;
-- flash rouge des dégâts ;
-- bordure verte de sélection ;
-- prévisualisation PV de soin ;
-- prévisualisation PM de coût de sort ;
-- signaux de cadres cliquables.
+sorts actifs = temporaires
+réinitialisation = début de combat
+sauvegarde = aucune persistance volontaire
 ```
 
-Ce n'est pas bloquant, mais il faudra surveiller ce fichier si d'autres mécaniques ciblant les héros s'ajoutent.
-
-Piste future : isoler progressivement les éléments visuels de barre PV/PM ou les styles de cadres si le fichier grossit trop.
-
-### `HeroFrameSelectionController.gd`
-
-Ce contrôleur doit rester générique.
-
-À éviter :
+Dette future probable : quand plusieurs sorts seront réellement disponibles, il faudra probablement créer :
 
 ```text
-- y coder des règles spécifiques au grimoire ;
-- y dupliquer des tables d'input ;
-- y appliquer directement des effets gameplay ;
-- y dépendre d'une seule vue de menu.
+système de sorts connus / découverts
+grimoire hors combat individuel par héros
+choix persistant des sorts actifs
+compatibilité anciennes sauvegardes
 ```
 
-À préserver :
+Cette évolution ne doit pas être improvisée dans `CharacterData.gd` ou `SaveManager.gd` sans conception préalable.
+
+### 3. Sélection par cadres héros
+
+`HeroFrameSelectionController.gd` est une brique UI réutilisable. Elle sert déjà :
 
 ```text
-- sélection d'index ;
-- survol souris ;
-- validation ;
-- annulation ;
-- mise à jour visuelle via `PartyStatusUI` ;
-- compatibilité souris / flèches / ZQSD / A / E.
+soins hors combat
+soins en combat
 ```
 
-### `GrimoireMenuView.gd`
-
-La vue du grimoire doit rester spécialisée sur l'affichage et les choix du menu.
-
-À éviter :
+À surveiller si elle sert plus tard à :
 
 ```text
-- en faire un journal de quête ;
-- y stocker une progression persistante ;
-- y ajouter directement des systèmes de découverte complexes ;
-- y mélanger trop de types de sorts avant d'avoir une abstraction stable.
+sorts de protection
+inspection de héros
+actions spéciales
+objets clés ou événements ciblés
 ```
 
-Si un second sort hors combat est ajouté, vérifier si une extraction `OutOfCombatSpellResolver.gd` devient utile.
-
-### `LogPanelUI.gd`
-
-Le canal de messages coloré est utile mais doit rester maintenable.
-
-À surveiller :
+Elle doit continuer à respecter :
 
 ```text
-- accumulation de détections textuelles fragiles ;
-- couleurs trop nombreuses ;
-- dépendance au texte exact des messages ;
-- besoin futur d'un type de message explicite.
+souris
+flèches
+ZQSD
+A / Entrée
+E / Échap
 ```
 
-Piste future : remplacer progressivement les détections de texte par un système de catégories de messages, si le besoin devient réel.
+### 4. Journal Combat
 
-## 4. Sauvegarde
+`LogPanelUI.gd` colore maintenant certaines lignes de combat selon leur texte.
 
-`v0.9` ne change pas volontairement le format de sauvegarde.
+Risque : si les messages de combat deviennent plus variés, l'analyse textuelle peut devenir fragile.
 
-Le grimoire modifie seulement des données déjà sauvegardées :
+Solution future possible : passer à des messages typés, par exemple :
 
 ```text
-- PV des héros ;
-- PM des héros.
+combat_player_damage
+combat_enemy_damage
+combat_heal
+system_warning
+key_item
+message_tile
 ```
 
-Les sorts disponibles restent déduits des classes et niveaux existants dans cette première version.
+Ce n'est pas nécessaire immédiatement, mais c'est une bonne direction si la coloration devient difficile à maintenir.
 
-Dette future probable : si des sorts découverts, runes ou apprentissages sont ajoutés, il faudra créer une donnée persistante dédiée.
+### 5. Documentation dungeon
 
-Exemples possibles :
+Pour `FLOOR_VISUALIZER.md`, ne jamais remplacer la grille/tableau par un bloc ASCII ou un format CSS expérimental sans demande explicite.
+
+Avant modification :
 
 ```text
-hero.known_ability_ids
-hero.discovered_ability_ids
-GameSession.magic_discoveries
-floor_states.magic_unlocks
+1. lire ASSISTANT_WORKFLOW.md ;
+2. lire docs/dungeon/FLOOR_DESIGN.md ;
+3. vérifier scripts/dungeon/FloorDatabase.gd ;
+4. conserver le format tableau/grille avec coordonnées.
 ```
 
-Ne pas ajouter cette persistance avant d'avoir un besoin clair.
-
-## 5. UI / style
-
-### Cadres et bordures
-
-Le projet utilise actuellement des styles créés par script.
-
-Pour de futures bordures plus propres :
+## À ne pas faire pour le moment
 
 ```text
-- envisager StyleBoxTexture ;
-- utiliser des textures 9-slice ;
-- centraliser les styles de cadres ;
-- éviter les variations visuelles trop dispersées.
+- ajouter des objets consommables ;
+- ajouter des potions ;
+- créer un journal de quête ;
+- créer un moniteur d'objectif ;
+- ajouter l'étage 3 avant d'enrichir davantage la boucle actuelle ;
+- changer le format de sauvegarde sans nécessité claire ;
+- préparer une grosse refactorisation générale non motivée.
 ```
 
-Ne pas lancer une refonte visuelle complète en même temps qu'un ajout gameplay important.
-
-### Grimoire
-
-Le grimoire est actuellement minimaliste, volontairement sans en-tête inutile et sans écran intermédiaire de cible.
-
-À conserver :
+## Dette technique future probable
 
 ```text
-- menu compact ;
-- sélection directe des cadres héros ;
-- prévisualisation par barres ;
-- peu de texte explicatif ;
-- cohérence avec le reste de l'UI.
+système de sorts connus / découverts
+grimoire individuel par héros
+sauvegarde des préférences de sorts actifs
+messages typés au lieu de détection textuelle
+meilleur découpage si CombatManager grossit à nouveau
+playtest 02 post-v0.10
 ```
 
-## 6. Donjon et visualiseur
+## Recommandation immédiate
 
-Règles à respecter impérativement :
-
-```text
-- lire ASSISTANT_WORKFLOW.md avant modification ;
-- lire docs/dungeon/FLOOR_DESIGN.md avant de modifier FLOOR_VISUALIZER.md ;
-- reconstruire FLOOR_VISUALIZER.md depuis scripts/dungeon/FloorDatabase.gd ;
-- conserver le format tableau/grille avec coordonnées ;
-- ne pas remplacer par un bloc ASCII brut ;
-- ne pas utiliser de format CSS expérimental sans demande explicite.
-```
-
-Les anciennes sauvegardes peuvent conserver des états de layout. Pour tester un changement de carte, utiliser une nouvelle partie ou nettoyer la sauvegarde de test.
-
-## 7. Points non prioritaires
-
-Ne pas prioriser pour le moment :
+Après `v0.10`, privilégier :
 
 ```text
-- objets consommables ;
-- potions ;
-- étage 3 ;
-- journal de quête ;
-- suivi explicite d'objectifs ;
-- bestiaire complet ;
-- refonte visuelle globale.
-```
-
-Ces sujets peuvent revenir plus tard, mais ils ne correspondent pas à la priorité immédiate après `v0.9`.
-
-## 8. Tests recommandés après v0.9
-
-Pour sécuriser la version, effectuer au moins un test court :
-
-```text
-- démarrer une nouvelle partie ;
-- créer un groupe avec Prêtresse ;
-- subir des dégâts ;
-- utiliser Soin léger hors combat ;
-- vérifier prévisualisation PV/PM ;
-- sauvegarder ;
-- charger ;
-- vérifier PV/PM ;
-- acheter/vendre en boutique ;
-- équiper/déséquiper ;
-- ouvrir coffre ;
-- lire message M ;
-- combattre ;
-- tester K.O. ;
-- tester boss si possible.
-```
-
-## 9. Évaluation actuelle
-
-La base est saine pour continuer.
-
-La prochaine dette à traiter dépendra des retours :
-
-```text
-- si l'UI grimoire gêne : polish ciblé ;
-- si les messages colorés deviennent fragiles : catégories de messages ;
-- si un second sort hors combat est ajouté : resolver de sorts hors combat ;
-- si des sorts découverts apparaissent : persistance dédiée.
+1. test complet de la boucle avec Mage + Prêtresse ;
+2. test boss et K.O. ;
+3. sauvegarde / chargement après plusieurs combats ;
+4. éventuellement playtest 02 ;
+5. ensuite seulement, concevoir les prochains sorts.
 ```
