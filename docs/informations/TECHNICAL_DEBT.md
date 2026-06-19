@@ -1,63 +1,30 @@
-# Dette technique et refactorisations — DungeonCrawFirstMiniGame
+# TECHNICAL_DEBT — DungeonCrawFirstMiniGame
 
-Ce document regroupe les pistes techniques qui alourdiraient trop `ROADMAP.md`. Objectif : garder la roadmap lisible, tout en conservant une trace des refactorisations utiles.
+Date de mise à jour : 2026-06-19
 
-## 1. Principe général
+Version de référence : `v0.9 — Grimoire hors combat et sélection de cible`
 
-Le projet possède maintenant une première boucle jouable stable jusqu'à `v0.8.2`.
+## 1. État général
 
-Les refactorisations doivent rester :
+La base `v0.9` est une base jouable avec une fonctionnalité de grimoire hors combat.
 
-- ciblées ;
-- testables rapidement ;
-- compatibles avec les sauvegardes autant que possible ;
-- faites une par une ;
-- séparées des gros ajouts de contenu ;
-- préparées en packs complets quand plusieurs fichiers sont concernés.
+La dette la plus lourde des contrôleurs principaux a été réduite en `v0.8.2` :
 
-La priorité n'est pas de rendre le code parfait. La priorité est de préserver la boucle jouable, de garder les playtests fiables et de réduire progressivement les zones difficiles à modifier.
-
-## 2. Points résolus ou reclassés
-
-### Scaling fenêtre
-
-Statut : résolu en `v0.8.1`.
-
-Le projet utilise maintenant :
-
-```ini
-window/stretch/mode="canvas_items"
-window/stretch/aspect="keep"
-window/stretch/scale=1.0
-window/stretch/scale_mode="fractional"
+```text
+- menu en jeu refactorisé ;
+- combat refactorisé ;
+- donjon refactorisé ;
+- GameSession refactorisé ;
+- création d'équipe refactorisée.
 ```
 
-Ce point ne doit plus être traité comme une dette active, sauf si un nouveau retour de playtest montre un problème sur une résolution précise.
+`v0.9` ajoute une couche UI plus avancée : sélection de cible par cadres héros, prévisualisation PV/PM, grimoire hors combat et messages colorés.
 
-### Crashs playtest Windows avec renderer moderne
+## 2. Dette réglée ou fortement réduite
 
-Statut : reclassé en contrainte d'export / compatibilité.
+### Refactorisations v0.8.2
 
-Le playtest 01 a montré des crashs natifs Windows non reproduits localement sur une machine Intel UHD Graphics avec renderer moderne. La build `Compatibility / OpenGL` a fonctionné.
-
-Décision actuelle :
-
-- ne pas modifier le gameplay des coffres ou de la sauvegarde pour cet incident ;
-- exporter les builds Windows de playtest en `Compatibility / OpenGL` par défaut ;
-- conserver les logs complets hors repo ;
-- documenter seulement des résumés nettoyés dans `playtests/`.
-
-### Fichiers temporaires versionnés
-
-Statut : résolu d'après l'état actuel du dossier `scenes/`.
-
-Les fichiers `.tmp` ne sont plus visibles dans `scenes/`. La règle reste : ne pas pousser `*.tmp`, `*.bak`, builds, exports ou zips temporaires.
-
-### Grands contrôleurs allégés
-
-Statut : première passe résolue en `v0.8.2`.
-
-Scripts refactorisés et validés localement :
+Les grands scripts suivants ont été allégés par extraction de helpers :
 
 ```text
 scripts/ui/InGameMenuPanelUI.gd
@@ -67,324 +34,212 @@ scripts/core/GameSession.gd
 scripts/ui/PartyCreationUI.gd
 ```
 
-Les refactorisations ont conservé les façades principales pour limiter les risques : les scènes et autres systèmes continuent à appeler les scripts centraux connus, tandis que les détails internes sont délégués à des helpers.
+Statut : validé localement avant release `v0.8.2`.
 
-## 3. Refactorisations réalisées en v0.8.2
+### Renderer / crash playtest
 
-### 3.1 Menu en jeu
+Le problème de crash Windows du playtest `v0.8` a été traité par l'utilisation de `Compatibility / OpenGL` pour les builds de test.
 
-Responsabilités extraites :
+Statut : résolu pour la procédure de build/playtest.
 
-- fabrique UI commune ;
-- inventaire ;
-- boutique ;
-- statut / équipement ;
-- téléportation de développement.
+### Scaling fenêtre
 
-Nouveau dossier :
+Le scaling `canvas_items + keep` est la base validée.
 
-```text
-scripts/ui/menu/
-```
+Statut : résolu pour la base actuelle.
 
-Dette restante : améliorer l'habillage visuel plus tard, mais ne pas mélanger une refonte visuelle UI avec un ajout gameplay majeur.
+## 3. Dette nouvelle ou à surveiller après v0.9
 
-### 3.2 Combat
+### `PartyStatusUI.gd`
 
-Responsabilités extraites :
-
-- accès aux données d'acteurs ;
-- précision / esquive ;
-- dégâts / soins ;
-- sorts disponibles ;
-- ciblage ;
-- journal de combat.
-
-Nouveaux helpers :
+`PartyStatusUI.gd` gère maintenant plus de responsabilités visuelles :
 
 ```text
-scripts/combat/CombatActorAccess.gd
-scripts/combat/CombatAccuracyResolver.gd
-scripts/combat/CombatDamageResolver.gd
-scripts/combat/CombatAbilityResolver.gd
-scripts/combat/CombatTargetSelector.gd
-scripts/combat/CombatLogHelper.gd
+- affichage des héros ;
+- flash rouge des dégâts ;
+- bordure verte de sélection ;
+- prévisualisation PV de soin ;
+- prévisualisation PM de coût de sort ;
+- signaux de cadres cliquables.
 ```
 
-Dette restante : le flow de tour reste dans `CombatManager.gd`. C'est volontaire pour éviter de casser les signaux, la victoire, la fuite, la défaite et les attentes de validation.
+Ce n'est pas bloquant, mais il faudra surveiller ce fichier si d'autres mécaniques ciblant les héros s'ajoutent.
 
-### 3.3 Donjon
+Piste future : isoler progressivement les éléments visuels de barre PV/PM ou les styles de cadres si le fichier grossit trop.
 
-Responsabilités extraites :
+### `HeroFrameSelectionController.gd`
 
-- lecture et modification du layout ;
-- état d'étage ;
-- découverte automap.
+Ce contrôleur doit rester générique.
 
-Nouveaux helpers :
+À éviter :
 
 ```text
-scripts/dungeon/DungeonMapHelper.gd
-scripts/dungeon/DungeonFloorStateHelper.gd
-scripts/dungeon/DungeonAutoMapHelper.gd
+- y coder des règles spécifiques au grimoire ;
+- y dupliquer des tables d'input ;
+- y appliquer directement des effets gameplay ;
+- y dépendre d'une seule vue de menu.
 ```
 
-Dette restante : les interactions de cases spéciales peuvent encore grossir avec le contenu futur. Les extraire trop tôt serait risqué ; mieux vaut le faire quand les nouveaux symboles seront décidés.
-
-### 3.4 Session globale
-
-Responsabilités extraites :
-
-- états d'étages ;
-- boutique ;
-- équipement.
-
-Nouveau dossier :
+À préserver :
 
 ```text
-scripts/core/session/
+- sélection d'index ;
+- survol souris ;
+- validation ;
+- annulation ;
+- mise à jour visuelle via `PartyStatusUI` ;
+- compatibilité souris / flèches / ZQSD / A / E.
 ```
 
-Dette restante : `GameSession.gd` reste un singleton central. C'est acceptable pour le prototype, tant que ses méthodes publiques restent stables.
+### `GrimoireMenuView.gd`
 
-### 3.5 Création d'équipe
+La vue du grimoire doit rester spécialisée sur l'affichage et les choix du menu.
 
-Responsabilités extraites :
-
-- fabrique UI ;
-- construction des héros ;
-- résumé de l'équipe.
-
-Nouveau dossier :
+À éviter :
 
 ```text
-scripts/ui/party_creation/
+- en faire un journal de quête ;
+- y stocker une progression persistante ;
+- y ajouter directement des systèmes de découverte complexes ;
+- y mélanger trop de types de sorts avant d'avoir une abstraction stable.
 ```
 
-Dette restante : faible. L'écran est isolé et peut rester ainsi tant que la création de groupe ne devient pas beaucoup plus complexe.
+Si un second sort hors combat est ajouté, vérifier si une extraction `OutOfCombatSpellResolver.gd` devient utile.
 
-## 4. Refactorisations restantes utiles à court terme
+### `LogPanelUI.gd`
 
-### 4.1 Centraliser les symboles de donjon
+Le canal de messages coloré est utile mais doit rester maintenable.
 
-Les symboles de cases (`#`, `.`, `D`, `O`, `B`, `C`, `M`, `L`, `X`, `<`, `>`, etc.) sont compris par plusieurs systèmes : données d'étage, rendu, automap, interactions, rencontres, sauvegarde.
-
-Objectif : éviter que l'ajout d'un nouveau symbole demande des modifications dispersées et risquées.
-
-Approche recommandée :
-
-1. créer ou compléter une source de vérité légère pour les symboles ;
-2. garder les chaînes existantes pour ne pas casser les layouts ;
-3. migrer progressivement les tests directs vers des fonctions explicites.
-
-Risque : moyen si fait trop vite, faible si fait progressivement.
-
-### 4.2 Centraliser les règles de marchabilité
-
-Plusieurs systèmes doivent savoir si une case bloque ou non le joueur.
-
-Objectif : avoir une fonction claire du type :
-
-```gdscript
-is_walkable_tile(tile: String) -> bool
-```
-
-À couvrir :
-
-- murs ;
-- portes fermées / ouvertes ;
-- temples ;
-- boutiques ;
-- coffres ;
-- messages ;
-- porte verrouillée ;
-- boss vaincu ou non ;
-- escaliers.
-
-Risque : moyen, car une erreur peut bloquer la progression.
-
-### 4.3 Centraliser les règles de rencontres aléatoires
-
-Les temples, boutiques, messages, coffres, escaliers ou cases spéciales ne doivent pas nécessairement déclencher de rencontres.
-
-Objectif : éviter les exceptions dispersées.
-
-Fonction cible possible :
-
-```gdscript
-allows_random_encounter(tile: String) -> bool
-```
-
-Risque : faible à moyen.
-
-### 4.4 Clarifier les événements de cases spéciales
-
-Les événements `C`, `M`, `L`, `X`, `O`, `B`, `<`, `>` sont déjà fonctionnels, mais leur logique va grossir avec le contenu futur.
-
-Approche recommandée :
-
-- conserver le fonctionnement actuel ;
-- identifier les blocs par catégories ;
-- déplacer seulement les helpers vraiment stables ;
-- éviter une architecture trop abstraite pour le prototype.
-
-Risque : moyen.
-
-## 5. Dette UI / ergonomie
-
-### 5.1 Panneaux principaux
-
-Les panneaux Inventaire, Statut, Équipement et Boutique sont mieux structurés depuis `v0.8.2`, mais leur habillage visuel reste simple.
-
-Améliorations possibles :
-
-- normaliser davantage les marges ;
-- envisager progressivement `StyleBoxTexture` ou `NinePatchRect` ;
-- garder les layouts faciles à modifier ;
-- éviter une refonte UI complète dans le même pack qu'un gros ajout de contenu.
-
-Risque : faible si les changements restent visuels.
-
-### 5.2 Feedback joueur
-
-Points à améliorer avant ou après la suite du playtest :
-
-- message plus clair après victoire boss ;
-- confirmation plus visible de consommation de la Clé du gardien ;
-- feedback de sauvegarde / chargement ;
-- feedback de coffre déjà ouvert ;
-- feedback de mort / retour titre ;
-- meilleure hiérarchie visuelle dans le journal.
-
-Risque : faible.
-
-## 6. Dette gameplay / contenu
-
-### 6.1 Boss actuel
-
-Le boss `gardien_boss_etage_2` est volontairement simple : il réutilise le gardien normal avec un multiplicateur de PV.
-
-Dette assumée :
-
-- pas encore d'attaque spéciale ;
-- pas encore de récompense unique ;
-- pas encore d'écran ou séquence de victoire ;
-- escalier derrière lui pas encore activé vers un étage 3.
-
-Statut : acceptable pour prototype, à reprendre quand le contenu suivant démarre.
-
-### 6.2 Étage 3
-
-Avant d'ajouter l'étage 3, vérifier :
-
-- règles de transition multi-étages ;
-- sauvegarde / chargement depuis un étage supérieur ;
-- automap par étage ;
-- retour vers étage précédent ;
-- table de rencontres dédiée ;
-- nouveaux symboles nécessaires.
-
-Risque : moyen.
-
-### 6.3 Nouveaux symboles possibles
-
-Idées déjà envisagées :
+À surveiller :
 
 ```text
-F = combat fixe non-boss
-S = passage secret
-P = piège
-E = événement simple
-R = rune / découverte visible
+- accumulation de détections textuelles fragiles ;
+- couleurs trop nombreuses ;
+- dépendance au texte exact des messages ;
+- besoin futur d'un type de message explicite.
 ```
 
-Avant implémentation, mettre à jour :
+Piste future : remplacer progressivement les détections de texte par un système de catégories de messages, si le besoin devient réel.
 
-- `docs/dungeon/FLOOR_DESIGN.md` ;
-- `docs/dungeon/FLOOR_VISUALIZER.md` ;
-- la source de vérité gameplay ;
-- l'automap ;
-- les règles de marchabilité / rencontre.
+## 4. Sauvegarde
 
-## 7. Sauvegarde et compatibilité
+`v0.9` ne change pas volontairement le format de sauvegarde.
 
-La sauvegarde couvre déjà beaucoup de systèmes : groupe, inventaire, équipement, or, position, étage, portes ouvertes, cellules découvertes, coffres, boss vaincu.
-
-Règles de prudence :
-
-- maintenir une compatibilité raisonnable avec les anciennes sauvegardes ;
-- prévoir des valeurs par défaut pour les nouveaux champs ;
-- tester une nouvelle partie et un chargement existant après chaque modification liée à la sauvegarde ;
-- rappeler que les anciennes sauvegardes peuvent conserver d'anciens layouts mémorisés.
-
-Risque : élevé si modifié sans test.
-
-## 8. Outil de téléportation de développement
-
-L'outil de téléportation est utile pour tester rapidement les étages.
-
-Dette assumée :
-
-- il ne fait pas partie de l'expérience finale ;
-- il doit rester clairement identifié comme outil de développement ;
-- il doit être désactivé ou supprimé avant une version finale propre.
-
-À retirer plus tard :
-
-- constante / garde `DEV_TELEPORT_ENABLED` ;
-- sections temporaires de téléportation dans `InGameMenuPanelUI.gd` et les vues associées ;
-- hooks associés dans `Dungeon.gd` ;
-- documentation de test devenue inutile.
-
-Risque : faible si retiré tard, après stabilisation des tests.
-
-## 9. Renderer, builds et playtests
-
-Le renderer `Compatibility / OpenGL` est la base recommandée pour les builds Windows de playtest.
-
-À ne pas pousser :
+Le grimoire modifie seulement des données déjà sauvegardées :
 
 ```text
-*.exe
-*.pck
-*.zip
-build/
-dist/
-export/
-logs bruts
-sauvegardes locales de testeurs
-captures système complètes
+- PV des héros ;
+- PM des héros.
 ```
 
-Si un crash testeur revient :
+Les sorts disponibles restent déduits des classes et niveaux existants dans cette première version.
 
-1. confirmer le renderer de la build ;
-2. confirmer si le jeu est lancé depuis un dossier local simple ;
-3. récupérer les logs Godot complets hors repo ;
-4. documenter seulement un résumé nettoyé dans `playtests/` ;
-5. éviter une correction gameplay tant que le crash n'est pas reproduit ou compris.
+Dette future probable : si des sorts découverts, runes ou apprentissages sont ajoutés, il faudra créer une donnée persistante dédiée.
 
-## 10. Priorités recommandées
+Exemples possibles :
 
-### Court terme
+```text
+hero.known_ability_ids
+hero.discovered_ability_ids
+GameSession.magic_discoveries
+floor_states.magic_unlocks
+```
 
-1. Continuer / finaliser le playtest 01 si de nouveaux retours arrivent.
-2. Corriger uniquement les problèmes confirmés.
-3. Améliorer quelques feedbacks joueur visibles.
-4. Centraliser progressivement les symboles et règles de cases.
+Ne pas ajouter cette persistance avant d'avoir un besoin clair.
 
-### Moyen terme
+## 5. UI / style
 
-1. Préparer proprement les futurs symboles `F`, `S`, `P`, `E`, `R`.
-2. Améliorer le rendu des éléments spéciaux de donjon.
-3. Préparer l'étage 3 seulement après validation de la stabilité post-playtest.
-4. Garder une architecture simple et lisible plutôt qu'une abstraction excessive.
+### Cadres et bordures
 
-## 11. Ce qu'il faut éviter
+Le projet utilise actuellement des styles créés par script.
 
-- Réécrire entièrement `Dungeon.gd` sans besoin concret.
-- Ajouter plusieurs nouveaux systèmes en même temps.
-- Modifier sauvegarde, donjon et UI dans un même pack sans raison forte.
-- Confondre problème de renderer/export avec bug gameplay.
-- Pousser des builds, logs ou zips temporaires.
-- Faire monter artificiellement la version vers `v1.0`.
+Pour de futures bordures plus propres :
+
+```text
+- envisager StyleBoxTexture ;
+- utiliser des textures 9-slice ;
+- centraliser les styles de cadres ;
+- éviter les variations visuelles trop dispersées.
+```
+
+Ne pas lancer une refonte visuelle complète en même temps qu'un ajout gameplay important.
+
+### Grimoire
+
+Le grimoire est actuellement minimaliste, volontairement sans en-tête inutile et sans écran intermédiaire de cible.
+
+À conserver :
+
+```text
+- menu compact ;
+- sélection directe des cadres héros ;
+- prévisualisation par barres ;
+- peu de texte explicatif ;
+- cohérence avec le reste de l'UI.
+```
+
+## 6. Donjon et visualiseur
+
+Règles à respecter impérativement :
+
+```text
+- lire ASSISTANT_WORKFLOW.md avant modification ;
+- lire docs/dungeon/FLOOR_DESIGN.md avant de modifier FLOOR_VISUALIZER.md ;
+- reconstruire FLOOR_VISUALIZER.md depuis scripts/dungeon/FloorDatabase.gd ;
+- conserver le format tableau/grille avec coordonnées ;
+- ne pas remplacer par un bloc ASCII brut ;
+- ne pas utiliser de format CSS expérimental sans demande explicite.
+```
+
+Les anciennes sauvegardes peuvent conserver des états de layout. Pour tester un changement de carte, utiliser une nouvelle partie ou nettoyer la sauvegarde de test.
+
+## 7. Points non prioritaires
+
+Ne pas prioriser pour le moment :
+
+```text
+- objets consommables ;
+- potions ;
+- étage 3 ;
+- journal de quête ;
+- suivi explicite d'objectifs ;
+- bestiaire complet ;
+- refonte visuelle globale.
+```
+
+Ces sujets peuvent revenir plus tard, mais ils ne correspondent pas à la priorité immédiate après `v0.9`.
+
+## 8. Tests recommandés après v0.9
+
+Pour sécuriser la version, effectuer au moins un test court :
+
+```text
+- démarrer une nouvelle partie ;
+- créer un groupe avec Prêtresse ;
+- subir des dégâts ;
+- utiliser Soin léger hors combat ;
+- vérifier prévisualisation PV/PM ;
+- sauvegarder ;
+- charger ;
+- vérifier PV/PM ;
+- acheter/vendre en boutique ;
+- équiper/déséquiper ;
+- ouvrir coffre ;
+- lire message M ;
+- combattre ;
+- tester K.O. ;
+- tester boss si possible.
+```
+
+## 9. Évaluation actuelle
+
+La base est saine pour continuer.
+
+La prochaine dette à traiter dépendra des retours :
+
+```text
+- si l'UI grimoire gêne : polish ciblé ;
+- si les messages colorés deviennent fragiles : catégories de messages ;
+- si un second sort hors combat est ajouté : resolver de sorts hors combat ;
+- si des sorts découverts apparaissent : persistance dédiée.
+```

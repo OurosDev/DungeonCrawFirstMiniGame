@@ -6,7 +6,7 @@ Le projet sert aussi de terrain d'apprentissage pour la gestion d'un petit proje
 
 ## État actuel
 
-Version stable récente : `v0.8.2 — Refactorisations internes et stabilisation technique`.
+Version stable récente : `v0.9 — Grimoire hors combat et sélection de cible`.
 
 Cette base contient une première boucle jouable :
 
@@ -21,9 +21,11 @@ Cette base contient une première boucle jouable :
 - sauvegarde / chargement ;
 - commandes souris et clavier AZERTY ;
 - configuration de playtest stabilisée en `Compatibility / OpenGL` ;
-- refactorisations internes validées des grands contrôleurs de menu, combat, donjon, session et création d'équipe.
+- refactorisations internes validées des grands contrôleurs de menu, combat, donjon, session et création d'équipe ;
+- grimoire hors combat permettant d'utiliser des sorts de soin ;
+- sélection de cible par cadres de héros avec prévisualisation PV/PM.
 
-`v0.8.2` ne change pas volontairement le gameplay. Cette version rend surtout le code plus maintenable en séparant plusieurs responsabilités jusque-là concentrées dans de gros scripts.
+`v0.9` ajoute une fonctionnalité de gameplay sans modifier volontairement le format de sauvegarde : le grimoire devient une interface d'action magique hors combat. Le jeu ne propose pas de journal de quête ni de consommables à ce stade.
 
 ## Renderer et affichage
 
@@ -57,6 +59,19 @@ Pour les builds Windows destinées aux testeurs, utiliser `Compatibility / OpenG
 ### Combat
 
 Les commandes de combat sont utilisables à la souris. Un clic peut aussi valider certains messages d'attente, notamment après l'affichage de dégâts.
+
+### Grimoire
+
+Depuis le menu en jeu, le grimoire permet d'utiliser certains sorts hors combat.
+
+Pour la sélection de cible :
+
+- souris : survol puis clic sur un cadre de héros ;
+- clavier : flèches ou `ZQSD` pour changer de cible ;
+- `A` / `Entrée` : valider ;
+- `E` / `Échap` : annuler.
+
+La cible reçoit une bordure verte et une prévisualisation du soin prévu sur sa barre de PV. Le lanceur affiche une prévisualisation du coût en PM sur sa barre de mana.
 
 ## Organisation du dépôt
 

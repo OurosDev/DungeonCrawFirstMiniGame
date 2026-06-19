@@ -8,7 +8,7 @@ Repo public : `https://github.com/OurosDev/DungeonCrawFirstMiniGame`
 
 Langue de travail : français
 
-Base récente vérifiée / préparée : `v0.8.2 — Refactorisations internes et stabilisation technique`
+Base récente vérifiée / préparée : `v0.9 — Grimoire hors combat et sélection de cible`
 
 ## 1. Rôle de ce fichier
 
@@ -29,7 +29,9 @@ La source de vérité reste toujours le repo vérifié sur `main`, puis l'audit 
 À donner au nouvel assistant si nécessaire :
 
 ```text
-Nous continuons le projet Godot public DungeonCrawFirstMiniGame. Lis d'abord IA_RELAIS.md puis ASSISTANT_WORKFLOW.md. Ensuite vérifie l'état actuel du repo GitHub sur main, les changelogs, les audits, la roadmap dans docs/informations, les documents dungeon et les playtests. Travaille en français, signale les incohérences, et fournis des packs complets de fichiers à remplacer quand tu modifies le projet. La base récente est v0.8.2 : refactorisations internes validées du menu, combat, donjon, GameSession et création d'équipe, sans changement volontaire de gameplay ni de sauvegarde. La base renderer reste Compatibility/OpenGL avec scaling fenêtre canvas_items + keep.
+Nous continuons le projet Godot public DungeonCrawFirstMiniGame. Lis d'abord IA_RELAIS.md puis ASSISTANT_WORKFLOW.md. Ensuite vérifie l'état actuel du repo GitHub sur main, les changelogs, les audits, la roadmap dans docs/informations, les documents dungeon et les playtests. Travaille en français, signale les incohérences, et fournis des packs complets de fichiers à remplacer quand tu modifies le projet.
+
+La base récente est v0.9 : grimoire hors combat avec soins, sélection de cible par cadres héros, prévisualisation PV/PM, contrôles souris/flèches/ZQSD/A/E, messages colorés, sans journal de quête, sans consommables et sans nouveau format de sauvegarde volontaire. La base renderer reste Compatibility/OpenGL avec scaling fenêtre canvas_items + keep.
 ```
 
 ## 3. État confirmé récent
@@ -37,20 +39,70 @@ Nous continuons le projet Godot public DungeonCrawFirstMiniGame. Lis d'abord IA_
 Dernière release à préparer / vérifier :
 
 ```text
-v0.8.2 — Refactorisations internes et stabilisation technique
+v0.9 — Grimoire hors combat et sélection de cible
 ```
 
 Base précédente :
 
 ```text
-v0.8.1 — Stabilisation playtest et scaling fenêtre
+v0.8.2 — Refactorisations internes et stabilisation technique
 ```
 
-`v0.8.2` est une version technique. Elle ne change pas volontairement le gameplay et ne modifie pas le format de sauvegarde. Elle rend surtout le code plus maintenable avant de nouveaux ajouts.
+`v0.9` est une version de gameplay ciblée. Elle ajoute une première fonction réelle au grimoire sans changer la philosophie du jeu : le grimoire sert à utiliser des sorts hors combat, pas à suivre les quêtes.
 
-## 4. Refactorisations validées localement pour v0.8.2
+## 4. Fonctionnalité v0.9 : grimoire hors combat
 
-Les refactorisations ont été faites par packs successifs, testées localement, puis sauvegardées par zip local côté utilisateur avant de passer à la suivante.
+### Scripts principaux
+
+Nouveaux scripts :
+
+```text
+scripts/ui/menu/GrimoireMenuView.gd
+scripts/ui/hero_selection/HeroFrameSelectionController.gd
+```
+
+Scripts modifiés :
+
+```text
+scripts/ui/InGameMenuPanelUI.gd
+scripts/ui/LogPanelUI.gd
+scripts/ui/PartyStatusUI.gd
+```
+
+### Comportement validé
+
+```text
+- Grimoire accessible depuis le menu en jeu.
+- Boutons compacts : Nom du lanceur — Nom du sort.
+- Sélection d'un sort de soin hors combat.
+- Sélection de cible via cadres héros latéraux.
+- Le premier héros est sélectionné par défaut.
+- Bordure verte sur la cible active.
+- Survol souris déplace la sélection.
+- Clic souris valide la cible.
+- Flèches et ZQSD déplacent la cible.
+- Entrée/A valide.
+- Échap/E annule.
+- Prévisualisation de soin sur la barre de PV de la cible uniquement.
+- Prévisualisation du coût PM sur la barre de mana du lanceur uniquement.
+- Son de soin et flash vert à la validation.
+- Retour à l'état normal après validation.
+```
+
+### Contraintes de design validées
+
+```text
+- Pas de journal de quête.
+- Pas de moniteur d'objectif.
+- Pas de liste automatique d'indices.
+- Pas de consommables pour le moment.
+- Le grimoire sert d'interface d'action magique hors combat.
+- Les informations importantes passent par le canal de messages existant, avec variations de couleur si utile.
+```
+
+## 5. Base technique héritée de v0.8.2
+
+`v0.8.2` a refactorisé les scripts lourds sans changement volontaire de gameplay.
 
 ### Menu en jeu
 
@@ -60,7 +112,7 @@ Fichier principal conservé :
 scripts/ui/InGameMenuPanelUI.gd
 ```
 
-Nouveaux helpers :
+Helpers :
 
 ```text
 scripts/ui/menu/MenuUIFactory.gd
@@ -68,9 +120,16 @@ scripts/ui/menu/DevTeleportMenuView.gd
 scripts/ui/menu/InventoryMenuView.gd
 scripts/ui/menu/ShopMenuView.gd
 scripts/ui/menu/StatusEquipmentMenuView.gd
+scripts/ui/menu/GrimoireMenuView.gd
 ```
 
-Statut : testé localement, fonctionne.
+### Sélection de cadres héros
+
+```text
+scripts/ui/hero_selection/HeroFrameSelectionController.gd
+```
+
+Ce contrôleur doit être considéré comme réutilisable. Il ne doit pas rester lié exclusivement au grimoire si d'autres mécaniques ciblant un héros apparaissent.
 
 ### Combat
 
@@ -80,7 +139,7 @@ Fichier principal conservé :
 scripts/combat/CombatManager.gd
 ```
 
-Nouveaux helpers :
+Helpers :
 
 ```text
 scripts/combat/CombatActorAccess.gd
@@ -91,8 +150,6 @@ scripts/combat/CombatTargetSelector.gd
 scripts/combat/CombatLogHelper.gd
 ```
 
-Statut : testé localement, fonctionne.
-
 ### Donjon
 
 Fichier principal conservé :
@@ -101,15 +158,13 @@ Fichier principal conservé :
 scripts/dungeon/Dungeon.gd
 ```
 
-Nouveaux helpers :
+Helpers :
 
 ```text
 scripts/dungeon/DungeonMapHelper.gd
 scripts/dungeon/DungeonFloorStateHelper.gd
 scripts/dungeon/DungeonAutoMapHelper.gd
 ```
-
-Statut : testé localement, fonctionne.
 
 ### Session globale
 
@@ -119,15 +174,13 @@ Fichier principal conservé :
 scripts/core/GameSession.gd
 ```
 
-Nouveaux helpers :
+Helpers :
 
 ```text
 scripts/core/session/GameSessionFloorStateHelper.gd
 scripts/core/session/GameSessionShopHelper.gd
 scripts/core/session/GameSessionEquipmentHelper.gd
 ```
-
-Statut : testé localement, fonctionne.
 
 ### Création d'équipe
 
@@ -137,7 +190,7 @@ Fichier principal conservé :
 scripts/ui/PartyCreationUI.gd
 ```
 
-Nouveaux helpers :
+Helpers :
 
 ```text
 scripts/ui/party_creation/PartyCreationUIFactory.gd
@@ -145,9 +198,7 @@ scripts/ui/party_creation/PartyCreationHeroBuilder.gd
 scripts/ui/party_creation/PartyCreationSummaryHelper.gd
 ```
 
-Statut : testé localement, fonctionne.
-
-## 5. Base technique toujours valable depuis v0.8.1
+## 6. Base technique toujours valable depuis v0.8.1
 
 État attendu de `project.godot` :
 
@@ -178,7 +229,7 @@ Décisions validées :
 - Le stretch viewport a été rejeté pour v0.8.1 car il réduisait la lisibilité des textes en 1080p.
 ```
 
-## 6. Fonctionnalités majeures déjà en place
+## 7. Fonctionnalités majeures déjà en place
 
 ### Base jeu
 
@@ -189,7 +240,7 @@ Décisions validées :
 - Interface et contrôles souris / clavier AZERTY.
 ```
 
-### Contrôles v0.8
+### Contrôles
 
 ```text
 - Z : avancer
@@ -201,6 +252,7 @@ Décisions validées :
 - Commandes exploration cliquables
 - Commandes combat cliquables
 - Clic souris pour valider l'attente après dégâts en combat
+- Grimoire : souris, flèches, ZQSD, A/E
 ```
 
 ### Donjon et étages
@@ -246,6 +298,7 @@ R : rune/sort réservé/futur
 - Boutique : vente et achat d'objets de base.
 - Prix d'achat boutique : sell_value × 4.
 - Temple : restauration gratuite HP/MP complète.
+- Grimoire : soins hors combat.
 - Coffres persistants.
 - Messages / indices.
 - Clé du gardien consommée à l'ouverture de la porte verrouillée du boss.
@@ -266,7 +319,7 @@ gardien_boss_etage_2
 
 Le boss gardien réutilise les assets du gardien normal avec un multiplicateur de HP.
 
-## 7. Documentation importante à consulter
+## 8. Documentation importante à consulter
 
 Au démarrage d'une nouvelle conversation, consulter au minimum :
 
@@ -275,8 +328,8 @@ IA_RELAIS.md
 ASSISTANT_WORKFLOW.md
 README.md
 CHANGELOG/README.md
-CHANGELOG/v0.8.2.md
-audits/STATE_AUDITv0.8.2.md
+CHANGELOG/v0.9.md
+audits/STATE_AUDITv0.9.md
 docs/informations/ROADMAP.md
 docs/informations/TECHNICAL_DEBT.md
 docs/dungeon/FLOOR_DESIGN.md
@@ -314,7 +367,7 @@ Priorité de confiance en cas d'incohérence :
 
 Si le repo contredit ce fichier, signaler l'écart avant de proposer un pack.
 
-## 8. Règles de modification
+## 9. Règles de modification
 
 Toujours travailler ainsi :
 
@@ -338,6 +391,8 @@ Règle spéciale pour les refactorisations ou modifications importantes :
 6. La documentation et la release sont préparées seulement quand la série de refactorisations est terminée.
 ```
 
+Si l'assistant a un doute sur un fichier GitHub ou si l'état local de l'utilisateur peut différer de `main`, il doit demander le fichier local concerné.
+
 Ne pas pousser :
 
 ```text
@@ -353,7 +408,7 @@ dist/
 export/
 ```
 
-## 9. Points à ne plus traiter comme ouverts
+## 10. Points à ne plus traiter comme ouverts
 
 Ces points sont considérés comme réglés ou non bloquants :
 
@@ -363,20 +418,32 @@ Ces points sont considérés comme réglés ou non bloquants :
 - Scaling fenêtre v0.8.1 : réglé par canvas_items + keep.
 - OneDrive : non retenu comme cause principale du crash, car Vulkan hors OneDrive crashait aussi.
 - Première passe de refactorisation des scripts lourds : validée en v0.8.2.
+- Grimoire de soins hors combat : validé en v0.9.
 ```
 
 Ne pas rouvrir ces points sans nouveau symptôme ou nouvelle preuve.
 
-## 10. Prochaines pistes probables
+## 11. Prochaines pistes probables
 
-Après `v0.8.2` :
+Après `v0.9` :
 
 ```text
-- vérifier si de nouveaux retours du playtest 01 arrivent ;
-- améliorer les feedbacks de progression, sauvegarde, boss et mort ;
-- centraliser progressivement les symboles et règles de cases ;
-- décider si la prochaine version est v0.8.3 polish ou v0.9 contenu ;
-- préparer l'étage 3 seulement après décision claire de périmètre.
+- playtest court post-v0.9 ;
+- polish du grimoire si de nouveaux retours apparaissent ;
+- futurs sorts utilitaires hors combat, notamment téléportation ou retour ;
+- amélioration progressive des messages importants colorés ;
+- feedbacks de boss, mort, sauvegarde et progression ;
+- centralisation progressive des symboles et règles de cases ;
+- étage 3 seulement après décision claire de périmètre, pas comme priorité immédiate.
+```
+
+Contraintes de direction :
+
+```text
+- ne pas proposer d'objets consommables pour le moment ;
+- ne pas transformer le grimoire en journal de quête ;
+- ne pas ajouter un suivi explicite d'objectifs ;
+- privilégier les fonctionnalités qui enrichissent la boucle existante.
 ```
 
 Pour les futures bordures UI :
@@ -389,18 +456,19 @@ Pour les futures bordures UI :
 - ne pas mélanger une refonte visuelle UI avec un gros changement gameplay.
 ```
 
-## 11. Avertissements importants
+## 12. Avertissements importants
 
 ```text
 - Ne pas identifier le style du projet à partir des halos blancs des assets : ce sont des artefacts à éviter.
 - Ne pas supposer que v1.0 approche automatiquement.
 - Ne pas modifier les layouts sans vérifier FLOOR_VISUALIZER.md et FLOOR_DESIGN.md.
+- Pour FLOOR_VISUALIZER.md, conserver le format tableau/grille avec coordonnées.
 - Ne pas pousser les builds de playtest.
 - Ne pas demander de logs bruts pour les commiter : les demander seulement en zip local temporaire si nécessaire pour analyse.
 - Ne pas traiter docs/informations/ROADMAP.md comme source absolue si un audit ou un changelog plus récent le contredit.
 ```
 
-## 12. Première réponse recommandée dans une nouvelle conversation
+## 13. Première réponse recommandée dans une nouvelle conversation
 
 Après lecture de ce fichier et vérification du repo, répondre brièvement avec :
 

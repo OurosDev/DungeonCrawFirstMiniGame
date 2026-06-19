@@ -2,7 +2,7 @@
 
 Date de mise à jour : 2026-06-19
 
-Version de référence : `v0.8.2 — Refactorisations internes et stabilisation technique`
+Version de référence : `v0.9 — Grimoire hors combat et sélection de cible`
 
 ## 1. Règle de démarrage d'une conversation
 
@@ -19,8 +19,8 @@ Documents à vérifier selon le besoin :
 ```text
 README.md
 CHANGELOG/README.md
-CHANGELOG/v0.8.2.md
-audits/STATE_AUDITv0.8.2.md
+CHANGELOG/v0.9.md
+audits/STATE_AUDITv0.9.md
 docs/informations/ROADMAP.md
 docs/informations/TECHNICAL_DEBT.md
 docs/dungeon/FLOOR_DESIGN.md
@@ -31,6 +31,8 @@ project.godot
 ```
 
 La source de vérité principale reste l'état réel du repo sur `main`. Si un document est en retard, le signaler clairement.
+
+Si l'assistant a un doute sur la version d'un fichier GitHub, si un fichier est trop long/difficile à consulter, ou si des modifications locales non poussées peuvent rendre GitHub obsolète, il doit demander à l'utilisateur de fournir le fichier local concerné plutôt que d'improviser.
 
 ## 2. Langue et format de réponse
 
@@ -88,9 +90,50 @@ Ne pas mélanger dans un premier pack de refactorisation :
 
 La documentation arrive à la fin, quand l'ensemble des refactorisations utiles est terminé ou quand l'utilisateur le demande explicitement.
 
-## 5. Base actuelle v0.8.2
+## 5. Base actuelle v0.9
 
-`v0.8.2` est une release technique de refactorisation interne.
+`v0.9` ajoute le grimoire hors combat et une sélection de cible par cadres de héros.
+
+Fonctionnalités validées :
+
+```text
+- grimoire accessible depuis le menu en jeu ;
+- sorts de soin hors combat ;
+- sélection de cible via cadres héros latéraux ;
+- contrôle souris ;
+- contrôle flèches / Entrée / Échap ;
+- contrôle AZERTY ZQSD / A / E ;
+- bordure verte sur la cible ;
+- prévisualisation PV sur la cible ;
+- prévisualisation PM sur le lanceur ;
+- son de soin et flash vert à la validation ;
+- canal de messages coloré pour les messages importants.
+```
+
+Règles de design associées :
+
+```text
+- le grimoire sert prioritairement aux sorts hors combat ;
+- il ne doit pas devenir un journal de quête ;
+- pas de moniteur de quête explicite ;
+- pas d'objets consommables pour le moment ;
+- privilégier le canal de messages existant pour les informations importantes ;
+- les couleurs de messages peuvent améliorer la lisibilité sans donner une checklist au joueur.
+```
+
+Scripts concernés par v0.9 :
+
+```text
+scripts/ui/menu/GrimoireMenuView.gd
+scripts/ui/hero_selection/HeroFrameSelectionController.gd
+scripts/ui/InGameMenuPanelUI.gd
+scripts/ui/LogPanelUI.gd
+scripts/ui/PartyStatusUI.gd
+```
+
+## 6. Base technique héritée de v0.8.2
+
+`v0.8.2` reste la base de refactorisation interne.
 
 Refactorisations validées localement :
 
@@ -105,14 +148,13 @@ scripts/ui/PartyCreationUI.gd -> scripts/ui/party_creation/*
 Règles conservées :
 
 ```text
-- pas de changement volontaire de gameplay ;
-- pas de changement volontaire de format de sauvegarde ;
 - scènes Godot conservées ;
 - grandes façades publiques conservées ;
+- éviter les changements de format de sauvegarde sans décision explicite ;
 - tests locaux validés par l'utilisateur avant release.
 ```
 
-## 6. Renderer et builds de test
+## 7. Renderer et builds de test
 
 La base `v0.8.1` reste valide pour le renderer :
 
@@ -132,7 +174,7 @@ Règles :
 - ne pas pousser les logs bruts ;
 - documenter seulement des synthèses nettoyées dans `playtests/`.
 
-## 7. Documentation et chemins actuels
+## 8. Documentation et chemins actuels
 
 Chemins actuels importants :
 
@@ -142,7 +184,7 @@ ASSISTANT_WORKFLOW.md
 README.md
 CHANGELOG/README.md
 CHANGELOG/vX.Y.md
-audits/STATE_AUDITvX.Y.Z.md
+audits/STATE_AUDITvX.Y.md
 docs/informations/ROADMAP.md
 docs/informations/TECHNICAL_DEBT.md
 docs/dungeon/FLOOR_DESIGN.md
@@ -153,7 +195,7 @@ playtests/PLAYTEST_XX_vX.Y.md
 
 `ROADMAP.md` et `TECHNICAL_DEBT.md` doivent être considérés comme localisés dans `docs/informations/`, pas à la racine.
 
-## 8. Gestion des playtests
+## 9. Gestion des playtests
 
 Les playtests doivent être documentés dans `playtests/`.
 
@@ -169,23 +211,24 @@ Nommage conseillé :
 
 ```text
 playtests/PLAYTEST_01_v0.8.md
-playtests/PLAYTEST_02_v0.8.2.md
+playtests/PLAYTEST_02_v0.9.md
 ```
 
-## 9. Donjon et layouts
+## 10. Donjon et layouts
 
 Avant toute modification de layout ou de symboles :
 
-1. lire `docs/dungeon/FLOOR_DESIGN.md` ;
-2. lire `docs/dungeon/FLOOR_VISUALIZER.md` ;
-3. vérifier `scripts/dungeon/FloorDatabase.gd` ;
-4. préserver la lisibilité de la grille/tableau dans `FLOOR_VISUALIZER.md`.
+1. lire `ASSISTANT_WORKFLOW.md` ;
+2. lire `docs/dungeon/FLOOR_DESIGN.md` ;
+3. lire `docs/dungeon/FLOOR_VISUALIZER.md` ;
+4. vérifier `scripts/dungeon/FloorDatabase.gd` ;
+5. préserver strictement la lisibilité de la grille/tableau dans `FLOOR_VISUALIZER.md`.
 
-Ne pas remplacer le visualiseur par un simple bloc ASCII sans demande explicite.
+Ne pas remplacer le visualiseur par un simple bloc ASCII, un format monospacé brut ou une variante CSS expérimentale sans demande explicite.
 
 Les anciennes sauvegardes peuvent conserver des layouts mémorisés. Pour tester un nouveau layout, utiliser une nouvelle partie ou réinitialiser la sauvegarde de test.
 
-## 10. Assets
+## 11. Assets
 
 Ne pas traiter les halos blancs autour des portraits ou sprites comme un style voulu. Ce sont des artefacts à éviter.
 
@@ -197,7 +240,7 @@ Pour les futurs assets :
 - cohérence avec le style rétro sombre ;
 - prudence avec les variations trop fortes entre frames.
 
-## 11. Fichiers à ne pas pousser
+## 12. Fichiers à ne pas pousser
 
 ```text
 packs .zip générés
@@ -219,7 +262,7 @@ export/
 
 Les zips locaux de sécurité restent hors repo.
 
-## 12. Préparation de release
+## 13. Préparation de release
 
 Quand l'utilisateur valide qu'une série de changements est terminée :
 
@@ -244,14 +287,13 @@ Titre de release conseillé
 Texte de release conseillé
 ```
 
-## 13. Versioning
+## 14. Versioning
 
 Ne pas accélérer artificiellement vers `v1.0`.
 
 Le projet peut continuer ainsi :
 
 ```text
-v0.8.3
 v0.9
 v0.10
 v0.11

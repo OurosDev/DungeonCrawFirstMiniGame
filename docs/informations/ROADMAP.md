@@ -1,248 +1,200 @@
-# Feuille de route — DungeonCrawFirstMiniGame
+# ROADMAP — DungeonCrawFirstMiniGame
 
-## 1. Objectif du projet
+Date de mise à jour : 2026-06-19
 
-Créer un dungeon crawler rétro en vue subjective, inspiré de l'esprit old-school et de jeux comme *Swords and Serpents* sur NES.
+Version de référence : `v0.9 — Grimoire hors combat et sélection de cible`
 
-Le projet avance par petites versions pré-1.0, chacune devant rester testable et récupérable via un tag GitHub stable.
+## 1. État actuel
 
-Objectifs de conception :
+La base récente est `v0.9`.
 
+Le jeu possède maintenant une boucle complète courte mais jouable :
+
+```text
+création d'équipe -> exploration étage 1 -> étage 2 -> clé du gardien -> porte verrouillée -> boss -> passage derrière le boss
+```
+
+La base comprend :
+
+```text
 - exploration case par case ;
-- groupe de quatre héros ;
-- combats au tour par tour ;
-- progression par étages ;
-- difficulté parfois brutale, compensée par l'exploration, la préparation et la gestion des ressources ;
-- documentation claire avant les ajouts de contenu majeurs.
-
-## 2. Base de travail actuelle
-
-Version stable actuelle : `v0.8.2`
-
-Release : `v0.8.2 — Refactorisations internes et stabilisation technique`
-
-Cette base contient :
-
-1. la boucle complète `v0.7.1` : création de groupe, exploration, étage 2, coffres, messages, clé du gardien, porte verrouillée, boss et retour titre après K.O. ;
-2. les contrôles `v0.8` : souris, clavier AZERTY, commandes de combat et d'exploration plus accessibles ;
-3. la stabilisation `v0.8.1` : renderer `Compatibility / OpenGL`, scaling de fenêtre `canvas_items + keep`, playtest 01 documenté, builds/logs hors repo ;
-4. les refactorisations `v0.8.2` : extraction progressive de helpers depuis les grands contrôleurs du menu, du combat, du donjon, de la session et de la création d'équipe.
-
-Historique détaillé : voir `CHANGELOG/README.md` et les fichiers `CHANGELOG/vX.Y.md`.
-
-## 3. Documents de référence
-
-```text
-IA_RELAIS.md                              Passage de main entre conversations
-ASSISTANT_WORKFLOW.md                     Règles de collaboration avec l'assistant
-README.md                                 Présentation publique du projet
-CHANGELOG/README.md                       Historique synthétique des versions
-CHANGELOG/*.md                            Détail par version
-audits/STATE_AUDITvX.Y.Z.md               Photographies d'état du repo
-docs/informations/ROADMAP.md              Direction actuelle et prochaines priorités
-docs/informations/TECHNICAL_DEBT.md       Refactorisations utiles et dette technique connue
-docs/dungeon/FLOOR_DESIGN.md              Règles de conception des étages et symboles
-docs/dungeon/FLOOR_VISUALIZER.md          Visualisation des layouts et variantes
-playtests/README.md                       Règles de documentation des playtests
-playtests/PLAYTEST_XX_vX.Y.md             Synthèses propres des tests
+- deux étages ;
+- transitions entre étages ;
+- sauvegarde / chargement ;
+- automap ;
+- combats aléatoires ;
+- combat de boss fixe ;
+- retour titre après K.O. ;
+- inventaire partagé ;
+- équipement ;
+- boutique ;
+- temple de guérison ;
+- coffres et messages ;
+- clé de progression ;
+- contrôles souris, flèches et AZERTY ;
+- renderer Compatibility / OpenGL ;
+- grimoire de soins hors combat.
 ```
 
-Rôle de `ROADMAP.md` : rester court, actuel et décisionnel.
+`v0.8.2` a réduit la dette des grands contrôleurs. `v0.9` ajoute une fonctionnalité de gameplay sans étendre le contenu brut.
 
-À ne plus stocker directement ici :
+## 2. Direction de design actuelle
 
-- corps complets des anciennes releases ;
-- longues notes de refactorisation ;
-- instructions de collaboration avec l'assistant ;
-- détails exhaustifs des layouts ;
-- listes trop longues de systèmes déjà terminés.
+La priorité n'est pas d'ajouter immédiatement un étage 3.
 
-## 4. Systèmes fonctionnels importants
-
-### Donjon et exploration
-
-- Déplacement case par case.
-- Rotation gauche / droite.
-- Murs, portes simples, portes ouvertes runtime.
-- Étages 1 et 2.
-- Escalier descendant `>` et escalier montant `<`.
-- États d'étage mémorisés.
-- Cellules découvertes de l'automap mémorisées par étage.
-- Rencontres aléatoires par étage.
-- Temple `O`.
-- Boutique `B`.
-- Coffres `C`.
-- Messages / indices `M`.
-- Porte verrouillée `L`.
-- Boss / rencontre majeure `X`.
-
-### Progression actuelle
-
-- L'étage 2 contient une zone boss protégée par une porte verrouillée.
-- La Clé du gardien est obtenue dans un coffre de l'étage 2.
-- Le boss `gardien_boss_etage_2` réutilise le gardien normal avec ses PV multipliés.
-- Le boss disparaît après victoire.
-- Le passage derrière lui devient accessible.
-- L'escalier descendant derrière le boss est présent visuellement, mais ne mène pas encore à un étage 3.
-
-### Combat
-
-- Combat au tour par tour.
-- Attaque physique.
-- Magie offensive.
-- Soin.
-- Fuite.
-- Drops réels ajoutés à l'inventaire.
-- EXP.
-- Boss fixe simple.
-- Retour à l'écran titre après K.O. complet du groupe.
-- Validation souris de certaines étapes de combat.
-
-### Économie et équipement
-
-- Inventaire commun de 24 emplacements.
-- Piles de 9 objets, sauf exceptions.
-- Or du groupe.
-- Vente en boutique.
-- Achat d'objets basiques.
-- Prix d'achat = `sell_value × 4`.
-- Objets de quête non vendables.
-- Équipement par héros : Arme, Casque, Armure, Bouclier, Bijou.
-- Bonus plats centralisés dans `ItemDatabase.gd`.
-
-### Interface et contrôles
-
-- Commandes souris pour exploration.
-- Commandes souris pour combat.
-- Bouton menu en exploration.
-- Contrôles AZERTY : `Z`, `Q`, `S`, `D`.
-- `A` agit comme validation.
-- `E` agit comme retour.
-- Scaling fenêtre stabilisé par `canvas_items + keep`.
-
-### Architecture après v0.8.2
-
-Plusieurs grands scripts restent les points d'entrée principaux, mais délèguent maintenant des responsabilités spécialisées :
-
-- `InGameMenuPanelUI.gd` délègue les écrans de menu à `scripts/ui/menu/` ;
-- `CombatManager.gd` délègue plusieurs règles de combat à des resolvers/helpers ;
-- `Dungeon.gd` délègue des helpers de carte, d'état d'étage et d'automap ;
-- `GameSession.gd` délègue des helpers d'état d'étage, boutique et équipement ;
-- `PartyCreationUI.gd` délègue la construction UI, la création des héros et les résumés.
-
-## 5. Priorité de reprise
-
-Après `v0.8.2`, le projet dispose d'une base plus saine pour reprendre soit le polish post-playtest, soit les premiers ajouts visibles de contenu.
-
-Axes à décider ensemble :
+La priorité est d'enrichir la boucle existante avec des fonctionnalités cohérentes :
 
 ```text
-A. Finaliser / poursuivre le playtest 01 sur base Compatibility / OpenGL
-B. Corriger les éventuels retours de confort issus du playtest
-C. Améliorer les feedbacks de progression, mort, boss, coffres et sauvegarde
-D. Centraliser les symboles et règles de cases du donjon
-E. Préparer le contenu suivant : étage 3, combats fixes F, grimoire, événements
+- grimoire hors combat ;
+- sorts utilitaires futurs ;
+- meilleurs feedbacks ;
+- lisibilité des messages importants ;
+- polish UI ciblé ;
+- équilibrage ;
+- playtests.
 ```
 
-Recommandation actuelle :
+Contraintes de design validées :
 
 ```text
-Prochaine version probable : v0.8.3 ou v0.9
-Objectif v0.8.3 : polish / confort / documentation / correctifs post-playtest
-Objectif v0.9 : nouveau contenu visible ou début d'étage 3
+- pas d'objets consommables pour le moment ;
+- pas de potions ;
+- pas de journal de quête ;
+- pas de moniteur d'objectif ;
+- pas de checklist d'indices ;
+- conserver une difficulté d'exploration old-school ;
+- utiliser le canal de messages existant pour les informations importantes.
 ```
 
-Le numéro exact dépendra du périmètre :
+Le grimoire doit rester une interface d'action magique hors combat. Sa première fonction est le soin, et ses extensions futures doivent rester dans cette logique.
 
-- `v0.8.3` si la version contient surtout du polish, de la documentation, des corrections ciblées ou des ajustements de playtest ;
-- `v0.9` si la version ajoute un vrai bloc de contenu visible ou une progression nouvelle.
+## 3. Priorité courte recommandée après v0.9
 
-## 6. Polish conseillé avant gros contenu
+### Option A — Playtest court post-v0.9
 
-Priorité haute :
+Objectif : vérifier que le grimoire fonctionne bien dans une session complète et que la sélection de cible reste intuitive.
 
-- compiler la suite du playtest 01 si de nouveaux retours arrivent ;
-- vérifier le confort de la build `Compatibility / OpenGL` sur d'autres machines ;
-- améliorer le feedback après victoire contre le boss ;
-- clarifier le feedback de consommation de la Clé du gardien ;
-- clarifier les messages de coffre déjà ouvert ou vide, si nécessaire ;
-- vérifier l'expérience K.O. après retour à l'écran titre ;
-- améliorer la lisibilité des retours de sauvegarde / chargement.
-
-Priorité moyenne :
-
-- améliorer le visuel 3D des escaliers `<` et `>` ;
-- améliorer le rendu 3D des coffres `C` ;
-- améliorer le rendu 3D des messages `M` ;
-- améliorer le rendu 3D des portes verrouillées `L` ;
-- cadres UI plus propres ;
-- début de `NinePatchRect` ou `StyleBoxTexture` pour les panneaux principaux ;
-- amélioration des fenêtres Inventaire / Statut / Équipement / Boutique ;
-- amélioration visuelle ou textuelle de la victoire boss.
-
-## 7. Refactorisations restantes utiles
-
-Voir `docs/informations/TECHNICAL_DEBT.md` pour le détail.
-
-Après `v0.8.2`, les gros contrôleurs les plus visibles ont été allégés. Les refactorisations restantes doivent être plus ciblées :
-
-- centraliser les symboles de donjon ;
-- centraliser les règles de marchabilité ;
-- centraliser les règles de non-rencontre aléatoire ;
-- clarifier progressivement les événements de cases spéciales `C`, `M`, `L`, `X`, `O`, `B`, `<`, `>` ;
-- conserver `Dungeon.gd`, `CombatManager.gd` et `GameSession.gd` comme façades publiques plutôt que multiplier les dépendances directes.
-
-## 8. Contenu futur possible
-
-### Progression
-
-- Étage 3.
-- Activation réelle de l'escalier `>` derrière le boss.
-- Nouveau thème visuel.
-- Nouvelle table de rencontre.
-
-### Donjon
-
-- Combats fixes non-boss `F`.
-- Passages secrets `S`.
-- Pièges `P`.
-- Événements simples `E`.
-- Runes ou découvertes visibles `R`.
-
-### Combat
-
-- Attaques spéciales de boss.
-- Récompense ou drop unique du boss.
-- Message ou écran de victoire boss.
-- Animations damage / attaque plus lisibles.
-
-### Interface
-
-- Grimoire fonctionnel.
-- Descriptions d'objets plus détaillées.
-- Meilleur feedback de sauvegarde, mort, victoire et progression.
-
-## 9. Règles de versioning
-
-Ne pas accélérer artificiellement vers `v1.0`.
-
-Le projet peut continuer en versions pré-1.0 :
+À tester :
 
 ```text
-v0.8.3
-v0.9
-v0.10
-v0.11
-...
+- nouvelle partie ;
+- grimoire avec Prêtresse ;
+- soin hors combat après combat ;
+- prévisualisation PV/PM ;
+- souris ;
+- flèches ;
+- ZQSD ;
+- A/E ;
+- sauvegarde après utilisation du grimoire ;
+- chargement après PV/PM modifiés ;
+- combat, boutique, inventaire et équipement après utilisation du grimoire.
 ```
 
-`v1.0` doit rester réservé à une version réellement complète, avec une progression suffisante, une boucle de jeu stabilisée, une documentation claire et une version exportable propre.
+Un fichier possible :
 
-## 10. Notes de vigilance
+```text
+playtests/PLAYTEST_02_v0.9.md
+```
 
-- Les anciennes sauvegardes peuvent conserver d'anciens layouts mémorisés.
-- Pour tester un changement de layout, utiliser une nouvelle partie ou réinitialiser la sauvegarde de test.
-- Les builds de playtest restent locales.
-- Les logs bruts complets restent hors repo.
-- Le renderer de playtest Windows recommandé est `Compatibility / OpenGL`.
-- L'outil de téléportation de développement est temporaire et devra être retiré ou désactivé avant une version finale propre.
+### Option B — Polish du grimoire
+
+À faire seulement si les tests montrent un besoin :
+
+```text
+- ajuster les proportions UI ;
+- améliorer les couleurs de prévisualisation ;
+- améliorer la bordure verte ;
+- éviter toute ambiguïté entre lanceur et cible ;
+- améliorer les messages de refus.
+```
+
+### Option C — Feedbacks de progression
+
+Sans journal de quête :
+
+```text
+- messages de clé plus visibles ;
+- messages de porte verrouillée plus clairs ;
+- messages de boss vaincu plus marquants ;
+- messages de sauvegarde/chargement plus lisibles ;
+- différencier couleur système, indice, avertissement, combat, grimoire.
+```
+
+## 4. Prochaine fonctionnalité probable après stabilisation
+
+### Sorts utilitaires hors combat
+
+Le socle du grimoire peut servir plus tard à :
+
+```text
+- téléportation ;
+- retour à l'entrée ;
+- retour au temple ;
+- révélation limitée d'une zone de carte ;
+- protection temporaire hors combat si compatible avec la vision du jeu.
+```
+
+Ces sorts devront être traités prudemment car ils peuvent modifier fortement l'équilibre et la tension d'exploration.
+
+### Découverte de sorts
+
+Pour des sorts avancés, il faudra probablement ajouter un système persistant :
+
+```text
+- sorts découverts ;
+- sorts connus ;
+- runes ou apprentissages ;
+- sauvegarde dédiée des découvertes magiques.
+```
+
+À ne pas faire tant que le besoin n'est pas clair.
+
+## 5. Contenu futur mais non prioritaire
+
+### Étage 3
+
+L'étage 3 reste une piste future, mais il n'est pas prioritaire juste après `v0.9`.
+
+Avant de l'ajouter, il vaut mieux :
+
+```text
+- vérifier que la boucle actuelle est agréable ;
+- stabiliser le grimoire ;
+- clarifier les feedbacks ;
+- équilibrer les soins hors combat ;
+- faire au moins un playtest court de la version v0.9.
+```
+
+### Nouveaux monstres / sprites
+
+Possible plus tard, si un nouvel étage ou un nouveau type de zone le justifie.
+
+### Nouveaux équipements
+
+Possible plus tard, mais ne doit pas devenir un remplacement indirect des consommables. Les équipements doivent rester centrés sur les classes, les choix de build simples et les récompenses durables.
+
+## 6. Dette technique à surveiller
+
+Points à surveiller après `v0.9` :
+
+```text
+- `PartyStatusUI.gd` devient plus complexe avec sélection de cadre et prévisualisations ;
+- `InGameMenuPanelUI.gd` reste une façade centrale importante ;
+- `HeroFrameSelectionController.gd` doit rester réutilisable et ne pas se spécialiser trop fortement sur le grimoire ;
+- les couleurs de messages doivent rester maintenables ;
+- les futurs sorts hors combat ne doivent pas dupliquer la logique d'input.
+```
+
+## 7. Versioning conseillé
+
+Ne pas accélérer vers `v1.0`.
+
+Suites possibles :
+
+```text
+v0.9.1 — Correctifs / polish grimoire si nécessaire
+v0.10 — Sort utilitaire hors combat ou feedbacks avancés
+v0.11 — Nouvelle étape de contenu seulement si la boucle actuelle est stabilisée
+```
+
+`v1.0` doit rester réservé à une version plus complète, plus stable, mieux équilibrée et exportable proprement.
