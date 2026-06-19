@@ -7,6 +7,7 @@ class_name ItemDatabase
 # ------------------------------------------------------------
 
 const ItemDataScript = preload("res://scripts/items/ItemData.gd")
+const ClassDatabaseScript = preload("res://scripts/characters/ClassDatabase.gd")
 
 
 # ------------------------------------------------------------
@@ -23,10 +24,10 @@ const SLOT_ARMOR: String = "armor"
 const SLOT_SHIELD: String = "shield"
 const SLOT_JEWELRY: String = "jewelry"
 
-const JOB_WARRIOR: String = "Guerrier"
-const JOB_THIEF: String = "Voleuse"
-const JOB_MAGE: String = "Mage"
-const JOB_CLERIC: String = "Prêtresse"
+const JOB_WARRIOR: String = ClassDatabaseScript.JOB_WARRIOR
+const JOB_THIEF: String = ClassDatabaseScript.JOB_THIEF
+const JOB_MAGE: String = ClassDatabaseScript.JOB_MAGE
+const JOB_CLERIC: String = ClassDatabaseScript.JOB_CLERIC
 
 const ITEM_TYPE_MISC: String = "misc"
 const ITEM_TYPE_QUEST: String = "quest"
@@ -113,7 +114,9 @@ static func is_quest_item(item_id: String) -> bool:
 
 static func can_item_be_equipped_by_class(item_id: String, job_name: String) -> bool:
 	var item = get_item_data(item_id)
-	return item.can_be_equipped_by_class(job_name)
+	var normalized_job_name: String = ClassDatabaseScript.normalize_class_name(job_name)
+
+	return item.can_be_equipped_by_class(normalized_job_name)
 
 
 static func get_all_item_ids() -> Array[String]:

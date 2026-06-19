@@ -1,13 +1,12 @@
 # IDEAS — DungeonCrawFirstMiniGame
 
-Date de création : 2026-06-19  
-Base de référence : `v0.10 — Grimoire de combat et ciblage des soins`
+Date de création : 2026-06-19
+
+Base de référence : `v0.11 — Cadres UI NineSlice et correction Prêtre`
 
 ## Rôle du document
 
-Ce fichier sert de boîte à idées longue durée pour les fonctionnalités, améliorations, pistes techniques et envies à ne pas perdre.
-
-Il complète la roadmap sans la remplacer :
+Ce fichier sert de boîte à idées longue durée pour les fonctionnalités, améliorations, pistes techniques et envies à ne pas perdre. Il complète la roadmap sans la remplacer :
 
 ```text
 ROADMAP.md = cap, priorités, prochaines phases probables.
@@ -39,6 +38,8 @@ Si une idée est abandonnée ou repoussée très loin, elle doit être déplacé
 - Conservation du scaling canvas_items + keep.
 - Éviter les contours blancs / halos sur les assets et cadres.
 - Améliorer progressivement les icônes ou marqueurs UI si nécessaire.
+- Créer une texture dédiée aux boutons, distincte de la texture de cadre principale.
+- Créer éventuellement des variantes de cadres pour les états actifs, dégâts, soin ou sélection.
 ```
 
 ## Grimoire, magie et sorts
@@ -49,7 +50,7 @@ Si une idée est abandonnée ou repoussée très loin, elle doit être déplacé
 - Sorts utilisables seulement en combat visibles mais grisés dans le grimoire hors combat.
 - Système sauvegardé de sorts connus / découverts.
 - Sorts offensifs supplémentaires pour le Mage.
-- Sorts de soin supplémentaires pour la Prêtresse.
+- Sorts de soin supplémentaires pour le Prêtre.
 - Sorts utilitaires hors combat : téléportation, retour, révélation, protection ou équivalent.
 - Sorts de soutien en combat : protection, bénédiction, réduction de dégâts, etc.
 - Meilleur affichage des sorts disponibles / indisponibles.
@@ -109,8 +110,9 @@ Si une idée est abandonnée ou repoussée très loin, elle doit être déplacé
 ## Playtests et exports
 
 ```text
-- Playtest 02 post-v0.10.
-- Tests complets Mage + Prêtresse après les grimoires.
+- Playtest 02 post-v0.11.
+- Tests complets Mage + Prêtre après les grimoires.
+- Tests UI en résolution native et en stretch.
 - Tests boss / K.O. / sauvegarde / chargement après combats.
 - Exports Compatibility / OpenGL par défaut pour les testeurs.
 - Documentation des playtests sans logs bruts.
@@ -122,6 +124,7 @@ Si une idée est abandonnée ou repoussée très loin, elle doit être déplacé
 ```text
 - Ne pas relancer de grosse refactorisation sans raison concrète.
 - Surveiller les systèmes magie, input, journal de combat et PartyStatusUI.
+- Surveiller UIFrameStyle.gd si plusieurs variantes de cadres apparaissent.
 - Évaluer proprement les impacts sauvegarde avant tout système persistant de sorts.
 - Si un système de messages typés est ajouté, centraliser les types au lieu de multiplier les heuristiques texte.
 - Continuer à privilégier les helpers / vues dédiées quand un contrôleur recommence à grossir.

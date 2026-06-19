@@ -1,7 +1,8 @@
 # ASSISTANT_WORKFLOW — DungeonCrawFirstMiniGame
 
-Date de mise à jour : 2026-06-19  
-Version de référence : `v0.10 — Grimoire de combat et ciblage des soins`
+Date de mise à jour : 2026-06-19
+
+Version de référence : `v0.11 — Cadres UI NineSlice et correction Prêtre`
 
 ## 1. Règle de démarrage d'une conversation
 
@@ -18,21 +19,21 @@ Documents à vérifier selon le besoin :
 ```text
 README.md
 CHANGELOG/README.md
-CHANGELOG/v0.10.md
-audits/STATE_AUDITv0.10.md
+CHANGELOG/v0.11.md
+audits/STATE_AUDITv0.11.md
 docs/informations/ROADMAP.md
 docs/informations/IDEAS.md
 docs/informations/TECHNICAL_DEBT.md
 docs/dungeon/FLOOR_DESIGN.md
 docs/dungeon/FLOOR_VISUALIZER.md
 playtests/README.md
-playtests/PLAYTEST_01_v0.8.md
+playtests/PLAYTEST_XX_vX.Y.md
 project.godot
 ```
 
-La source de vérité principale reste l'état réel du repo sur `main`. Si un document est en retard, le signaler clairement.
+La source de vérité vérifiable principale reste l'état réel du repo sur `main`.
 
-Si l'assistant a un doute sur la version d'un fichier GitHub, si un fichier est trop long/difficile à consulter, ou si des modifications locales non poussées peuvent rendre GitHub obsolète, il doit demander à l'utilisateur de fournir le fichier local concerné plutôt que d'improviser.
+Si un document est en retard, le signaler clairement. Si l'assistant a un doute sur la version d'un fichier GitHub, si un fichier est trop long/difficile à consulter, ou si des modifications locales non poussées peuvent rendre GitHub obsolète, il doit demander à l'utilisateur de fournir le fichier local concerné plutôt que d'improviser.
 
 ## 2. Sources de vérité et base locale active
 
@@ -41,6 +42,9 @@ Le repo GitHub public sur `main` est la source vérifiable principale, mais il p
 Règles :
 
 - si l'utilisateur indique avoir appliqué un pack local non encore poussé, cet état local devient la base de travail fonctionnelle pour la suite ;
+- les fichiers locaux fournis explicitement par l'utilisateur pour la tâche en cours sont prioritaires pour cette tâche ;
+- cette priorité locale ne doit pas exclure la consultation du repo GitHub ;
+- cette priorité locale ne doit pas empêcher l'utilisation ou la modification de fichiers du repo GitHub quand cela améliore la cohérence globale, la documentation, la comparaison ou la préparation de release ;
 - l'assistant doit signaler explicitement quand il travaille sur une base locale supposée plutôt que sur l'état GitHub vérifié ;
 - si une modification dépend d'un fichier local non poussé, demander le fichier local concerné plutôt que reconstruire à partir d'une version GitHub possiblement obsolète ;
 - ne pas considérer la mémoire de conversation comme plus fiable qu'un fichier de repo vérifié ou qu'un fichier local fourni par l'utilisateur ;
@@ -101,9 +105,7 @@ Le pack de scripts ne doit être préparé qu'après validation explicite ou imp
 
 ## 5. Périmètre évolutif maîtrisé
 
-Le périmètre d'un pack doit être maîtrisé, mais pas verrouillé artificiellement.
-
-L'assistant doit annoncer les fichiers et systèmes probablement concernés, mais il doit garder la possibilité de toucher un système connexe si cela rend l'implémentation plus saine, plus stable ou plus durable.
+Le périmètre d'un pack doit être maîtrisé, mais pas verrouillé artificiellement. L'assistant doit annoncer les fichiers et systèmes probablement concernés, mais il doit garder la possibilité de toucher un système connexe si cela rend l'implémentation plus saine, plus stable ou plus durable.
 
 Règles :
 
@@ -170,11 +172,62 @@ Ne pas proposer de refactorisation générale sans raison concrète. Refactorise
 - un bug montre une responsabilité mal isolée ;
 - l'utilisateur demande explicitement une passe technique.
 
-## 8. Base actuelle v0.10
+## 8. Base actuelle v0.11
+
+`v0.11` améliore l'identité visuelle de l'interface avec un cadre NineSlice sombre et corrige le libellé de classe d'Eldric.
+
+Fonctionnalités validées :
+
+```text
+- texture assets/ui/frames/texture_cadre_ui.png ;
+- helper scripts/ui/theme/UIFrameStyle.gd ;
+- StyleBoxTexture pour les cadres principaux ;
+- cadres héros, viewport, journal et automap texturés ;
+- cadres et boutons des menus texturés ;
+- boutons de commandes exploration/combat texturés ;
+- suppression du long cadre derrière les boutons de commandes ;
+- correction Prêtresse -> Prêtre ;
+- normalisation des anciennes sauvegardes vers Prêtre.
+```
+
+Points à surveiller :
+
+```text
+- une texture dédiée aux boutons sera probablement nécessaire ;
+- vérifier régulièrement la lisibilité en basse résolution ;
+- vérifier les états visuels de sélection, dégâts, soin et héros actif ;
+- ne pas casser le scaling canvas_items + keep.
+```
+
+Scripts concernés par `v0.11` :
+
+```text
+scripts/ui/theme/UIFrameStyle.gd
+scripts/ui/GameUI.gd
+scripts/ui/PartyStatusUI.gd
+scripts/ui/DungeonViewportUI.gd
+scripts/ui/CommandOverlayUI.gd
+scripts/ui/LogPanelUI.gd
+scripts/ui/AutoMapUI.gd
+scripts/ui/menu/MenuUIFactory.gd
+scripts/characters/ClassDatabase.gd
+scripts/characters/CharacterData.gd
+scripts/items/ItemDatabase.gd
+scripts/core/SaveManager.gd
+scripts/ui/PartyCreationUI.gd
+```
+
+Asset concerné par `v0.11` :
+
+```text
+assets/ui/frames/texture_cadre_ui.png
+```
+
+## 9. Base héritée de v0.10
 
 `v0.10` ajoute le grimoire de combat et le ciblage des soins en combat.
 
-Fonctionnalités validées :
+Fonctionnalités conservées :
 
 ```text
 - bouton Grimoire pendant le combat ;
@@ -207,17 +260,7 @@ Règles de design associées :
 - pas de moniteur de quête explicite.
 ```
 
-Scripts concernés par `v0.10` :
-
-```text
-scripts/ui/menu/CombatGrimoireMenuView.gd
-scripts/combat/CombatManager.gd
-scripts/dungeon/DungeonInputController.gd
-scripts/ui/InGameMenuPanelUI.gd
-scripts/ui/LogPanelUI.gd
-```
-
-## 9. Base héritée de v0.9
+## 10. Base héritée de v0.9
 
 `v0.9` ajoute le grimoire hors combat et une sélection de cible par cadres de héros.
 
@@ -238,7 +281,7 @@ Le grimoire ne doit pas devenir un journal de quête.
 
 Les informations importantes peuvent être mieux colorées dans le canal de messages existant, mais sans checklist ni suivi d'objectifs explicite.
 
-## 10. Base technique héritée de v0.8.2
+## 11. Base technique héritée de v0.8.2
 
 `v0.8.2` reste la base de refactorisation interne.
 
@@ -261,7 +304,7 @@ Règles conservées :
 - tests locaux validés par l'utilisateur avant release.
 ```
 
-## 11. Relecture régulière des documents de pilotage
+## 12. Relecture régulière des documents de pilotage
 
 L'assistant doit relire régulièrement les documents présents dans `docs/` pour conserver une cohérence entre les décisions, la dette technique et l'état réel du projet.
 
@@ -301,7 +344,7 @@ Rôle de ces documents :
 
 Si un document est en retard mais que la tâche actuelle ne nécessite pas de le corriger immédiatement, le signaler et reporter sa mise à jour à la prochaine release ou passe documentaire.
 
-## 12. ROADMAP.md et IDEAS.md
+## 13. ROADMAP.md et IDEAS.md
 
 `docs/informations/ROADMAP.md` et `docs/informations/IDEAS.md` ont des rôles distincts.
 
@@ -346,7 +389,7 @@ Règles strictes :
 - ajouter les nouvelles idées dans une section claire, même si elles ne sont pas prioritaires ;
 - ne pas présenter le contenu de `IDEAS.md` comme une promesse de développement.
 
-## 13. Tests recommandés par type de pack
+## 14. Tests recommandés par type de pack
 
 L'assistant doit proposer des tests adaptés au type de modification.
 
@@ -414,7 +457,7 @@ automap
 rencontres aléatoires
 ```
 
-## 14. Renderer et builds de test
+## 15. Renderer et builds de test
 
 La base `v0.8.1` reste valide pour le renderer :
 
@@ -434,7 +477,7 @@ Règles :
 - ne pas pousser les logs bruts ;
 - documenter seulement des synthèses nettoyées dans `playtests/`.
 
-## 15. Documentation et chemins actuels
+## 16. Documentation et chemins actuels
 
 Chemins actuels importants :
 
@@ -442,7 +485,6 @@ Chemins actuels importants :
 IA_RELAIS.md
 ASSISTANT_WORKFLOW.md
 README.md
-CHANGELOG/README.md
 CHANGELOG/vX.Y.md
 audits/STATE_AUDITvX.Y.md
 docs/informations/ROADMAP.md
@@ -456,7 +498,7 @@ playtests/PLAYTEST_XX_vX.Y.md
 
 `ROADMAP.md`, `IDEAS.md` et `TECHNICAL_DEBT.md` doivent être considérés comme localisés dans `docs/informations/`, pas à la racine.
 
-## 16. Gestion des playtests
+## 17. Gestion des playtests
 
 Les playtests doivent être documentés dans `playtests/`.
 
@@ -475,7 +517,7 @@ playtests/PLAYTEST_01_v0.8.md
 playtests/PLAYTEST_02_v0.10.md
 ```
 
-## 17. Donjon et layouts
+## 18. Donjon et layouts
 
 Avant toute modification de layout ou de symboles :
 
@@ -489,7 +531,7 @@ Ne pas remplacer le visualiseur par un simple bloc ASCII, un format monospacé b
 
 Les anciennes sauvegardes peuvent conserver des layouts mémorisés. Pour tester un nouveau layout, utiliser une nouvelle partie ou réinitialiser la sauvegarde de test.
 
-## 18. Règles de design du jeu
+## 19. Règles de design du jeu
 
 Règles actuellement importantes :
 
@@ -502,80 +544,3 @@ enrichir d'abord la boucle complète existante avec des fonctionnalités
 préserver une part de difficulté liée à l'absence de suivi explicite
 privilégier les indices, feedbacks et couleurs de messages plutôt qu'une checklist
 ```
-
-## 19. Assets
-
-Ne pas traiter les halos blancs autour des portraits ou sprites comme un style voulu. Ce sont des artefacts à éviter.
-
-Pour les futurs assets :
-
-- fond transparent propre ;
-- contours sombres ou nets ;
-- pas de halo blanc ;
-- cohérence avec le style rétro sombre ;
-- prudence avec les variations trop fortes entre frames.
-
-## 20. Fichiers à ne pas pousser
-
-```text
-packs .zip générés
-README_PACK.md
-builds exportées
-*.exe
-*.pck
-*.zip
-logs bruts
-captures système complètes
-sauvegardes locales
-dossier .godot/
-build/
-dist/
-export/
-*.tmp
-*.bak
-```
-
-Les zips locaux de sécurité restent hors repo.
-
-## 21. Préparation de release
-
-Une release ne doit être préparée que lorsque l'utilisateur indique explicitement que la série de changements est validée ou qu'il souhaite préparer la release.
-
-Quand l'utilisateur valide qu'une série de changements est terminée :
-
-1. préparer un pack documentaire complet ;
-2. inclure le changelog de la version ;
-3. mettre à jour l'index du changelog ;
-4. mettre à jour `README.md` si la version publique ou les chemins changent ;
-5. mettre à jour `docs/informations/ROADMAP.md` ;
-6. mettre à jour `docs/informations/IDEAS.md` seulement si une idée doit être ajoutée/promue, ou si l'utilisateur confirme explicitement un retrait ;
-7. mettre à jour `docs/informations/TECHNICAL_DEBT.md` ;
-8. mettre à jour `IA_RELAIS.md` si la base de reprise change ;
-9. créer un audit d'état si utile ;
-10. fournir une note de release GitHub à copier.
-
-Toujours séparer :
-
-```text
-Nouveaux fichiers
-Fichiers mis à jour
-Fichiers à ne pas pousser
-Tests recommandés
-Titre de release conseillé
-Texte de release conseillé
-```
-
-## 22. Versioning
-
-Ne pas accélérer artificiellement vers `v1.0`.
-
-Le projet peut continuer ainsi :
-
-```text
-v0.9
-v0.10
-v0.11
-...
-```
-
-`v1.0` doit être réservé à une version réellement complète, stable, documentée et exportable proprement.

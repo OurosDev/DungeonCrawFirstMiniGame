@@ -1,13 +1,14 @@
 # ROADMAP — DungeonCrawFirstMiniGame
 
-Date de mise à jour : 2026-06-19  
-Version stable actuelle : `v0.10 — Grimoire de combat et ciblage des soins`
+Date de mise à jour : 2026-06-19
+
+Version stable actuelle : `v0.11 — Cadres UI NineSlice et correction Prêtre`
 
 ## Rôle du document
 
-Cette roadmap sert à conserver le cap du projet, la vision longue et une proposition de priorités pour les prochaines phases.
+Cette roadmap sert à conserver le cap du projet, la vision longue et une proposition de priorités pour les prochaines phases. Elle ne doit pas devenir une simple liste de toutes les idées possibles.
 
-Elle ne doit pas devenir une simple liste de toutes les idées possibles. Les idées non priorisées, reportées ou encore à discuter doivent être conservées dans :
+Les idées non priorisées, reportées ou encore à discuter doivent être conservées dans :
 
 ```text
 docs/informations/IDEAS.md
@@ -33,6 +34,7 @@ inventaire commun
 grimoires hors combat et combat
 sauvegarde / chargement
 contrôles souris + AZERTY
+interface texturée NineSlice
 Compatibility / OpenGL
 ```
 
@@ -51,6 +53,7 @@ Le contenu supplémentaire, comme l'étage 3, doit arriver seulement quand la bo
 - Enrichir d'abord les systèmes autour de la boucle déjà complète.
 - Préserver une interface jouable à la souris et au clavier AZERTY.
 - Préférer des fonctionnalités durables aux ajouts de contenu rapides.
+- Éviter les halos blancs et contours clairs non désirés.
 ```
 
 ## Versions récentes
@@ -94,13 +97,48 @@ Le contenu supplémentaire, comme l'étage 3, doit arriver seulement quand la bo
 - Journal Combat plus lisible : dégâts ennemis rouges, soins verts.
 ```
 
+### v0.11 — Cadres UI NineSlice et correction Prêtre
+
+```text
+- Texture de cadre UI NineSlice.
+- Cadres principaux, héros, viewport, journal et automap texturés.
+- Cadres et boutons des menus texturés.
+- Long cadre derrière les commandes retiré.
+- Base UI centralisée via UIFrameStyle.gd.
+- Correction du libellé de classe : Prêtre.
+```
+
 ## Prochaines phases proposées
 
 Ces phases sont une proposition d'ordre de travail. Elles peuvent évoluer, mais il faut conserver une vision de 3 à 5 étapes pour éviter de perdre le cap long terme.
 
-### Phase 1 — Playtest 02 post-v0.10
+### Phase 1 — Finition UI NineSlice et boutons dédiés
 
-Objectif : vérifier que la boucle complète reste stable après l'ajout des grimoires et du ciblage des soins en combat.
+Objectif : consolider le polish visuel introduit par `v0.11`.
+
+Pistes :
+
+```text
+- créer une texture dédiée aux boutons ;
+- vérifier tous les états hover / pressed / disabled ;
+- améliorer éventuellement les cadres actifs, dégâts, soin et sélection ;
+- harmoniser les marges internes des panneaux ;
+- vérifier le rendu en résolution native et en stretch ;
+- conserver la lisibilité en basse résolution.
+```
+
+Points de vigilance :
+
+```text
+- ne pas casser le scaling canvas_items + keep ;
+- ne pas rendre les cadres trop chargés ;
+- ne pas réduire la lisibilité des textes ;
+- garder les boutons immédiatement reconnaissables et cliquables.
+```
+
+### Phase 2 — Playtest 02 post-v0.11
+
+Objectif : vérifier que la boucle complète reste stable après l'ajout des grimoires, du ciblage des soins et du nouveau rendu UI.
 
 À tester :
 
@@ -111,8 +149,10 @@ soins hors combat
 soins en combat
 prévisualisation PV/PM
 combat mage
-combat prêtresse
+combat prêtre
 journal Combat coloré
+boutons texturés
+menus texturés
 victoire
 fuite
 K.O.
@@ -126,36 +166,10 @@ changement d'étage
 Sortie attendue :
 
 ```text
-playtests/PLAYTEST_02_v0.10.md
+playtests/PLAYTEST_02_v0.11.md
 ```
 
 Ne pas pousser les logs bruts, builds exportées ou sauvegardes locales.
-
-### Phase 2 — Refonte visuelle UI par NinePatch / NineSlice
-
-Objectif : améliorer l'identité visuelle et la lisibilité de l'interface sans changer le gameplay.
-
-Cette phase doit remettre au premier plan la modernisation visuelle des cadres, qui fait partie de la vision long terme.
-
-Pistes :
-
-```text
-- créer ou intégrer un ninesheet / atlas de cadres texturés ;
-- appliquer des NinePatchRect ou équivalents aux panneaux principaux ;
-- harmoniser les cadres du menu, combat, inventaire, grimoire et statut ;
-- conserver la lisibilité en basse résolution ;
-- éviter les halos blancs et artefacts de découpe ;
-- garder une structure facile à modifier plus tard.
-```
-
-Points de vigilance :
-
-```text
-- ne pas casser le scaling canvas_items + keep ;
-- ne pas réduire la lisibilité des textes ;
-- ne pas rendre les cadres trop chargés visuellement ;
-- tester souris, clavier et redimensionnement fenêtre.
-```
 
 ### Phase 3 — Progression magique plus riche
 
@@ -261,9 +275,9 @@ Le projet reste en pré-1.0. Ne pas accélérer artificiellement vers `v1.0`.
 Les versions peuvent continuer ainsi :
 
 ```text
-v0.10
 v0.11
 v0.12
+v0.13
 ...
 ```
 

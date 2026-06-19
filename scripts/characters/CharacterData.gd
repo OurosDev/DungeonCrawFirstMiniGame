@@ -28,6 +28,7 @@ var stats = null
 
 var hp: int = 1
 var max_hp: int = 1
+
 var mp: int = 0
 var max_mp: int = 0
 
@@ -49,7 +50,8 @@ func _init(
 	p_magic_power: int = 1
 ) -> void:
 	character_name = p_character_name
-	job = p_job
+	job = ClassDatabaseScript.normalize_class_name(p_job)
+
 	base_stats = StatBlockScript.new(
 		p_strength,
 		p_agility,
@@ -57,8 +59,10 @@ func _init(
 		p_magic_power
 	)
 	stats = base_stats.create_copy()
+
 	equipped_items = EquipmentRulesScript.create_empty_equipment()
 	equipment_bonuses = create_empty_bonus_dictionary()
+
 	recalculate_equipment_stats()
 	recalculate_derived_stats(true)
 
@@ -68,7 +72,12 @@ func _init(
 # Fournit les données de classe et les capacités disponibles.
 # ------------------------------------------------------------
 
+func normalize_job_name() -> void:
+	job = ClassDatabaseScript.normalize_class_name(job)
+
+
 func get_class_data():
+	normalize_job_name()
 	return ClassDatabaseScript.get_class_data(job)
 
 
@@ -230,8 +239,8 @@ func create_empty_bonus_dictionary() -> Dictionary:
 	return {
 		"strength": 0,
 		"agility": 0,
-		"endurance": 0,
-		"magic_power": 0
+		"magic_power": 0,
+		"endurance": 0
 	}
 
 
@@ -252,6 +261,7 @@ func set_equipped_item(slot_id: String, item_id: String) -> void:
 		return
 
 	equipped_items[slot_id] = item_id.strip_edges().to_lower()
+
 	recalculate_equipment_stats()
 	recalculate_derived_stats(false)
 
@@ -267,7 +277,6 @@ func get_equipment_save_data() -> Dictionary:
 
 	for slot_id in EquipmentRulesScript.get_slot_order():
 		var item_id: String = str(equipped_items.get(slot_id, ""))
-
 		if item_id == "":
 			continue
 
@@ -404,8 +413,10 @@ func gain_exp(amount: int) -> String:
 
 func level_up() -> String:
 	level += 1
+
 	apply_level_growth()
 	recalculate_derived_stats(true)
+
 	exp_to_next = int(float(exp_to_next) * 1.4)
 
 	return character_name + " atteint le niveau " + str(level) + " !"
@@ -413,25 +424,24 @@ func level_up() -> String:
 
 func apply_level_growth() -> void:
 	ensure_stat_blocks()
+	normalize_job_name()
 
-	if job == "Guerrier":
+	if job == ClassDatabaseScript.JOB_WARRIOR:
 		base_stats.strength += 1
 		base_stats.endurance += 1
-	elif job == "Voleuse":
+	elif job == ClassDatabaseScript.JOB_THIEF:
 		base_stats.agility += 1
-
 		if randi_range(1, 2) == 1:
 			base_stats.strength += 1
 		else:
 			base_stats.endurance += 1
-	elif job == "Mage":
+	elif job == ClassDatabaseScript.JOB_MAGE:
 		base_stats.magic_power += 1
-
 		if randi_range(1, 2) == 1:
 			base_stats.agility += 1
 		else:
 			base_stats.endurance += 1
-	elif job == "Prêtresse":
+	elif job == ClassDatabaseScript.JOB_CLERIC:
 		base_stats.magic_power += 1
 		base_stats.endurance += 1
 	else:

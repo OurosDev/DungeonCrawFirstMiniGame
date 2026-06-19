@@ -6,6 +6,7 @@ extends Node
 # ------------------------------------------------------------
 
 const CharacterDataScript = preload("res://scripts/characters/CharacterData.gd")
+const ClassDatabaseScript = preload("res://scripts/characters/ClassDatabase.gd")
 const StatBlockScript = preload("res://scripts/core/StatBlock.gd")
 
 
@@ -49,7 +50,6 @@ func save_game_from_dungeon(dungeon) -> bool:
 		dungeon.store_current_floor_state()
 
 	var save_data: Dictionary = {}
-
 	save_data["version"] = 5
 	save_data["current_floor_id"] = dungeon.current_floor_id
 	save_data["party"] = serialize_party(dungeon.party)
@@ -135,7 +135,9 @@ func serialize_hero(hero) -> Dictionary:
 	var data: Dictionary = {}
 
 	data["character_name"] = get_string_property(hero, "character_name", "Héros")
-	data["job"] = get_string_property(hero, "job", "")
+	data["job"] = ClassDatabaseScript.normalize_class_name(
+		get_string_property(hero, "job", "")
+	)
 	data["level"] = get_int_property(hero, "level", 1)
 	data["exp"] = get_int_property(hero, "exp", 0)
 	data["exp_to_next"] = get_int_property(hero, "exp_to_next", 100)
@@ -201,7 +203,9 @@ func deserialize_hero(data: Dictionary):
 	var hero = CharacterDataScript.new()
 
 	hero.character_name = str(data.get("character_name", "Héros"))
-	hero.job = str(data.get("job", "Guerrier"))
+	hero.job = ClassDatabaseScript.normalize_class_name(
+		str(data.get("job", ClassDatabaseScript.JOB_WARRIOR))
+	)
 	hero.level = int(data.get("level", 1))
 
 	if object_has_property(hero, "exp"):

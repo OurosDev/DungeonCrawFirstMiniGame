@@ -2,16 +2,19 @@
 
 Date de mise à jour : 2026-06-19
 
-Base de reprise : `v0.10 — Grimoire de combat et ciblage des soins`
+Base de reprise : `v0.11 — Cadres UI NineSlice et correction Prêtre`
 
 ## Prompt court de reprise
 
 ```text
 Nous continuons le projet Godot public DungeonCrawFirstMiniGame.
+
 Lis d'abord IA_RELAIS.md puis ASSISTANT_WORKFLOW.md.
 Ensuite vérifie l'état actuel du repo GitHub sur main, les changelogs, les audits, la roadmap, les documents dungeon et les playtests.
+
 Travaille en français, signale les incohérences, et fournis des packs complets de fichiers à remplacer quand tu modifies le projet.
-La base récente est v0.10 : grimoire de combat, sorts actifs temporaires, soin en combat par sélection de cadres, prévisualisation PV/PM, journal Combat coloré, sans changement volontaire de sauvegarde.
+
+La base récente est v0.11 : amélioration visuelle de l'UI par texture NineSlice, cadres principaux et boutons texturés, menus harmonisés, long cadre de commandes supprimé derrière les boutons, et correction du libellé de classe Prêtre.
 ```
 
 ## État actuel confirmé
@@ -35,6 +38,7 @@ sauvegarde / chargement
 contrôles souris et clavier AZERTY
 grimoire hors combat
 grimoire de combat
+interface principale texturée par NineSlice
 ```
 
 ## Versions récentes
@@ -42,11 +46,30 @@ grimoire de combat
 ```text
 v0.8.1 — Stabilisation playtest et scaling fenêtre
 v0.8.2 — Refactorisations internes et stabilisation technique
-v0.9   — Grimoire hors combat et sélection de cible
-v0.10  — Grimoire de combat et ciblage des soins
+v0.9 — Grimoire hors combat et sélection de cible
+v0.10 — Grimoire de combat et ciblage des soins
+v0.11 — Cadres UI NineSlice et correction Prêtre
 ```
 
-## Points v0.10 validés
+## Points v0.11 validés
+
+```text
+- ajout de l'asset assets/ui/frames/texture_cadre_ui.png ;
+- création du helper scripts/ui/theme/UIFrameStyle.gd ;
+- application du cadre NineSlice aux panneaux principaux ;
+- application de la texture aux cadres des héros ;
+- application de la texture au viewport, au journal et à l'automap ;
+- application de la texture aux boutons principaux ;
+- application de la texture aux cadres et boutons des menus ;
+- suppression du long cadre derrière les commandes d'exploration ;
+- suppression du long cadre derrière les commandes de combat ;
+- lisibilité générale conservée ;
+- boutons encore utilisables, même si une texture dédiée aux boutons reste souhaitable plus tard ;
+- correction de la classe d'Eldric : Prêtre au lieu de Prêtresse ;
+- compatibilité des anciennes sauvegardes via normalisation du nom de classe.
+```
+
+## Points v0.10 conservés
 
 ```text
 - bouton Grimoire pendant le combat ;
@@ -87,6 +110,26 @@ v0.10  — Grimoire de combat et ciblage des soins
 - Les informations importantes passent plutôt par le canal de messages, avec variations de couleur si utile.
 - Ne pas viser l'étage 3 comme priorité immédiate.
 - Enrichir d'abord la boucle complète existante avec des fonctionnalités.
+- Éviter les contours blancs et halos clairs sur les assets.
+```
+
+## UI NineSlice
+
+État actuel :
+
+```text
+asset principal : assets/ui/frames/texture_cadre_ui.png
+helper : scripts/ui/theme/UIFrameStyle.gd
+panneaux : marge NineSlice 16 px
+boutons : marge NineSlice réduite 8 px
+```
+
+Évolution future probable :
+
+```text
+texture dédiée aux boutons
+éventuelle variante de cadre pour certains états actifs
+éventuel atlas/ninesheet si plusieurs familles de cadres apparaissent
 ```
 
 ## Sorts et grimoires
@@ -133,10 +176,11 @@ PartyCreationUI.gd -> scripts/ui/party_creation/*
 ASSISTANT_WORKFLOW.md
 README.md
 CHANGELOG/README.md
-CHANGELOG/v0.10.md
-audits/STATE_AUDITv0.10.md
+CHANGELOG/v0.11.md
+audits/STATE_AUDITv0.11.md
 docs/informations/ROADMAP.md
 docs/informations/TECHNICAL_DEBT.md
+docs/informations/IDEAS.md
 docs/dungeon/FLOOR_DESIGN.md
 docs/dungeon/FLOOR_VISUALIZER.md
 playtests/README.md
@@ -149,6 +193,8 @@ playtests/README.md
 - Vérifier main avant de modifier.
 - Si plusieurs fichiers sont concernés, fournir un pack complet en priorité.
 - Pour les refactorisations : scripts d'abord, tests locaux, zip local côté utilisateur, documentation seulement au moment de la release.
+- Les fichiers locaux fournis explicitement par l'utilisateur sont prioritaires pour la tâche en cours.
+- Cette priorité locale n'exclut pas la consultation, l'utilisation ou la modification des fichiers du repo GitHub lorsque c'est pertinent.
 - Si un fichier GitHub semble obsolète, trop long ou incertain, demander le fichier local à l'utilisateur.
 - Ne pas pousser les packs zip, builds, logs bruts ou sauvegardes locales.
 ```

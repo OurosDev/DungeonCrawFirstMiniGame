@@ -1,4 +1,5 @@
 extends RefCounted
+class_name ClassDatabase
 
 # ------------------------------------------------------------
 # ClassDatabase
@@ -16,23 +17,58 @@ extends RefCounted
 # - un niveau minimum
 # - une découverte dans le labyrinthe
 
-
 const ClassDataScript = preload("res://scripts/characters/ClassData.gd")
 
+# ------------------------------------------------------------
+# CONSTANTES
+# Définit les noms canoniques des classes.
+# ------------------------------------------------------------
+
+const JOB_WARRIOR: String = "Guerrier"
+const JOB_THIEF: String = "Voleuse"
+const JOB_MAGE: String = "Mage"
+const JOB_CLERIC: String = "Prêtre"
+
+
+# ------------------------------------------------------------
+# LISTE DES CLASSES
+# Expose uniquement les noms corrigés/canoniques.
+# ------------------------------------------------------------
 
 static func get_available_class_names() -> Array[String]:
 	return [
-		"Guerrier",
-		"Voleuse",
-		"Mage",
-		"Prêtresse"
+		JOB_WARRIOR,
+		JOB_THIEF,
+		JOB_MAGE,
+		JOB_CLERIC
 	]
 
 
+# ------------------------------------------------------------
+# NORMALISATION
+# Corrige les anciens libellés sauvegardés ou assignés avant le hotfix.
+# ------------------------------------------------------------
+
+static func normalize_class_name(job_name: String) -> String:
+	var normalized_name: String = job_name.strip_edges()
+
+	if normalized_name.begins_with("Prêtr"):
+		return JOB_CLERIC
+
+	return normalized_name
+
+
+# ------------------------------------------------------------
+# DONNÉES DE CLASSE
+# Retourne les caractéristiques associées à chaque classe.
+# ------------------------------------------------------------
+
 static func get_class_data(job_name: String):
-	if job_name == "Guerrier":
+	var normalized_name: String = normalize_class_name(job_name)
+
+	if normalized_name == JOB_WARRIOR:
 		return ClassDataScript.new(
-			"Guerrier",
+			JOB_WARRIOR,
 			"GUE",
 			14,
 			0,
@@ -45,9 +81,9 @@ static func get_class_data(job_name: String):
 			"Avantages : HP élevés, bons dégâts physiques, bon équipement.\nInconvénients : pas de magie."
 		)
 
-	if job_name == "Voleuse":
+	if normalized_name == JOB_THIEF:
 		return ClassDataScript.new(
-			"Voleuse",
+			JOB_THIEF,
 			"VOL",
 			10,
 			0,
@@ -60,9 +96,9 @@ static func get_class_data(job_name: String):
 			"Avantages : bonne Agilité, utile plus tard pour pièges et coffres.\nInconvénients : moins résistante qu'un Guerrier."
 		)
 
-	if job_name == "Mage":
+	if normalized_name == JOB_MAGE:
 		return ClassDataScript.new(
-			"Mage",
+			JOB_MAGE,
 			"MAG",
 			6,
 			8,
@@ -75,9 +111,9 @@ static func get_class_data(job_name: String):
 			"Avantages : magie offensive, beaucoup de MP si MAG élevée.\nInconvénients : HP faibles, équipement limité."
 		)
 
-	if job_name == "Prêtresse":
+	if normalized_name == JOB_CLERIC:
 		return ClassDataScript.new(
-			"Prêtresse",
+			JOB_CLERIC,
 			"PRE",
 			9,
 			6,
@@ -91,8 +127,8 @@ static func get_class_data(job_name: String):
 		)
 
 	return ClassDataScript.new(
-		job_name,
-		job_name,
+		normalized_name,
+		normalized_name,
 		8,
 		0,
 		0,

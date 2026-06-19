@@ -6,7 +6,7 @@ Le projet sert aussi de terrain d'apprentissage pour la gestion d'un petit proje
 
 ## État actuel
 
-Version stable récente : `v0.10 — Grimoire de combat et ciblage des soins`.
+Version stable récente : `v0.11 — Cadres UI NineSlice et correction Prêtre`.
 
 Cette base contient une première boucle jouable :
 
@@ -27,9 +27,11 @@ Cette base contient une première boucle jouable :
 - grimoire de combat lié au héros actif ;
 - sorts actifs temporaires réinitialisés à chaque combat ;
 - soin en combat avec ciblage direct par cadres ;
-- journal Combat coloré pour distinguer dégâts ennemis et soins.
+- journal Combat coloré pour distinguer dégâts ennemis et soins ;
+- cadres et boutons principaux de l'interface habillés avec une texture NineSlice sombre ;
+- correction du libellé de classe `Prêtre` pour Eldric.
 
-`v0.10` ajoute une amélioration de gameplay centrée sur le combat magique. Le jeu ne propose pas de journal de quête ni d'objets consommables à ce stade.
+`v0.11` améliore principalement l'identité visuelle de l'interface sans changer la boucle de gameplay. La version ajoute aussi un petit hotfix de cohérence de libellé : la classe d'Eldric est désormais `Prêtre`. Le jeu ne propose pas de journal de quête ni d'objets consommables à ce stade.
 
 ## Renderer et affichage
 
@@ -46,7 +48,9 @@ window/stretch/scale_mode="fractional"
 renderer/rendering_method="gl_compatibility"
 ```
 
-Pour les builds Windows destinées aux testeurs, utiliser `Compatibility / OpenGL` par défaut. Cette règle vient du premier playtest externe : les builds modernes `Forward+ / D3D12` ou Vulkan pouvaient provoquer des crashs natifs sur une machine Intel UHD Graphics, alors que la build `Compatibility / OpenGL` a fonctionné.
+Pour les builds Windows destinées aux testeurs, utiliser `Compatibility / OpenGL` par défaut.
+
+Cette règle vient du premier playtest externe : les builds modernes `Forward+ / D3D12` ou Vulkan pouvaient provoquer des crashs natifs sur une machine Intel UHD Graphics, alors que la build `Compatibility / OpenGL` a fonctionné.
 
 ## Contrôles
 
@@ -72,17 +76,13 @@ Selon le héros actif, les commandes peuvent inclure :
 - `Grimoire`
 - `Fuir`
 
-Le bouton `Grimoire` permet au héros actif de vérifier ou changer son sort actif temporaire. Changer réellement de sort actif consomme l'action du tour ; valider le sort déjà actif ou revenir en arrière ne consomme pas le tour.
+Le bouton `Grimoire` permet au héros actif de vérifier ou changer son sort actif temporaire.
 
-Le bouton `Magie` lance directement le sort offensif actif. Le bouton `Soin` lance directement le sort de soin actif et passe en sélection de cible par cadres.
-
-Un clic peut aussi valider certains messages d'attente, notamment après l'affichage de dégâts.
+Changer réellement de sort actif consomme l'action du tour ; valider le sort déjà actif ou revenir en arrière ne consomme pas le tour. Le bouton `Magie` lance directement le sort offensif actif. Le bouton `Soin` lance directement le sort de soin actif et passe en sélection de cible par cadres. Un clic peut aussi valider certains messages d'attente, notamment après l'affichage de dégâts.
 
 ### Grimoire et sélection de cible
 
-Depuis le menu en jeu, le grimoire hors combat permet d'utiliser certains sorts hors combat.
-
-En combat, le grimoire est distinct : il est propre au héros actif et sert à gérer son sort actif temporaire pour le combat en cours.
+Depuis le menu en jeu, le grimoire hors combat permet d'utiliser certains sorts hors combat. En combat, le grimoire est distinct : il est propre au héros actif et sert à gérer son sort actif temporaire pour le combat en cours.
 
 Pour la sélection de cible :
 
@@ -93,13 +93,23 @@ Pour la sélection de cible :
 
 La cible reçoit une bordure verte et une prévisualisation du soin prévu sur sa barre de PV. Le lanceur affiche une prévisualisation du coût en PM sur sa barre de mana.
 
+## Interface
+
+L'interface principale utilise maintenant une texture de cadre NineSlice :
+
+```text
+assets/ui/frames/texture_cadre_ui.png
+```
+
+Cette texture est appliquée aux cadres principaux de jeu, aux cadres de héros, au viewport, au journal, à l'automap, aux menus et aux boutons principaux. Les boutons restent lisibles avec la texture actuelle, mais une variante dédiée aux boutons pourra être créée plus tard pour un rendu plus propre.
+
 ## Organisation du dépôt
 
 ```text
 CHANGELOG/                 Historique des versions
 audits/                    Audits d'état du dépôt
 docs/dungeon/              Documents de conception et visualisation des étages
-docs/informations/         Roadmap et dette technique
+docs/informations/         Roadmap, idées et dette technique
 playtests/                 Synthèses propres des sessions de test
 scenes/                    Scènes Godot
 scripts/                   Scripts GDScript organisés par domaine
@@ -112,6 +122,7 @@ Fichiers de pilotage importants :
 - `ASSISTANT_WORKFLOW.md` : règles de collaboration et de préparation des packs ;
 - `docs/informations/ROADMAP.md` : direction actuelle du projet ;
 - `docs/informations/TECHNICAL_DEBT.md` : refactorisations et dette technique ;
+- `docs/informations/IDEAS.md` : réserve d'idées non priorisées ou reportées ;
 - `CHANGELOG/README.md` : index des versions ;
 - `playtests/README.md` : règles de documentation des playtests.
 
@@ -133,4 +144,4 @@ Les changements sont préparés par petits lots testables. Pour les refactorisat
 
 Une grande partie du projet est produite ou organisée avec assistance IA. Les SFX utilisés proviennent de sources CC0 indiquées localement par le développeur.
 
-Les contours blancs ou halos autour des portraits, personnages ou monstres ne font pas partie du style souhaité : ils doivent être évités dans les futurs assets.
+Les contours blancs ou halos autour des portraits, personnages, monstres, cadres ou assets UI ne font pas partie du style souhaité : ils doivent être évités dans les futurs assets.
