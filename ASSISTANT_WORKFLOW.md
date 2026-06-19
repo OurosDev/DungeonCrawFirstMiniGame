@@ -1,7 +1,6 @@
 # ASSISTANT_WORKFLOW — DungeonCrawFirstMiniGame
 
-Date de mise à jour : 2026-06-19
-
+Date de mise à jour : 2026-06-19  
 Version de référence : `v0.10 — Grimoire de combat et ciblage des soins`
 
 ## 1. Règle de démarrage d'une conversation
@@ -22,6 +21,7 @@ CHANGELOG/README.md
 CHANGELOG/v0.10.md
 audits/STATE_AUDITv0.10.md
 docs/informations/ROADMAP.md
+docs/informations/IDEAS.md
 docs/informations/TECHNICAL_DEBT.md
 docs/dungeon/FLOOR_DESIGN.md
 docs/dungeon/FLOOR_VISUALIZER.md
@@ -54,7 +54,7 @@ Ordre de confiance recommandé :
 3. Audit d'état le plus récent
 4. Changelog de version
 5. IA_RELAIS.md
-6. ROADMAP.md / TECHNICAL_DEBT.md
+6. ROADMAP.md / TECHNICAL_DEBT.md / IDEAS.md
 7. Mémoire de conversation
 ```
 
@@ -234,7 +234,9 @@ Fonctionnalités conservées :
 - canal de messages coloré pour les messages importants.
 ```
 
-Le grimoire ne doit pas devenir un journal de quête. Les informations importantes peuvent être mieux colorées dans le canal de messages existant, mais sans checklist ni suivi d'objectifs explicite.
+Le grimoire ne doit pas devenir un journal de quête.
+
+Les informations importantes peuvent être mieux colorées dans le canal de messages existant, mais sans checklist ni suivi d'objectifs explicite.
 
 ## 10. Base technique héritée de v0.8.2
 
@@ -279,6 +281,7 @@ Documents à surveiller en priorité :
 
 ```text
 docs/informations/ROADMAP.md
+docs/informations/IDEAS.md
 docs/informations/TECHNICAL_DEBT.md
 docs/dungeon/FLOOR_DESIGN.md
 docs/dungeon/FLOOR_VISUALIZER.md
@@ -290,6 +293,7 @@ audits/STATE_AUDITvX.Y.md
 Rôle de ces documents :
 
 - `ROADMAP.md` oriente les priorités et évite de partir vers une piste contraire à la direction actuelle ;
+- `IDEAS.md` conserve les idées longues, non priorisées ou reportées sans les perdre ;
 - `TECHNICAL_DEBT.md` garde les risques connus, refactorisations utiles et points à éviter ;
 - les audits donnent une photographie fiable de l'état réel du repo à une version donnée ;
 - les documents `docs/dungeon/` encadrent les layouts, symboles et visualisations ;
@@ -297,7 +301,52 @@ Rôle de ces documents :
 
 Si un document est en retard mais que la tâche actuelle ne nécessite pas de le corriger immédiatement, le signaler et reporter sa mise à jour à la prochaine release ou passe documentaire.
 
-## 12. Tests recommandés par type de pack
+## 12. ROADMAP.md et IDEAS.md
+
+`docs/informations/ROADMAP.md` et `docs/informations/IDEAS.md` ont des rôles distincts.
+
+```text
+ROADMAP.md = cap, vision, prochaines phases probables, priorités.
+IDEAS.md = boîte à idées, pistes non priorisées, envies à ne pas perdre.
+```
+
+### Mise à jour de ROADMAP.md
+
+L'assistant peut modifier la roadmap sans demander une confirmation spécifique à chaque fois, mais il doit respecter ces règles :
+
+- conserver une vision long terme, pas seulement l'état de la dernière release ;
+- conserver une proposition de 3 à 5 prochaines phases quand c'est pertinent ;
+- ne pas supprimer silencieusement une direction importante déjà discutée ;
+- si une idée quitte la roadmap parce qu'elle n'est plus prioritaire, la conserver ou la déplacer dans `IDEAS.md` ;
+- garder les contraintes de design actuelles visibles : pas de consommables, pas de journal de quête, pas d'étage 3 immédiat ;
+- garder les priorités cohérentes avec `TECHNICAL_DEBT.md`, les audits et les playtests ;
+- ne pas transformer la roadmap en simple changelog ;
+- ne pas transformer la roadmap en boîte à idées exhaustive.
+
+Avant de modifier `ROADMAP.md`, relire au minimum :
+
+```text
+docs/informations/ROADMAP.md
+docs/informations/IDEAS.md
+docs/informations/TECHNICAL_DEBT.md
+CHANGELOG/README.md
+l'audit le plus récent si disponible
+```
+
+### Mise à jour de IDEAS.md
+
+`IDEAS.md` est conservateur : il sert à ne pas perdre les idées.
+
+Règles strictes :
+
+- ne jamais effacer une idée par simple nettoyage ;
+- ne retirer une idée que si la fonctionnalité / action / modification a bien été effectuée et que l'utilisateur confirme explicitement son retrait du fichier ;
+- si une idée devient prioritaire, elle peut être copiée ou promue dans `ROADMAP.md` sans être automatiquement supprimée de `IDEAS.md` ;
+- si une idée devient moins pertinente, la déplacer dans une section reportée ou à discuter plutôt que la supprimer ;
+- ajouter les nouvelles idées dans une section claire, même si elles ne sont pas prioritaires ;
+- ne pas présenter le contenu de `IDEAS.md` comme une promesse de développement.
+
+## 13. Tests recommandés par type de pack
 
 L'assistant doit proposer des tests adaptés au type de modification.
 
@@ -365,7 +414,7 @@ automap
 rencontres aléatoires
 ```
 
-## 13. Renderer et builds de test
+## 14. Renderer et builds de test
 
 La base `v0.8.1` reste valide pour le renderer :
 
@@ -385,7 +434,7 @@ Règles :
 - ne pas pousser les logs bruts ;
 - documenter seulement des synthèses nettoyées dans `playtests/`.
 
-## 14. Documentation et chemins actuels
+## 15. Documentation et chemins actuels
 
 Chemins actuels importants :
 
@@ -397,6 +446,7 @@ CHANGELOG/README.md
 CHANGELOG/vX.Y.md
 audits/STATE_AUDITvX.Y.md
 docs/informations/ROADMAP.md
+docs/informations/IDEAS.md
 docs/informations/TECHNICAL_DEBT.md
 docs/dungeon/FLOOR_DESIGN.md
 docs/dungeon/FLOOR_VISUALIZER.md
@@ -404,9 +454,9 @@ playtests/README.md
 playtests/PLAYTEST_XX_vX.Y.md
 ```
 
-`ROADMAP.md` et `TECHNICAL_DEBT.md` doivent être considérés comme localisés dans `docs/informations/`, pas à la racine.
+`ROADMAP.md`, `IDEAS.md` et `TECHNICAL_DEBT.md` doivent être considérés comme localisés dans `docs/informations/`, pas à la racine.
 
-## 15. Gestion des playtests
+## 16. Gestion des playtests
 
 Les playtests doivent être documentés dans `playtests/`.
 
@@ -425,7 +475,7 @@ playtests/PLAYTEST_01_v0.8.md
 playtests/PLAYTEST_02_v0.10.md
 ```
 
-## 16. Donjon et layouts
+## 17. Donjon et layouts
 
 Avant toute modification de layout ou de symboles :
 
@@ -439,7 +489,7 @@ Ne pas remplacer le visualiseur par un simple bloc ASCII, un format monospacé b
 
 Les anciennes sauvegardes peuvent conserver des layouts mémorisés. Pour tester un nouveau layout, utiliser une nouvelle partie ou réinitialiser la sauvegarde de test.
 
-## 17. Règles de design du jeu
+## 18. Règles de design du jeu
 
 Règles actuellement importantes :
 
@@ -453,7 +503,7 @@ préserver une part de difficulté liée à l'absence de suivi explicite
 privilégier les indices, feedbacks et couleurs de messages plutôt qu'une checklist
 ```
 
-## 18. Assets
+## 19. Assets
 
 Ne pas traiter les halos blancs autour des portraits ou sprites comme un style voulu. Ce sont des artefacts à éviter.
 
@@ -465,7 +515,7 @@ Pour les futurs assets :
 - cohérence avec le style rétro sombre ;
 - prudence avec les variations trop fortes entre frames.
 
-## 19. Fichiers à ne pas pousser
+## 20. Fichiers à ne pas pousser
 
 ```text
 packs .zip générés
@@ -487,7 +537,7 @@ export/
 
 Les zips locaux de sécurité restent hors repo.
 
-## 20. Préparation de release
+## 21. Préparation de release
 
 Une release ne doit être préparée que lorsque l'utilisateur indique explicitement que la série de changements est validée ou qu'il souhaite préparer la release.
 
@@ -498,10 +548,11 @@ Quand l'utilisateur valide qu'une série de changements est terminée :
 3. mettre à jour l'index du changelog ;
 4. mettre à jour `README.md` si la version publique ou les chemins changent ;
 5. mettre à jour `docs/informations/ROADMAP.md` ;
-6. mettre à jour `docs/informations/TECHNICAL_DEBT.md` ;
-7. mettre à jour `IA_RELAIS.md` si la base de reprise change ;
-8. créer un audit d'état si utile ;
-9. fournir une note de release GitHub à copier.
+6. mettre à jour `docs/informations/IDEAS.md` seulement si une idée doit être ajoutée/promue, ou si l'utilisateur confirme explicitement un retrait ;
+7. mettre à jour `docs/informations/TECHNICAL_DEBT.md` ;
+8. mettre à jour `IA_RELAIS.md` si la base de reprise change ;
+9. créer un audit d'état si utile ;
+10. fournir une note de release GitHub à copier.
 
 Toujours séparer :
 
@@ -514,7 +565,7 @@ Titre de release conseillé
 Texte de release conseillé
 ```
 
-## 21. Versioning
+## 22. Versioning
 
 Ne pas accélérer artificiellement vers `v1.0`.
 

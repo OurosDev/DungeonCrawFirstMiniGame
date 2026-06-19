@@ -1,153 +1,262 @@
 # ROADMAP — DungeonCrawFirstMiniGame
 
-Date de mise à jour : 2026-06-19
-
+Date de mise à jour : 2026-06-19  
 Version stable actuelle : `v0.10 — Grimoire de combat et ciblage des soins`
 
-## Vision actuelle
+## Rôle du document
 
-Le projet doit continuer à enrichir la boucle jouable complète existante plutôt que viser trop vite du contenu supplémentaire.
+Cette roadmap sert à conserver le cap du projet, la vision longue et une proposition de priorités pour les prochaines phases.
 
-La priorité n'est pas l'étage 3, ni l'ajout de consommables. La priorité est de consolider les systèmes qui rendent les deux premiers étages plus intéressants : magie, grimoire, lisibilité, événements, progression par objets clés, équipement, feedbacks et playtests.
-
-## Base jouable actuelle
+Elle ne doit pas devenir une simple liste de toutes les idées possibles. Les idées non priorisées, reportées ou encore à discuter doivent être conservées dans :
 
 ```text
-création d'équipe
-exploration de deux étages
-portes / temples / boutiques
-coffres / messages
-clé du gardien
-porte verrouillée
+docs/informations/IDEAS.md
+```
+
+Règle importante : lorsqu'une idée sort de la roadmap parce qu'elle n'est pas prioritaire, elle doit être déplacée ou conservée dans `IDEAS.md` plutôt que supprimée définitivement.
+
+## Vision du projet
+
+`DungeonCrawFirstMiniGame` est un dungeon crawler rétro en vue subjective, inspiré par l'esprit NES / Swords and Serpents, avec une boucle volontairement lisible mais exigeante.
+
+La priorité actuelle n'est pas de multiplier trop vite le contenu brut. Le projet doit d'abord enrichir et consolider la boucle complète déjà jouable :
+
+```text
+création de groupe
+exploration étage 1 / étage 2
+portes, temples, boutiques, coffres, messages
+objets clés de quête
 boss fixe du gardien
 combat tour par tour
 inventaire commun
 équipement
-grimoire hors combat
-grimoire de combat
+grimoires hors combat et combat
 sauvegarde / chargement
 contrôles souris + AZERTY
 Compatibility / OpenGL
+```
+
+Le contenu supplémentaire, comme l'étage 3, doit arriver seulement quand la boucle actuelle est suffisamment riche, stable et agréable à rejouer.
+
+## Principes de design
+
+```text
+- Pas d'objets consommables pour le moment.
+- Pas de potions pour le moment.
+- L'inventaire doit rester centré sur l'équipement, l'or et les objets clés.
+- Pas de journal de quête ni moniteur d'objectif explicite.
+- L'absence de suivi de quête fait partie de la difficulté voulue.
+- Les indices doivent passer par le donjon, les messages, les couleurs et les feedbacks.
+- Ne pas viser l'étage 3 comme priorité immédiate.
+- Enrichir d'abord les systèmes autour de la boucle déjà complète.
+- Préserver une interface jouable à la souris et au clavier AZERTY.
+- Préférer des fonctionnalités durables aux ajouts de contenu rapides.
 ```
 
 ## Versions récentes
 
 ### v0.8.1 — Stabilisation playtest et scaling fenêtre
 
-- Renderer `Compatibility / OpenGL`.
-- Scaling fenêtre `canvas_items + keep`.
+```text
+- Renderer Compatibility / OpenGL.
+- Scaling fenêtre canvas_items + keep.
 - Playtest 01 documenté.
 - Logs et builds hors repo.
+```
 
 ### v0.8.2 — Refactorisations internes et stabilisation technique
 
+```text
 - Refactorisation du menu en jeu.
 - Refactorisation du combat.
 - Refactorisation du donjon.
-- Refactorisation de `GameSession`.
+- Refactorisation de GameSession.
 - Refactorisation de la création d'équipe.
+```
 
 ### v0.9 — Grimoire hors combat et sélection de cible
 
+```text
 - Grimoire hors combat.
 - Soins hors combat.
 - Sélection de cible par cadres de héros.
 - Prévisualisation PV/PM.
 - Messages importants plus lisibles.
+```
 
 ### v0.10 — Grimoire de combat et ciblage des soins
 
+```text
 - Grimoire de combat propre au héros actif.
 - Sorts actifs temporaires réinitialisés à chaque combat.
-- `Magie` et `Soin` en actions directes.
+- Magie et Soin en actions directes.
 - Soin en combat avec sélection par cadres.
 - Journal Combat plus lisible : dégâts ennemis rouges, soins verts.
+```
 
-## Priorités recommandées à court terme
+## Prochaines phases proposées
 
-### 1. Playtest ciblé post-v0.10
+Ces phases sont une proposition d'ordre de travail. Elles peuvent évoluer, mais il faut conserver une vision de 3 à 5 étapes pour éviter de perdre le cap long terme.
 
-Objectif : vérifier que la boucle complète reste stable avec le grimoire de combat.
+### Phase 1 — Playtest 02 post-v0.10
+
+Objectif : vérifier que la boucle complète reste stable après l'ajout des grimoires et du ciblage des soins en combat.
 
 À tester :
 
 ```text
 grimoire hors combat
 grimoire de combat
-soin en combat
+soins hors combat
+soins en combat
 prévisualisation PV/PM
 combat mage
 combat prêtresse
+journal Combat coloré
 victoire
 fuite
 K.O.
+boss gardien
 sauvegarde / chargement
 boutique
 équipement
-boss gardien
+changement d'étage
 ```
 
-### 2. Amélioration progressive du système de sorts
-
-Pistes compatibles avec la vision actuelle :
+Sortie attendue :
 
 ```text
-nouveaux sorts offensifs simples
-nouveaux sorts de soin
-sorts utilitaires hors combat plus tard
-sorts actifs configurables plus tard
-grimoire individuel par héros plus tard
-système sauvegardé de sorts connus/découverts seulement quand nécessaire
+playtests/PLAYTEST_02_v0.10.md
 ```
 
-À éviter pour l'instant :
+Ne pas pousser les logs bruts, builds exportées ou sauvegardes locales.
+
+### Phase 2 — Refonte visuelle UI par NinePatch / NineSlice
+
+Objectif : améliorer l'identité visuelle et la lisibilité de l'interface sans changer le gameplay.
+
+Cette phase doit remettre au premier plan la modernisation visuelle des cadres, qui fait partie de la vision long terme.
+
+Pistes :
 
 ```text
-objets consommables
-potions
-journal de quête
-moniteur d'objectif
-étage 3 immédiat
-multiplication trop rapide du contenu
+- créer ou intégrer un ninesheet / atlas de cadres texturés ;
+- appliquer des NinePatchRect ou équivalents aux panneaux principaux ;
+- harmoniser les cadres du menu, combat, inventaire, grimoire et statut ;
+- conserver la lisibilité en basse résolution ;
+- éviter les halos blancs et artefacts de découpe ;
+- garder une structure facile à modifier plus tard.
 ```
 
-### 3. Lisibilité et feedbacks
-
-Améliorer les retours joueur sans transformer le jeu en checklist :
+Points de vigilance :
 
 ```text
-messages importants mieux différenciés
-feedbacks de boss / clé / porte / coffre
-feedbacks de montée de niveau
-journal Combat plus robuste si les textes se multiplient
+- ne pas casser le scaling canvas_items + keep ;
+- ne pas réduire la lisibilité des textes ;
+- ne pas rendre les cadres trop chargés visuellement ;
+- tester souris, clavier et redimensionnement fenêtre.
 ```
 
-### 4. Équipement et objets clés
+### Phase 3 — Progression magique plus riche
 
-L'inventaire doit rester centré sur :
+Objectif : préparer le système de sorts pour aller au-delà des sorts de base actuels.
+
+Pistes compatibles avec l'état actuel :
 
 ```text
-équipement
-objets clés de quête
-or
+- nouveaux sorts offensifs simples ;
+- nouveaux sorts de soin ;
+- premiers sorts utilitaires hors combat ;
+- meilleure séparation entre sorts utilisables hors combat et en combat ;
+- grimoire hors combat individuel par héros ;
+- sorts visibles mais grisés selon contexte ;
+- choix de sorts actifs avant combat, seulement quand il y aura assez de sorts pour le justifier.
 ```
 
-Les consommables ne correspondent pas à la direction actuelle du jeu.
+Dette potentielle à traiter avant ou pendant cette phase :
+
+```text
+- système de sorts connus / découverts ;
+- compatibilité des anciennes sauvegardes si de nouveaux champs sont ajoutés ;
+- éventuel stockage des préférences de sorts actifs ;
+- éviter d'improviser directement dans SaveManager ou CharacterData sans conception préalable.
+```
+
+### Phase 4 — Événements fixes et interactions de donjon
+
+Objectif : enrichir les deux premiers étages sans ajouter immédiatement un nouvel étage.
+
+Pistes :
+
+```text
+- événements fixes simples ;
+- interactions liées à des objets clés ;
+- inscriptions ou messages plus importants ;
+- portes ou passages conditionnels ;
+- récompenses non consommables ;
+- petits choix ou mini-objectifs sans journal de quête explicite.
+```
+
+Règle de design : l'information doit rester dans le donjon et les messages, pas dans une checklist.
+
+### Phase 5 — Équipement, objets clés et récompenses structurantes
+
+Objectif : donner plus de poids aux coffres, à l'équipement et aux objets clés sans introduire de consommables.
+
+Pistes :
+
+```text
+- comparaison d'équipement plus lisible ;
+- objets d'équipement plus typés par classe ;
+- objets clés plus structurants ;
+- récompenses de coffres mieux différenciées ;
+- confirmation avant vente importante ;
+- feedbacks plus clairs quand un objet ne peut pas être vendu ou équipé.
+```
 
 ## Priorités plus tardives
 
 ```text
-nouveaux monstres ou variations de monstres
-nouveaux sorts et effets
-événements fixes plus riches
-boss plus structurés
-étage 3 quand la boucle actuelle sera suffisamment enrichie
-exports de playtest plus encadrés
+- messages typés pour remplacer la coloration textuelle si le journal devient fragile ;
+- nouveaux monstres ou variations de monstres ;
+- boss plus structurés ;
+- nouveaux sprites ou animations ;
+- sons et musiques additionnels ;
+- étage 3 quand la boucle actuelle aura été davantage enrichie ;
+- exports de playtest plus encadrés ;
+- meilleure documentation joueur à terme.
+```
+
+## Éléments volontairement non prioritaires
+
+```text
+- objets consommables ;
+- potions ;
+- journal de quête ;
+- moniteur d'objectif ;
+- étage 3 immédiat ;
+- grosse refactorisation générale non motivée ;
+- accélération artificielle vers v1.0.
+```
+
+Ces éléments peuvent être rediscutés plus tard, mais ils ne doivent pas être proposés comme prochaine étape par défaut.
+
+## Lien avec IDEAS.md
+
+`docs/informations/IDEAS.md` contient les pistes non priorisées ou reportées.
+
+Règles :
+
+```text
+- La roadmap garde le cap et les prochaines phases probables.
+- IDEAS.md conserve les idées à ne pas perdre.
+- Une idée peut remonter de IDEAS.md vers la roadmap si elle devient prioritaire.
+- Une idée retirée de la roadmap doit être conservée dans IDEAS.md sauf si elle est abandonnée explicitement.
 ```
 
 ## Notes de versioning
 
-Le projet reste en pré-1.0. Ne pas accélérer vers `v1.0`.
+Le projet reste en pré-1.0. Ne pas accélérer artificiellement vers `v1.0`.
 
 Les versions peuvent continuer ainsi :
 
