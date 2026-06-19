@@ -1,22 +1,40 @@
 extends Panel
 class_name LogPanelUI
 
+# ------------------------------------------------------------
+# CONSTANTES
+# ------------------------------------------------------------
 const LOG_ALL: String = "all"
 const LOG_JOURNAL: String = "journal"
 const LOG_COMBAT: String = "combat"
 const LOG_SYSTEM: String = "system"
 
+const TONE_DEFAULT: String = "default"
+const TONE_SYSTEM: String = "system"
+const TONE_COMBAT: String = "combat"
+const TONE_IMPORTANT: String = "important"
+const TONE_MAGIC: String = "magic"
+const TONE_HEAL: String = "heal"
+const TONE_WARNING: String = "warning"
+
+# ------------------------------------------------------------
+# NŒUDS UI
+# ------------------------------------------------------------
 var tabs_container: HBoxContainer = null
 var log_text: RichTextLabel = null
-
 var log_tab_buttons: Dictionary = {}
+
+# ------------------------------------------------------------
+# ÉTAT
+# ------------------------------------------------------------
 var selected_log_channel: String = LOG_JOURNAL
 var log_entries: Array = []
 var last_message_by_channel: Dictionary = {}
-
 var ui_built: bool = false
 
-
+# ------------------------------------------------------------
+# INITIALISATION
+# ------------------------------------------------------------
 func _ready() -> void:
 	build_ui()
 
@@ -60,22 +78,22 @@ func build_ui() -> void:
 	log_text.name = "LogText"
 	log_text.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	log_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	log_text.bbcode_enabled = false
+	log_text.bbcode_enabled = true
 	log_text.scroll_following = true
 	log_text.fit_content = false
-
 	log_text.add_theme_font_size_override("normal_font_size", 16)
 	log_text.add_theme_color_override("default_color", Color(0.94, 0.86, 0.68))
 	log_text.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.75))
 	log_text.add_theme_constant_override("shadow_offset_x", 1)
 	log_text.add_theme_constant_override("shadow_offset_y", 1)
-
 	log_box.add_child(log_text)
 
 	update_log_tab_buttons()
 	update_log_display()
 
-
+# ------------------------------------------------------------
+# ONGLETS
+# ------------------------------------------------------------
 func add_log_tab_button(channel: String, button_text: String) -> void:
 	var button: Button = Button.new()
 	button.text = button_text
@@ -83,11 +101,8 @@ func add_log_tab_button(channel: String, button_text: String) -> void:
 	button.focus_mode = Control.FOCUS_NONE
 	button.custom_minimum_size = Vector2(82, 24)
 	button.add_theme_font_size_override("font_size", 13)
-
 	apply_button_style(button)
-
 	button.pressed.connect(_on_log_tab_pressed.bind(channel))
-
 	tabs_container.add_child(button)
 	log_tab_buttons[channel] = button
 
@@ -105,11 +120,12 @@ func set_log_channel(channel: String) -> void:
 func update_log_tab_buttons() -> void:
 	for channel in log_tab_buttons.keys():
 		var button: Button = log_tab_buttons[channel]
-
 		if button != null:
 			button.button_pressed = channel == selected_log_channel
 
-
+# ------------------------------------------------------------
+# AJOUT DE MESSAGES
+# ------------------------------------------------------------
 func add_system_message(message: String) -> void:
 	add_log_message(LOG_SYSTEM, message)
 
@@ -124,7 +140,6 @@ func add_combat_message(message: String) -> void:
 
 func add_log_message(channel: String, message: String) -> void:
 	var clean_message: String = message.strip_edges()
-
 	if clean_message == "":
 		return
 
@@ -136,7 +151,8 @@ func add_log_message(channel: String, message: String) -> void:
 
 	log_entries.append({
 		"channel": channel,
-		"message": clean_message
+		"message": clean_message,
+		"tone": detect_log_tone(channel, clean_message)
 	})
 
 	while log_entries.size() > 120:
@@ -144,13 +160,14 @@ func add_log_message(channel: String, message: String) -> void:
 
 	update_log_display()
 
-
+# ------------------------------------------------------------
+# AFFICHAGE
+# ------------------------------------------------------------
 func update_log_display() -> void:
 	if log_text == null:
 		return
 
 	var text: String = build_visible_log_text()
-
 	if text == "":
 		text = "Aucun message."
 
@@ -162,8 +179,9 @@ func build_visible_log_text() -> String:
 	var added_count: int = 0
 
 	for entry in log_entries:
-		var channel: String = entry["channel"]
-		var message: String = entry["message"]
+		var channel: String = str(entry.get("channel", LOG_JOURNAL))
+		var message: String = str(entry.get("message", ""))
+		var tone: String = str(entry.get("tone", detect_log_tone(channel, message)))
 
 		if selected_log_channel != LOG_ALL:
 			if channel != selected_log_channel:
@@ -173,72 +191,169 @@ func build_visible_log_text() -> String:
 			result += "\n\n"
 
 		if selected_log_channel == LOG_ALL:
-			result += get_log_prefix(channel) + " "
+			result += format_log_prefix(channel) + " "
 
-		result += message
+		result += format_log_message(message, tone)
 		added_count += 1
 
 	return result
 
 
+func format_log_prefix(channel: String) -> String:
+	var prefix_text: String = get_log_prefix(channel)
+	var prefix_color: String = "#9E8A68"
+
+	if channel == LOG_JOURNAL:
+		prefix_color = "#D8C28C"
+	elif channel == LOG_COMBAT:
+		prefix_color = "#E7A15B"
+	elif channel == LOG_SYSTEM:
+		prefix_color = "#9DB8E8"
+
+	return "[color=" + prefix_color + "]" + escape_bbcode_text(prefix_text) + "[/color]"
+
+
+func format_log_message(message: String, tone: String) -> String:
+	var color_hex: String = get_tone_color(tone)
+	return "[color=" + color_hex + "]" + escape_bbcode_text(message) + "[/color]"
+
+
 func get_log_prefix(channel: String) -> String:
 	if channel == LOG_JOURNAL:
-		return "[Journal]"
-
+		return "Journal —"
 	if channel == LOG_COMBAT:
-		return "[Combat]"
-
+		return "Combat —"
 	if channel == LOG_SYSTEM:
-		return "[Système]"
+		return "Système —"
+	return "Info —"
 
-	return "[Info]"
 
+func escape_bbcode_text(value: String) -> String:
+	# Godot 4 ne fournit pas String.escape_bbcode().
+	# On remplace les crochets par les balises littérales reconnues par RichTextLabel.
+	var escaped_value: String = value
+	escaped_value = escaped_value.replace("[", "__SAS_BBCODE_LEFT_BRACKET__")
+	escaped_value = escaped_value.replace("]", "__SAS_BBCODE_RIGHT_BRACKET__")
+	escaped_value = escaped_value.replace("__SAS_BBCODE_LEFT_BRACKET__", "[lb]")
+	escaped_value = escaped_value.replace("__SAS_BBCODE_RIGHT_BRACKET__", "[rb]")
+	return escaped_value
 
+# ------------------------------------------------------------
+# CANAUX ET COULEURS
+# Détecte les messages importants sans créer de journal de quête.
+# ------------------------------------------------------------
 func detect_log_channel(message: String, default_channel: String) -> String:
 	var lower_text: String = message.to_lower()
 
+	if lower_text.contains("grimoire"):
+		return LOG_JOURNAL
+	if lower_text.contains("hors combat"):
+		return LOG_JOURNAL
+
 	if lower_text.contains("attaque"):
 		return LOG_COMBAT
-
 	if lower_text.contains("dégâts"):
 		return LOG_COMBAT
-
 	if lower_text.contains("combat"):
 		return LOG_COMBAT
-
 	if lower_text.contains("vaincu"):
 		return LOG_COMBAT
-
 	if lower_text.contains("exp"):
 		return LOG_COMBAT
-
 	if lower_text.contains("lance"):
 		return LOG_COMBAT
-
 	if lower_text.contains("soin"):
 		return LOG_COMBAT
-
 	if lower_text.contains("tour de"):
 		return LOG_COMBAT
-
 	if lower_text.contains("apparaît"):
 		return LOG_COMBAT
-
 	if lower_text.contains("découvre"):
 		return LOG_JOURNAL
-
 	if lower_text.contains("trouvez"):
 		return LOG_JOURNAL
-
 	if lower_text.contains("rune"):
 		return LOG_JOURNAL
-
 	if lower_text.contains("donjon"):
 		return LOG_JOURNAL
 
 	return default_channel
 
 
+func detect_log_tone(channel: String, message: String) -> String:
+	var lower_text: String = message.to_lower()
+
+	if channel == LOG_SYSTEM:
+		return TONE_SYSTEM
+
+	if lower_text.contains("impossible"):
+		return TONE_WARNING
+	if lower_text.contains("verrouillée"):
+		return TONE_WARNING
+	if lower_text.contains("introuvable"):
+		return TONE_WARNING
+	if lower_text.contains("plein"):
+		return TONE_WARNING
+	if lower_text.contains("pm insuffisants"):
+		return TONE_WARNING
+
+	if lower_text.contains("grimoire"):
+		return TONE_HEAL
+	if lower_text.contains("récupère") and lower_text.contains("hp"):
+		return TONE_HEAL
+	if lower_text.contains("se recueille au temple"):
+		return TONE_HEAL
+
+	if lower_text.contains("clé"):
+		return TONE_IMPORTANT
+	if lower_text.contains("déverrouille"):
+		return TONE_IMPORTANT
+	if lower_text.contains("gardien"):
+		return TONE_IMPORTANT
+	if lower_text.contains("passage"):
+		return TONE_IMPORTANT
+	if lower_text.contains("objet clé"):
+		return TONE_IMPORTANT
+
+	if lower_text.contains("inscription"):
+		return TONE_MAGIC
+	if lower_text.contains("voix"):
+		return TONE_MAGIC
+	if lower_text.contains("traces anciennes"):
+		return TONE_MAGIC
+	if lower_text.contains("présence puissante"):
+		return TONE_MAGIC
+	if lower_text.contains("rune"):
+		return TONE_MAGIC
+	if lower_text.contains("symbole sacré"):
+		return TONE_MAGIC
+	if lower_text.contains("découvre le sort"):
+		return TONE_MAGIC
+
+	if channel == LOG_COMBAT:
+		return TONE_COMBAT
+
+	return TONE_DEFAULT
+
+
+func get_tone_color(tone: String) -> String:
+	if tone == TONE_SYSTEM:
+		return "#AFC8FF"
+	if tone == TONE_COMBAT:
+		return "#FFB06A"
+	if tone == TONE_IMPORTANT:
+		return "#FFD766"
+	if tone == TONE_MAGIC:
+		return "#9FD3FF"
+	if tone == TONE_HEAL:
+		return "#8FEA83"
+	if tone == TONE_WARNING:
+		return "#FF7C5F"
+	return "#F0DCAD"
+
+# ------------------------------------------------------------
+# STYLE
+# ------------------------------------------------------------
 func create_panel_style(
 	background_color: Color,
 	border_color: Color,
@@ -252,7 +367,6 @@ func create_panel_style(
 	style.corner_radius_top_right = 2
 	style.corner_radius_bottom_left = 2
 	style.corner_radius_bottom_right = 2
-
 	return style
 
 

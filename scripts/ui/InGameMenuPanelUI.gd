@@ -23,6 +23,8 @@ const DevTeleportMenuViewScript = preload("res://scripts/ui/menu/DevTeleportMenu
 const InventoryMenuViewScript = preload("res://scripts/ui/menu/InventoryMenuView.gd")
 const ShopMenuViewScript = preload("res://scripts/ui/menu/ShopMenuView.gd")
 const StatusEquipmentMenuViewScript = preload("res://scripts/ui/menu/StatusEquipmentMenuView.gd")
+const GrimoireMenuViewScript = preload("res://scripts/ui/menu/GrimoireMenuView.gd")
+const HeroFrameSelectionControllerScript = preload("res://scripts/ui/hero_selection/HeroFrameSelectionController.gd")
 
 
 # ------------------------------------------------------------
@@ -58,6 +60,8 @@ var dev_teleport_x_input: LineEdit = null
 var dev_teleport_y_input: LineEdit = null
 var dev_teleport_feedback_label: Label = null
 
+var hero_selection_controller = null
+
 
 # ------------------------------------------------------------
 # ÉTAT
@@ -67,6 +71,10 @@ var dev_teleport_feedback_label: Label = null
 var current_party: Array = []
 var ui_built: bool = false
 
+var pending_grimoire_heal_caster_index: int = -1
+var pending_grimoire_heal_ability_id: String = ""
+var pending_grimoire_heal_amount: int = 0
+
 
 # ------------------------------------------------------------
 # INITIALISATION
@@ -75,6 +83,23 @@ var ui_built: bool = false
 
 func _ready() -> void:
 	build_ui()
+
+
+func _input(event: InputEvent) -> void:
+	if not is_menu_open():
+		return
+
+	if hero_selection_controller == null:
+		return
+
+	if not hero_selection_controller.has_method("is_active"):
+		return
+
+	if not hero_selection_controller.is_active():
+		return
+
+	if hero_selection_controller.handle_input(event):
+		get_viewport().set_input_as_handled()
 
 
 func build_ui() -> void:
@@ -185,6 +210,7 @@ func open_menu(party: Array) -> void:
 
 
 func close_menu() -> void:
+	cancel_hero_frame_selection()
 	visible = false
 
 
@@ -219,6 +245,7 @@ func set_menu_chrome_visible(should_show: bool) -> void:
 # ------------------------------------------------------------
 
 func show_main_screen() -> void:
+	cancel_hero_frame_selection()
 	set_menu_chrome_visible(false)
 	clear_content()
 
@@ -332,27 +359,106 @@ func on_shop_sell_pressed(item_id: String) -> void:
 	ShopMenuViewScript.on_shop_sell_pressed(self, item_id)
 
 
-func show_grimoire_screen() -> void:
-	set_menu_chrome_visible(true)
-	clear_content()
+# ------------------------------------------------------------
+# GRIMOIRE
+# Délègue les sorts hors combat à une vue dédiée.
+# ------------------------------------------------------------
 
-	title_label.text = "GRIMOIRE"
-	message_label.text = ""
+func show_grimoire_screen(feedback_text: String = "") -> void:
+	GrimoireMenuViewScript.show_grimoire_screen(self, feedback_text)
 
-	var text_label: Label = create_label(
-		"Le grimoire sera ajouté plus tard.\n\nCe panneau servira à consulter les sorts connus et, plus tard, à lancer certains soins hors combat.",
-		16,
-		Color(0.78, 0.72, 0.58)
+
+func show_grimoire_heal_target_screen(
+	caster_index: int,
+	ability_id: String,
+	feedback_text: String = ""
+) -> void:
+	GrimoireMenuViewScript.show_grimoire_heal_target_screen(
+		self,
+		caster_index,
+		ability_id,
+		feedback_text
 	)
-	text_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	text_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	text_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	content_box.add_child(text_label)
 
-	var back_button: Button = create_menu_button("Retour")
-	back_button.pressed.connect(show_main_screen)
-	content_box.add_child(back_button)
+
+func start_hero_frame_selection(
+	selected_index: int,
+	heal_preview_by_index: Dictionary = {},
+	mana_preview_hero_index: int = -1,
+	mana_preview_cost: int = 0
+) -> void:
+	if hero_selection_controller == null:
+		hero_selection_controller = HeroFrameSelectionControllerScript.new()
+		hero_selection_controller.setup(self)
+
+	hero_selection_controller.begin_selection(
+		current_party,
+		selected_index,
+		heal_preview_by_index,
+		mana_preview_hero_index,
+		mana_preview_cost
+	)
+
+
+func update_hero_frame_selection(
+	selected_index: int,
+	heal_preview_by_index: Dictionary = {},
+	mana_preview_hero_index: int = -1,
+	mana_preview_cost: int = 0
+) -> void:
+	if hero_selection_controller == null:
+		return
+
+	hero_selection_controller.update_selection(
+		selected_index,
+		heal_preview_by_index,
+		mana_preview_hero_index,
+		mana_preview_cost
+	)
+
+
+func cancel_hero_frame_selection() -> void:
+	if hero_selection_controller == null:
+		return
+
+	hero_selection_controller.cancel_selection()
+
+
+func finish_hero_frame_selection() -> void:
+	if hero_selection_controller == null:
+		return
+
+	hero_selection_controller.finish_selection()
+
+
+func play_hero_frame_selection_confirm_flash(hero_index: int) -> void:
+	if hero_selection_controller == null:
+		return
+
+	hero_selection_controller.play_confirm_flash(hero_index)
+
+
+func on_hero_frame_selection_confirmed(hero_index: int) -> void:
+	GrimoireMenuViewScript.on_grimoire_heal_pressed(
+		self,
+		pending_grimoire_heal_caster_index,
+		pending_grimoire_heal_ability_id,
+		hero_index
+	)
+
+
+func on_hero_frame_selection_cancelled() -> void:
+	cancel_hero_frame_selection()
+	show_grimoire_screen()
+
+
+func on_grimoire_heal_pressed(caster_index: int, ability_id: String, target_index: int) -> void:
+	GrimoireMenuViewScript.on_grimoire_heal_pressed(
+		self,
+		caster_index,
+		ability_id,
+		target_index
+	)
 
 
 # ------------------------------------------------------------

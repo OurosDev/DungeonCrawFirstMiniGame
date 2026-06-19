@@ -3,6 +3,14 @@ extends Control
 class_name PartyStatusUI
 
 # ------------------------------------------------------------
+# SIGNAUX
+# Signale au contrôleur externe qu’un cadre héros a été choisi.
+# ------------------------------------------------------------
+
+signal hero_frame_selected(hero_index: int)
+signal hero_frame_hovered(hero_index: int)
+
+# ------------------------------------------------------------
 # DÉPENDANCES
 # Charge le composant de portrait utilisé dans chaque panneau héros.
 # ------------------------------------------------------------
@@ -39,11 +47,13 @@ const PANEL_DEAD_BACKGROUND_COLOR: Color = Color(0.035, 0.028, 0.026, 0.96)
 const BORDER_NORMAL_COLOR: Color = Color(0.38, 0.24, 0.10, 1.0)
 const BORDER_ACTIVE_COLOR: Color = Color(1.00, 0.78, 0.25, 1.0)
 const BORDER_DAMAGE_COLOR: Color = Color(0.95, 0.16, 0.10, 1.0)
+const BORDER_SELECTION_COLOR: Color = Color(0.20, 0.86, 0.22, 1.0)
 const BORDER_DEAD_COLOR: Color = Color(0.34, 0.08, 0.07, 1.0)
 
 const NAME_NORMAL_COLOR: Color = Color(0.94, 0.82, 0.58, 1.0)
 const NAME_ACTIVE_COLOR: Color = Color(1.00, 0.88, 0.45, 1.0)
 const NAME_DAMAGE_COLOR: Color = Color(1.00, 0.35, 0.28, 1.0)
+const NAME_SELECTION_COLOR: Color = Color(0.65, 1.00, 0.58, 1.0)
 const NAME_DEAD_COLOR: Color = Color(0.60, 0.23, 0.20, 1.0)
 
 const TEXT_NORMAL_COLOR: Color = Color(0.78, 0.68, 0.50, 1.0)
@@ -51,6 +61,13 @@ const TEXT_MUTED_COLOR: Color = Color(0.48, 0.42, 0.35, 1.0)
 
 const DAMAGE_FLASH_COLOR: Color = Color(1.0, 0.08, 0.04, 0.72)
 const DAMAGE_FLASH_CLEAR_COLOR: Color = Color(1.0, 0.08, 0.04, 0.0)
+
+const HEAL_PREVIEW_COLOR: Color = Color(0.96, 0.44, 0.26, 0.92)
+const MANA_FILL_COLOR: Color = Color(0.18, 0.28, 0.82, 1.0)
+const MANA_BACKGROUND_COLOR: Color = Color(0.03, 0.04, 0.10, 1.0)
+const MANA_COST_PREVIEW_COLOR: Color = Color(0.54, 0.72, 1.0, 0.95)
+const HEAL_SELECTION_FLASH_COLOR: Color = Color(0.22, 1.0, 0.24, 1.0)
+const HEAL_SELECTION_FLASH_CLEAR_COLOR: Color = Color(0.22, 1.0, 0.24, 0.0)
 
 const DODGE_FLASH_COLOR: Color = Color(1.0, 1.0, 1.0, 0.95)
 const DODGE_FLASH_CLEAR_COLOR: Color = Color(1.0, 1.0, 1.0, 0.0)
@@ -74,6 +91,13 @@ var ui_built: bool = false
 
 var last_hero_hp_by_key: Dictionary = {}
 var pending_damage_keys: Dictionary = {}
+
+var selection_active: bool = false
+var selected_hero_index: int = -1
+var heal_preview_by_index: Dictionary = {}
+var mana_preview_hero_index: int = -1
+var mana_preview_cost: int = 0
+var last_party: Array = []
 
 
 # ------------------------------------------------------------
@@ -150,6 +174,7 @@ func update_party(
 	dodge_feedback_hero = null
 ) -> void:
 	ensure_ui_ready()
+	last_party = party.duplicate()
 
 	if left_hero_column == null:
 		return
@@ -274,6 +299,8 @@ func create_hero_panel(
 	if hero_key != "":
 		is_damage_focus = pending_damage_keys.has(hero_key)
 
+	var is_selection_focus: bool = selection_active and index == selected_hero_index and not is_empty
+
 	var is_active_turn: bool = false
 
 	if hero_key != "":
@@ -295,6 +322,10 @@ func create_hero_panel(
 		border_color = BORDER_ACTIVE_COLOR
 		border_width = 4
 
+	if is_selection_focus:
+		border_color = BORDER_SELECTION_COLOR
+		border_width = 4
+
 	if is_damage_focus:
 		border_color = BORDER_DAMAGE_COLOR
 		border_width = 4
@@ -310,6 +341,10 @@ func create_hero_panel(
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if selection_active and not is_empty:
+		panel.mouse_filter = Control.MOUSE_FILTER_STOP
+		panel.gui_input.connect(Callable(self, "on_hero_panel_gui_input").bind(index))
+		panel.mouse_entered.connect(Callable(self, "on_hero_panel_mouse_entered").bind(index))
 
 	var content: VBoxContainer = VBoxContainer.new()
 	content.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -329,8 +364,10 @@ func create_hero_panel(
 		fill_hero_info(
 			content,
 			hero,
+			index,
 			is_active_turn,
 			is_damage_focus,
+			is_selection_focus,
 			is_dead,
 			should_show_damage_portrait
 		)
@@ -376,8 +413,10 @@ func fill_empty_panel(
 func fill_hero_info(
 	content: VBoxContainer,
 	hero,
+	index: int,
 	is_active_turn: bool,
 	is_damage_focus: bool,
+	is_selection_focus: bool,
 	is_dead: bool,
 	should_show_damage_portrait: bool
 ) -> void:
@@ -385,6 +424,9 @@ func fill_hero_info(
 
 	if is_active_turn:
 		name_color = NAME_ACTIVE_COLOR
+
+	if is_selection_focus:
+		name_color = NAME_SELECTION_COLOR
 
 	if is_damage_focus:
 		name_color = NAME_DAMAGE_COLOR
@@ -473,30 +515,16 @@ func fill_hero_info(
 
 	content.add_child(bars_box)
 
-	var hp_bar: ProgressBar = create_bar(
-		Color(0.68, 0.12, 0.08, 1.0),
-		Color(0.10, 0.035, 0.025, 1.0)
-	)
-
-	hp_bar.max_value = max(1, get_int_property(hero, "max_hp", 1))
-	hp_bar.value = clamp(
-		get_int_property(hero, "hp", 0),
-		0,
-		int(hp_bar.max_value)
+	var hp_bar: Control = create_health_bar(
+		hero,
+		get_heal_preview_amount_for_index(index, hero)
 	)
 
 	bars_box.add_child(hp_bar)
 
-	var mp_bar: ProgressBar = create_bar(
-		Color(0.18, 0.28, 0.82, 1.0),
-		Color(0.03, 0.04, 0.10, 1.0)
-	)
-
-	mp_bar.max_value = max(1, get_int_property(hero, "max_mp", 1))
-	mp_bar.value = clamp(
-		get_int_property(hero, "mp", 0),
-		0,
-		int(mp_bar.max_value)
+	var mp_bar: Control = create_mana_bar(
+		hero,
+		get_mana_preview_cost_for_index(index, hero)
 	)
 
 	bars_box.add_child(mp_bar)
@@ -616,6 +644,159 @@ func add_dodge_flash(panel: Panel) -> void:
 	tween.tween_callback(flash_frame.queue_free)
 
 
+
+func add_heal_selection_flash(panel: Panel) -> void:
+	var flash_frame: Panel = Panel.new()
+	flash_frame.name = "HealSelectionFlashFrame"
+	flash_frame.set_anchors_preset(Control.PRESET_FULL_RECT)
+	flash_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	flash_frame.modulate = HEAL_SELECTION_FLASH_COLOR
+
+	panel.add_child(flash_frame)
+
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = Color(0.0, 0.0, 0.0, 0.0)
+	style.border_color = HEAL_SELECTION_FLASH_COLOR
+	style.set_border_width_all(4)
+	style.corner_radius_top_left = 2
+	style.corner_radius_top_right = 2
+	style.corner_radius_bottom_left = 2
+	style.corner_radius_bottom_right = 2
+
+	flash_frame.add_theme_stylebox_override("panel", style)
+
+	var tween: Tween = panel.create_tween()
+	tween.tween_property(flash_frame, "modulate", HEAL_SELECTION_FLASH_CLEAR_COLOR, 0.12)
+	tween.tween_property(flash_frame, "modulate", HEAL_SELECTION_FLASH_COLOR, 0.10)
+	tween.tween_property(flash_frame, "modulate", HEAL_SELECTION_FLASH_CLEAR_COLOR, 0.18)
+	tween.tween_callback(flash_frame.queue_free)
+
+
+# ------------------------------------------------------------
+# SÉLECTION PAR CADRES HÉROS
+# API réutilisable pour sélectionner une cible via les panneaux latéraux.
+# ------------------------------------------------------------
+
+func begin_hero_frame_selection(
+	party: Array,
+	selected_index: int,
+	p_heal_preview_by_index: Dictionary = {},
+	p_mana_preview_hero_index: int = -1,
+	p_mana_preview_cost: int = 0
+) -> void:
+	selection_active = true
+	selected_hero_index = clamp(selected_index, 0, 3)
+	heal_preview_by_index = p_heal_preview_by_index.duplicate()
+	mana_preview_hero_index = p_mana_preview_hero_index
+	mana_preview_cost = max(0, p_mana_preview_cost)
+	update_party(party, null)
+
+
+func update_hero_frame_selection(
+	selected_index: int,
+	p_heal_preview_by_index: Dictionary = {},
+	p_mana_preview_hero_index: int = -1,
+	p_mana_preview_cost: int = 0
+) -> void:
+	if not selection_active:
+		return
+
+	selected_hero_index = clamp(selected_index, 0, 3)
+	heal_preview_by_index = p_heal_preview_by_index.duplicate()
+	mana_preview_hero_index = p_mana_preview_hero_index
+	mana_preview_cost = max(0, p_mana_preview_cost)
+	if not last_party.is_empty():
+		update_party(last_party, null)
+
+
+func end_hero_frame_selection() -> void:
+	if not selection_active and heal_preview_by_index.is_empty() and mana_preview_cost <= 0:
+		return
+
+	selection_active = false
+	selected_hero_index = -1
+	heal_preview_by_index.clear()
+	mana_preview_hero_index = -1
+	mana_preview_cost = 0
+
+	if not last_party.is_empty():
+		update_party(last_party, null)
+
+
+func on_hero_panel_gui_input(event: InputEvent, hero_index: int) -> void:
+	if not selection_active:
+		return
+
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			call_deferred("emit_hero_frame_selected_deferred", hero_index)
+
+
+func on_hero_panel_mouse_entered(hero_index: int) -> void:
+	if not selection_active:
+		return
+
+	call_deferred("emit_hero_frame_hovered_deferred", hero_index)
+
+
+func emit_hero_frame_selected_deferred(hero_index: int) -> void:
+	if not selection_active:
+		return
+
+	hero_frame_selected.emit(hero_index)
+
+
+func emit_hero_frame_hovered_deferred(hero_index: int) -> void:
+	if not selection_active:
+		return
+
+	hero_frame_hovered.emit(hero_index)
+
+
+func play_hero_selection_confirm_flash(hero_index: int) -> void:
+	var panel_name: String = "HeroPanel" + str(hero_index + 1)
+	var panel = find_child(panel_name, true, false) as Panel
+	if panel == null:
+		return
+
+	add_heal_selection_flash(panel)
+
+
+func get_heal_preview_amount_for_index(index: int, hero) -> int:
+	if not selection_active:
+		return 0
+
+	if index != selected_hero_index:
+		return 0
+
+	if not heal_preview_by_index.has(index):
+		return 0
+
+	var raw_amount: int = int(heal_preview_by_index[index])
+	if raw_amount <= 0:
+		return 0
+
+	var hp: int = get_int_property(hero, "hp", 0)
+	var max_hp: int = get_int_property(hero, "max_hp", hp)
+	return clamp(raw_amount, 0, max(0, max_hp - hp))
+
+
+func get_mana_preview_cost_for_index(index: int, hero) -> int:
+	if not selection_active:
+		return 0
+
+	if index != mana_preview_hero_index:
+		return 0
+
+	if mana_preview_cost <= 0:
+		return 0
+
+	var mp: int = get_int_property(hero, "mp", 0)
+	if mp <= 0:
+		return 0
+
+	return clamp(mana_preview_cost, 0, mp)
+
 # ------------------------------------------------------------
 # VALIDATION DES DÉGÂTS
 # Permet au contrôleur d’input de savoir si un portrait damage est bloqué.
@@ -668,6 +849,116 @@ func create_label(
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	return label
+
+
+func create_health_bar(
+	hero,
+	heal_preview_amount: int = 0
+) -> Control:
+	var bar: Panel = Panel.new()
+	bar.custom_minimum_size = Vector2(0, BAR_HEIGHT)
+	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bar.clip_contents = true
+
+	var background_style: StyleBoxFlat = StyleBoxFlat.new()
+	background_style.bg_color = Color(0.10, 0.035, 0.025, 1.0)
+	background_style.corner_radius_top_left = 1
+	background_style.corner_radius_top_right = 1
+	background_style.corner_radius_bottom_left = 1
+	background_style.corner_radius_bottom_right = 1
+	bar.add_theme_stylebox_override("panel", background_style)
+
+	var hp: int = get_int_property(hero, "hp", 0)
+	var max_hp: int = max(1, get_int_property(hero, "max_hp", 1))
+	var current_ratio: float = clamp(float(hp) / float(max_hp), 0.0, 1.0)
+	var preview_ratio: float = clamp(float(hp + heal_preview_amount) / float(max_hp), 0.0, 1.0)
+
+	var fill_rect: ColorRect = ColorRect.new()
+	fill_rect.name = "HPFill"
+	fill_rect.color = Color(0.68, 0.12, 0.08, 1.0)
+	fill_rect.anchor_left = 0.0
+	fill_rect.anchor_top = 0.0
+	fill_rect.anchor_right = current_ratio
+	fill_rect.anchor_bottom = 1.0
+	fill_rect.offset_left = 0
+	fill_rect.offset_top = 0
+	fill_rect.offset_right = 0
+	fill_rect.offset_bottom = 0
+	fill_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bar.add_child(fill_rect)
+
+	if heal_preview_amount > 0 and preview_ratio > current_ratio:
+		var preview_rect: ColorRect = ColorRect.new()
+		preview_rect.name = "HPHealPreview"
+		preview_rect.color = HEAL_PREVIEW_COLOR
+		preview_rect.anchor_left = current_ratio
+		preview_rect.anchor_top = 0.0
+		preview_rect.anchor_right = preview_ratio
+		preview_rect.anchor_bottom = 1.0
+		preview_rect.offset_left = 0
+		preview_rect.offset_top = 0
+		preview_rect.offset_right = 0
+		preview_rect.offset_bottom = 0
+		preview_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		bar.add_child(preview_rect)
+
+	return bar
+
+
+func create_mana_bar(
+	hero,
+	mana_cost_preview: int = 0
+) -> Control:
+	var bar: Panel = Panel.new()
+	bar.custom_minimum_size = Vector2(0, BAR_HEIGHT)
+	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bar.clip_contents = true
+
+	var background_style: StyleBoxFlat = StyleBoxFlat.new()
+	background_style.bg_color = MANA_BACKGROUND_COLOR
+	background_style.corner_radius_top_left = 1
+	background_style.corner_radius_top_right = 1
+	background_style.corner_radius_bottom_left = 1
+	background_style.corner_radius_bottom_right = 1
+	bar.add_theme_stylebox_override("panel", background_style)
+
+	var mp: int = get_int_property(hero, "mp", 0)
+	var max_mp: int = max(1, get_int_property(hero, "max_mp", 1))
+	var current_ratio: float = clamp(float(mp) / float(max_mp), 0.0, 1.0)
+	var after_cost_ratio: float = clamp(float(max(0, mp - mana_cost_preview)) / float(max_mp), 0.0, 1.0)
+
+	var fill_rect: ColorRect = ColorRect.new()
+	fill_rect.name = "MPFill"
+	fill_rect.color = MANA_FILL_COLOR
+	fill_rect.anchor_left = 0.0
+	fill_rect.anchor_top = 0.0
+	fill_rect.anchor_right = current_ratio
+	fill_rect.anchor_bottom = 1.0
+	fill_rect.offset_left = 0
+	fill_rect.offset_top = 0
+	fill_rect.offset_right = 0
+	fill_rect.offset_bottom = 0
+	fill_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bar.add_child(fill_rect)
+
+	if mana_cost_preview > 0 and current_ratio > after_cost_ratio:
+		var preview_rect: ColorRect = ColorRect.new()
+		preview_rect.name = "MPCostPreview"
+		preview_rect.color = MANA_COST_PREVIEW_COLOR
+		preview_rect.anchor_left = after_cost_ratio
+		preview_rect.anchor_top = 0.0
+		preview_rect.anchor_right = current_ratio
+		preview_rect.anchor_bottom = 1.0
+		preview_rect.offset_left = 0
+		preview_rect.offset_top = 0
+		preview_rect.offset_right = 0
+		preview_rect.offset_bottom = 0
+		preview_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		bar.add_child(preview_rect)
+
+	return bar
 
 
 func create_bar(
