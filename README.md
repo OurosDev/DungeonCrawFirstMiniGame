@@ -6,20 +6,23 @@ Le projet sert aussi de terrain d'apprentissage pour la gestion d'un petit proje
 
 ## État actuel
 
-Version stable récente : `v0.12 — Équilibrage combat, sort découvert et corrections UI`.
+Version stable récente : `v0.13 — Magicka : progression magique, sorts actifs et poison`.
 
-Cette version conserve la base `v0.11.3 — Fond de menu, polices et lisibilité UI` et ajoute une passe de progression / équilibrage :
+Cette version poursuit la base `v0.12 — Équilibrage combat, sort découvert et corrections UI` avec une étape importante autour de la magie :
 
-- le sort de base du Mage coûte désormais plus cher en mana ;
-- le sort `Éclat de givre`, découvert à l'étage 1, devient utilisable en combat par un Mage compatible ;
-- la découverte du sort est sauvegardée dans la progression du groupe ;
-- les points de vie des monstres normaux sont augmentés de 25 % ;
-- le boss gardien est explicitement exclu de cette hausse et conserve ses PV prévus ;
-- les valeurs de rolls de création d'équipe sont colorées selon leur qualité ;
-- l'écran d'équipement du menu Statut est ajusté pour éviter les chevauchements ;
-- le canal de messages revient automatiquement sur `Journal` après un combat.
+- rééquilibrage d'`Éclat de givre` ;
+- ajout du `Soin renforcé` pour le Prêtre niveau 5 ;
+- ajout du `Soin de groupe`, découvert à l'étage 2 ;
+- ajout du sort `Poison` pour le Mage niveau 5 ;
+- ajout d'un premier système de statut temporaire réutilisable ;
+- préparation des sorts actifs hors combat depuis le grimoire ;
+- sauvegarde des sorts actifs préparés ;
+- initialisation des sorts actifs de combat depuis les choix hors combat ;
+- conservation du grimoire de combat comme outil de changement temporaire pendant un combat.
 
-Le format de sauvegarde est mis à jour pour mémoriser les sorts découverts. Les anciennes sauvegardes restent compatibles : en absence du nouveau champ, la liste de sorts découverts est vide.
+Le format de sauvegarde passe en version 7 pour mémoriser les sorts actifs préparés.
+
+## Base jouable actuelle
 
 La base jouable contient notamment :
 
@@ -33,15 +36,62 @@ La base jouable contient notamment :
 - coffres, messages, clé de progression et boss fixe ;
 - sauvegarde / chargement ;
 - commandes souris et clavier AZERTY ;
-- configuration de playtest stabilisée en `Compatibility / OpenGL` ;
 - grimoire hors combat ;
 - grimoire de combat ;
+- préparation hors combat des sorts actifs ;
+- sort de poison et statut poison sur monstre ;
 - soin en combat avec ciblage direct par cadres ;
+- soin de groupe sans sélection de cible ;
 - journal Combat coloré ;
 - UI NineSlice ;
 - carte agrandie et automap améliorée ;
 - image de fond du menu principal ;
 - police OpenType dédiée au titre et police globale d'interface.
+
+## Magie en v0.13
+
+### Mage
+
+```text
+Étincelle
+- niveau : 1
+- coût : 6 PM
+- effet : dégâts 8-16 sur un ennemi
+
+Éclat de givre
+- niveau : 2
+- coût : 10 PM
+- effet : dégâts 12-24 sur un ennemi
+- prérequis : découverte spell_ice_shard
+
+Poison
+- niveau : 5
+- coût : 10 PM
+- effet : applique le statut Poison à un monstre normal
+- dégâts : 5 à 10 % des PV max du monstre à chaque tick
+```
+
+Le boss gardien est immunisé au poison pour préserver l'équilibrage actuel.
+
+### Prêtre
+
+```text
+Soin léger
+- niveau : 1
+- coût : 4 PM
+- effet : soin 8-14 PV sur un allié
+
+Soin renforcé
+- niveau : 5
+- coût : 9 PM
+- effet : soin 16-28 PV sur un allié
+
+Soin de groupe
+- coût : 9 PM
+- effet : soin 7-13 PV sur toute l'équipe
+- prérequis : découverte spell_group_heal
+- emplacement : étage 2, x 21, y 8
+```
 
 ## Renderer et affichage
 
@@ -81,10 +131,6 @@ Carte
 Menu
 ```
 
-Les raccourcis clavier restent inchangés.
-
-La commande `Carte` ouvre une carte agrandie de l'étage découvert dans le viewport. `Retour`, `E` ou `Échap` ferment la carte et reviennent à l'exploration.
-
 ## Interface
 
 L'interface principale utilise :
@@ -103,22 +149,6 @@ assets/fonts/game_ui.otf
 ```
 
 Les fichiers de police doivent être conservés uniquement si leur licence autorise leur utilisation et leur distribution dans le dépôt public.
-
-## Donjon et modèles 3D spéciaux
-
-Règle d'orientation des modèles spéciaux :
-
-1. conserver l'orientation naturelle si elle regarde déjà une case `.`;
-2. sinon, chercher une case `.` adjacente ;
-3. sinon, chercher une case praticable non-mur ;
-4. sinon, conserver l'orientation naturelle.
-
-Modèles concernés :
-
-- `M` = message / stèle ;
-- `C` = coffre ;
-- `O` = temple ;
-- `B` = boutique.
 
 ## Organisation du dépôt
 

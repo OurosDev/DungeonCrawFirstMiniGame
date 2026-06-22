@@ -2,7 +2,7 @@
 
 Date de mise à jour : 2026-06-22
 
-Version stable actuelle : `v0.12 — Équilibrage combat, sort découvert et corrections UI`
+Version stable actuelle : `v0.13 — Magicka : progression magique, sorts actifs et poison`
 
 ## Vision
 
@@ -33,70 +33,63 @@ v0.11.1 — Carte agrandie et automap améliorée
 v0.11.2 — Polish menus et orientation des modèles 3D
 v0.11.3 — Fond de menu, polices et lisibilité UI
 v0.12 — Équilibrage combat, sort découvert et corrections UI
+v0.13 — Magicka : progression magique, sorts actifs et poison
 ```
 
 ## Prochaines phases proposées
 
-### Phase 1 — Playtest 02 post-v0.12
+### Phase 1 — Playtest 03 post-v0.13
 
 À tester :
 
 ```text
-menu principal avec image de fond
-Options
-Nouvelle partie
-création d'équipe
-couleurs des rolls
-validation des quatre héros
-progression jusqu'à découverte d'Éclat de givre
-Mage niveau 1 / niveau 2
-grimoire de combat
-coût d'Étincelle
-coût d'Éclat de givre
-sauvegarde / chargement après découverte
-PV des monstres normaux
-boss gardien
-écran équipement
-carte agrandie
-automap compacte
-journal / combat / retour journal
+nouvelle partie
+montée en niveau du Mage
+montée en niveau du Prêtre
+découverte Éclat de givre
+découverte Soin de groupe étage 2 x21 y8
+préparation hors combat de sorts actifs
+sauvegarde / chargement des sorts préparés
+grimoire de combat temporaire
+Poison sur monstres normaux
+Poison sur boss gardien
+Soin renforcé
+Soin de groupe
 boutique
 temple
-grimoire hors combat
-soins hors combat
-soins en combat
+inventaire
+équipement
+boss
 ```
 
 Sortie attendue :
 
 ```text
-playtests/PLAYTEST_02_v0.12.md
+playtests/PLAYTEST_03_v0.13.md
 ```
 
-### Phase 2 — Progression magique plus riche
+### Phase 2 — Stabilisation magie / statuts
 
 Pistes :
 
 ```text
-- nouveaux sorts offensifs simples ;
-- nouveaux sorts de soin ;
-- premiers sorts utilitaires hors combat ;
-- grimoire hors combat individuel par héros ;
-- choix de sorts actifs avant combat quand il y aura assez de sorts ;
-- découvertes de sorts supplémentaires liées à l'exploration.
+- ajuster les coûts de PM ;
+- ajuster les dégâts d'Éclat de givre ;
+- ajuster le poison si trop fort ou trop faible ;
+- décider si certains monstres pourront empoisonner les héros ;
+- ajouter une interface plus visible pour les statuts ;
+- documenter les statuts dans un fichier technique si le système s'étend.
 ```
 
-### Phase 3 — Finition UI post-polices
+### Phase 3 — Nouveaux sorts simples
 
 Pistes :
 
 ```text
-- vérifier les écrans qui contiennent beaucoup de texte ;
-- vérifier les états hover / pressed / disabled ;
-- améliorer les cadres actifs, dégâts, soin et sélection ;
-- harmoniser les marges internes des panneaux ;
-- vérifier les tooltips en basse résolution ;
-- créer une texture dédiée aux boutons si la texture de cadre principale reste trop générique.
+- sort offensif supplémentaire pour Mage ;
+- sort utilitaire hors combat ;
+- sort de soutien simple pour Prêtre ;
+- découverte de sorts par exploration, sans journal de quête.
 ```
 
 ## Éléments volontairement non prioritaires

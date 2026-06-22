@@ -4,6 +4,7 @@ Index des versions publiques et de travail du projet.
 
 ## Versions récentes
 
+- [`v0.13 — Magicka : progression magique, sorts actifs et poison`](v0.13.md)
 - [`v0.12 — Équilibrage combat, sort découvert et corrections UI`](v0.12.md)
 - [`v0.11.3 — Fond de menu, polices et lisibilité UI`](v0.11.3.md)
 - [`v0.11.2 — Polish menus et orientation des modèles 3D`](v0.11.2.md)

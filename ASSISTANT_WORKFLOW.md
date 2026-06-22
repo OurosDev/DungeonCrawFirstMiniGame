@@ -2,7 +2,7 @@
 
 Date de mise à jour : 2026-06-22
 
-Version de référence : `v0.12 — Équilibrage combat, sort découvert et corrections UI`
+Version de référence : `v0.13 — Magicka : progression magique, sorts actifs et poison`
 
 ## 1. Règle de démarrage d'une conversation
 
@@ -19,8 +19,8 @@ Documents à vérifier selon le besoin :
 ```text
 README.md
 CHANGELOG/README.md
-CHANGELOG/v0.12.md
-audits/STATE_AUDITv0.12.md
+CHANGELOG/v0.13.md
+audits/STATE_AUDITv0.13.md
 docs/informations/ROADMAP.md
 docs/informations/IDEAS.md
 docs/informations/TECHNICAL_DEBT.md
@@ -56,13 +56,38 @@ Les fichiers locaux fournis explicitement sont prioritaires, sans exclure la con
 - Donner des fichiers complets quand c'est raisonnable.
 - Quand plusieurs fichiers sont concernés, fournir un pack complet téléchargeable en priorité.
 
-## 4. Systèmes sensibles
+## 4. Règle d'en-tête de version des scripts
+
+À partir de `v0.13-Magicka`, chaque script modifié dans un bloc de travail doit recevoir un commentaire d'en-tête indiquant la version du bloc.
+
+Format recommandé :
+
+```gdscript
+# ------------------------------------------------------------
+# VERSION SCRIPT
+# v0.13-Magicka
+# ------------------------------------------------------------
+```
+
+Règles :
+
+```text
+- Ajouter l'en-tête aux scripts modifiés, pas à tout le projet d'un coup.
+- Ne pas réécrire uniquement un fichier pour ajouter l'en-tête, sauf demande explicite.
+- Mettre à jour l'en-tête quand un script est réellement modifié dans un nouveau bloc.
+- Utiliser cet en-tête pour vérifier rapidement si un fichier local/GitHub est celui attendu.
+- Plus tard, faire un audit des scripts qui n'ont pas encore d'en-tête si l'utilisateur le demande.
+```
+
+## 5. Systèmes sensibles
 
 Avant de modifier un système sensible, résumer la conception prévue :
 
 ```text
 sauvegarde / chargement
 combat
+statuts temporaires
+poison
 GameSession
 inventaire / équipement
 sorts / grimoire
@@ -74,7 +99,7 @@ symboles et règles de cases du donjon
 orientation des modèles 3D spéciaux
 ```
 
-## 5. Workflow général de modification
+## 6. Workflow général de modification
 
 1. vérifier l'état actuel du repo ou la base locale fournie ;
 2. identifier les fichiers concernés ;
@@ -83,77 +108,88 @@ orientation des modèles 3D spéciaux
 5. séparer clairement nouveaux fichiers / fichiers mis à jour / fichiers à ne pas pousser ;
 6. attendre les tests locaux avant de préparer une release.
 
-## 6. Base actuelle v0.12
+Pour les packs de scripts importants :
 
-Version stable récente : `v0.12 — Équilibrage combat, sort découvert et corrections UI`.
+```text
+- éviter les reconstructions complètes depuis des sources incertaines ;
+- partir des fichiers locaux fournis quand ils existent ;
+- limiter les changements par bloc ;
+- tester la compilation avant d'enchaîner ;
+- si une erreur massive apparaît, revenir à la base validée et corriger par étapes.
+```
 
-Cette version conserve la base `v0.11.3 — Fond de menu, polices et lisibilité UI` et ajoute :
+## 7. Base actuelle v0.13
 
-- coût de mana du sort de base du Mage doublé ;
-- utilisation en combat du sort `Éclat de givre` découvert à l'étage 1 ;
-- sauvegarde des sorts découverts via `discovered_ability_ids` ;
-- PV des monstres normaux augmentés de 25 % ;
-- boss gardien explicitement exclu de cette hausse ;
-- coloration des valeurs de rolls dans la création d'équipe ;
-- corrections de layout dans l'écran `Statut > Équipement` ;
-- retour automatique du canal `Journal` après un combat.
+Version stable récente : `v0.13 — Magicka : progression magique, sorts actifs et poison`.
 
-Scripts concernés par `v0.12` :
+Cette version ajoute :
+
+- rééquilibrage d'`Éclat de givre` ;
+- ajout du `Soin renforcé` niveau 5 ;
+- ajout du `Soin de groupe` découvert à l'étage 2 ;
+- ajout du sort `Poison` niveau 5 ;
+- ajout d'un premier système de statut temporaire ;
+- préparation hors combat des sorts actifs ;
+- sauvegarde des sorts actifs préparés ;
+- initialisation des sorts actifs de combat depuis la préparation hors combat ;
+- conservation du grimoire de combat pour des changements temporaires pendant un combat.
+
+Scripts concernés par `v0.13-Magicka` :
 
 ```text
 scripts/abilities/AbilityDatabase.gd
-scripts/monsters/MonsterDatabase.gd
-scripts/combat/CombatAbilityResolver.gd
-scripts/dungeon/Dungeon.gd
+scripts/characters/ClassDatabase.gd
+scripts/combat/CombatManager.gd
+scripts/combat/CombatStatusEffectResolver.gd
 scripts/core/GameSession.gd
 scripts/core/SaveManager.gd
-scripts/ui/PartyCreationUI.gd
-scripts/ui/menu/StatusEquipmentMenuView.gd
-scripts/ui/GameUI.gd
+scripts/dungeon/Dungeon.gd
+scripts/dungeon/FloorDatabase.gd
+scripts/ui/menu/CombatGrimoireMenuView.gd
+scripts/ui/menu/GrimoireMenuView.gd
 ```
 
 Point sensible :
 
 ```text
-SaveManager passe en version 6 pour sauvegarder discovered_ability_ids.
-Anciennes sauvegardes compatibles : champ absent = liste vide.
+SaveManager passe en version 7 pour sauvegarder active_ability_ids_by_party_slot.
+Les découvertes de sorts restent sauvegardées via discovered_ability_ids.
 ```
 
-## 7. Tests recommandés v0.12
+## 8. Tests recommandés v0.13
 
 ```text
-Étincelle coûte 6 PM
-Éclat de givre découvert à l'étage 1
-Mage niveau 1 : Éclat de givre indisponible
-Mage niveau 2 : Éclat de givre disponible en combat
-sauvegarde / chargement après découverte
-PV des monstres normaux augmentés
-boss gardien conservé à 225 PV
-création d'équipe : stats 10 vertes
-création d'équipe : stats 5 jaunes
-création d'équipe : stats 4 ou moins rouges
-écran équipement : Accessoire visible
-écran équipement : pas de cadres inutiles autour des slots
-écran équipement : Retour statut dans le cadre
-entrée combat : canal Combat
-sortie combat : canal Journal
+Éclat de givre coûte 10 PM
+Éclat de givre inflige plus de dégâts qu'Étincelle
+Poison disponible Mage niveau 5
+Poison fonctionne sur monstre normal
+Poison se dissipe selon la règle prévue
+Poison ne fonctionne pas sur le boss gardien
+Soin renforcé disponible Prêtre niveau 5
+Soin de groupe découvert étage 2 x21 y8
+Soin de groupe soigne toute l'équipe
+Soin de groupe ne demande pas de cible
+préparation hors combat d'un sort offensif
+préparation hors combat d'un sort de soin
+entrée combat avec sort préparé
+grimoire de combat toujours temporaire
+sauvegarde / chargement des sorts préparés
 inventaire
 boutique
 temple
 carte
 automap
-grimoire hors combat
-grimoire de combat
+équipement
 boss gardien
 ```
 
-## 8. Renderer et builds de test
+## 9. Renderer et builds de test
 
 Exporter les builds Windows de playtest en `Compatibility / OpenGL` par défaut.
 
 Ne pas pousser builds, logs bruts ou sauvegardes locales.
 
-## 9. Règles de design
+## 10. Règles de design
 
 ```text
 ne pas ajouter d'objets consommables pour le moment

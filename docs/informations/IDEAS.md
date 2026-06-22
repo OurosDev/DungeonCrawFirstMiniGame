@@ -2,13 +2,28 @@
 
 Date de mise à jour : 2026-06-22
 
-Base de référence : `v0.12 — Équilibrage combat, sort découvert et corrections UI`
+Base de référence : `v0.13 — Magicka : progression magique, sorts actifs et poison`
 
 ## Rôle du document
 
 Ce fichier sert de boîte à idées longue durée.
 
 Ne jamais supprimer une idée par simple nettoyage.
+
+## Magie et statuts
+
+```text
+- Ajouter plus tard des monstres capables d'empoisonner les héros.
+- Ajouter une UI plus visible pour les statuts actifs.
+- Ajouter des résistances ou immunités seulement si le système reste lisible.
+- Ajouter d'autres statuts simples après validation du poison.
+- Ajouter un sort offensif supplémentaire pour le Mage.
+- Ajouter un sort utilitaire hors combat.
+- Ajouter un sort de soutien simple pour le Prêtre.
+- Ajouter des découvertes de sorts dans des impasses ou zones secondaires.
+- Documenter les statuts dans un fichier technique si leur nombre augmente.
+- Prévoir une description plus claire des sorts dans le grimoire si nécessaire.
+```
 
 ## Interface et identité visuelle
 
@@ -29,7 +44,8 @@ Ne jamais supprimer une idée par simple nettoyage.
 ```text
 - Ajuster progressivement les coûts de mana après playtest.
 - Ajuster les PV des monstres selon la durée réelle des combats.
-- Ajouter plus tard des résistances ou faiblesses, seulement si cela reste lisible.
+- Évaluer si le poison est trop fort sur les monstres à hauts PV.
+- Garder les boss immunisés au poison tant que l'équilibrage n'est pas stabilisé.
 - Ajouter des comportements spéciaux simples pour certains monstres.
 - Prévoir un futur équilibrage des récompenses si les combats deviennent plus longs.
 ```
@@ -42,27 +58,6 @@ Ne jamais supprimer une idée par simple nettoyage.
 - Étendre la règle à d'autres types de modèles seulement si nécessaire.
 - Ajouter éventuellement une documentation plus formelle dans FLOOR_DESIGN.md lors d'une future mise à jour dungeon.
 - Vérifier les entrées de salle ou objets spéciaux après chaque changement de layout.
-```
-
-## Création d'équipe et aide utilisateur
-
-```text
-- Vérifier si les couleurs de roll suffisent à rendre les bons / mauvais tirages lisibles.
-- Vérifier si les tooltips Relancer / Stocker / Reprendre suffisent aux nouveaux joueurs.
-- Ajouter éventuellement une aide plus discrète si un prochain playtest montre encore une incompréhension.
-- Garder l'aide légère, sans tutoriel lourd.
-```
-
-## Grimoire, magie et sorts
-
-```text
-- Grimoire hors combat individuel par héros.
-- Sorts actifs configurables hors combat quand plusieurs sorts seront disponibles.
-- Sorts utilisables seulement en combat visibles mais grisés dans le grimoire hors combat.
-- Sorts offensifs supplémentaires pour le Mage.
-- Sorts de soin supplémentaires pour le Prêtre.
-- Sorts utilitaires hors combat.
-- Nouvelles découvertes de sorts liées à des messages, coffres ou événements fixes.
 ```
 
 ## Idées explicitement reportées pour le moment
