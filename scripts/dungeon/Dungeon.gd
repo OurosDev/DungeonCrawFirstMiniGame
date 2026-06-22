@@ -86,6 +86,7 @@ func _ready() -> void:
 		return
 
 	party = GameSession.get_party()
+	sync_discovered_abilities_from_session()
 	load_floor(GameSession.current_floor_id)
 
 	if GameSession.is_loading_save:
@@ -440,22 +441,32 @@ func discover_cell(cell: Vector2i) -> void:
 # ------------------------------------------------------------
 func setup_ability_discoveries() -> void:
 	ability_discovery_locations.clear()
+	sync_discovered_abilities_from_session()
+
 	if current_floor_data == null:
 		return
+
 	for cell in current_floor_data.ability_discovery_locations.keys():
-		ability_discovery_locations[cell] = current_floor_data.ability_discovery_locations[cell]
+		var discovery_id: String = str(current_floor_data.ability_discovery_locations[cell])
+		if has_discovered_ability(discovery_id):
+			continue
+
+		ability_discovery_locations[cell] = discovery_id
 
 
 func check_ability_discovery() -> bool:
 	var current_cell: Vector2i = player.grid_cell
+
 	if not ability_discovery_locations.has(current_cell):
 		return false
 
-	var discovery_id: String = ability_discovery_locations[current_cell]
-	if discovered_ability_ids.has(discovery_id):
+	var discovery_id: String = str(ability_discovery_locations[current_cell])
+
+	if has_discovered_ability(discovery_id):
 		return false
 
-	discovered_ability_ids.append(discovery_id)
+	register_discovered_ability(discovery_id)
+	ability_discovery_locations.erase(current_cell)
 
 	if dungeon_renderer != null:
 		dungeon_renderer.hide_discovery_marker(current_cell)
@@ -464,6 +475,50 @@ func check_ability_discovery() -> bool:
 		combat_manager.battle_log = get_ability_discovery_message(discovery_id)
 
 	return true
+
+
+func sync_discovered_abilities_from_session() -> void:
+	discovered_ability_ids.clear()
+
+	if GameSession.has_method("get_discovered_ability_ids"):
+		var session_discoveries = GameSession.get_discovered_ability_ids()
+		if session_discoveries is Array:
+			for raw_discovery_id in session_discoveries:
+				var discovery_id: String = str(raw_discovery_id).strip_edges()
+
+				if discovery_id == "":
+					continue
+
+				if discovered_ability_ids.has(discovery_id):
+					continue
+
+				discovered_ability_ids.append(discovery_id)
+
+
+func has_discovered_ability(discovery_id: String) -> bool:
+	var normalized_id: String = discovery_id.strip_edges()
+	if normalized_id == "":
+		return false
+
+	if discovered_ability_ids.has(normalized_id):
+		return true
+
+	if GameSession.has_method("has_discovered_ability"):
+		return GameSession.has_discovered_ability(normalized_id)
+
+	return false
+
+
+func register_discovered_ability(discovery_id: String) -> void:
+	var normalized_id: String = discovery_id.strip_edges()
+	if normalized_id == "":
+		return
+
+	if not discovered_ability_ids.has(normalized_id):
+		discovered_ability_ids.append(normalized_id)
+
+	if GameSession.has_method("discover_ability"):
+		GameSession.discover_ability(normalized_id)
 
 
 func get_ability_discovery_message(discovery_id: String) -> String:

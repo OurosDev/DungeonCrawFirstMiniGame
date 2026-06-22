@@ -21,6 +21,7 @@ var current_floor_id: int = 1
 var is_loading_save: bool = false
 var pending_save_data: Dictionary = {}
 var floor_states: Dictionary = {}
+var discovered_ability_ids: Array[String] = []
 var inventory = null
 var gold: int = 0
 var shop_available: bool = false
@@ -35,6 +36,7 @@ func prepare_new_game() -> void:
 	is_loading_save = false
 	pending_save_data.clear()
 	floor_states.clear()
+	discovered_ability_ids.clear()
 	reset_inventory()
 	set_gold(0)
 	set_shop_available(false)
@@ -79,9 +81,11 @@ func prepare_loaded_game(save_data: Dictionary) -> void:
 	is_loading_save = true
 	pending_save_data = save_data.duplicate(true)
 	floor_states.clear()
+	discovered_ability_ids.clear()
 	if pending_save_data.has("current_floor_id"):
 		current_floor_id = int(pending_save_data["current_floor_id"])
 	load_floor_states_from_save_data(pending_save_data)
+	load_discovered_ability_ids_from_save_data(pending_save_data.get("discovered_ability_ids", []))
 	load_inventory_from_save_data(pending_save_data.get("inventory", []))
 	set_gold(int(pending_save_data.get("gold", 0)))
 	set_shop_available(false)
@@ -133,6 +137,57 @@ func duplicate_string_array(source_array) -> Array:
 
 func duplicate_serialized_cell_array(source_array) -> Array:
 	return FloorStateHelperScript.duplicate_serialized_cell_array(source_array)
+
+# ------------------------------------------------------------
+# DÉCOUVERTES DE SORTS
+# Conserve les savoirs magiques trouvés par le groupe dans le donjon.
+# ------------------------------------------------------------
+func discover_ability(discovery_id: String) -> bool:
+	var normalized_id: String = discovery_id.strip_edges()
+	if normalized_id == "":
+		return false
+
+	if discovered_ability_ids.has(normalized_id):
+		return false
+
+	discovered_ability_ids.append(normalized_id)
+	return true
+
+
+func has_discovered_ability(discovery_id: String) -> bool:
+	var normalized_id: String = discovery_id.strip_edges()
+	if normalized_id == "":
+		return false
+
+	return discovered_ability_ids.has(normalized_id)
+
+
+func get_discovered_ability_ids() -> Array[String]:
+	var result: Array[String] = []
+
+	for discovery_id in discovered_ability_ids:
+		result.append(discovery_id)
+
+	return result
+
+
+func load_discovered_ability_ids_from_save_data(serialized_discoveries) -> void:
+	discovered_ability_ids.clear()
+
+	if not serialized_discoveries is Array:
+		return
+
+	for raw_discovery_id in serialized_discoveries:
+		var discovery_id: String = str(raw_discovery_id).strip_edges()
+
+		if discovery_id == "":
+			continue
+
+		if discovered_ability_ids.has(discovery_id):
+			continue
+
+		discovered_ability_ids.append(discovery_id)
+
 
 # ------------------------------------------------------------
 # INVENTAIRE

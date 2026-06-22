@@ -1,6 +1,7 @@
 extends RefCounted
 class_name StatusEquipmentMenuView
 
+
 # ------------------------------------------------------------
 # VUE STATUT / ÉQUIPEMENT
 # Construit les écrans de personnages, slots et choix d'équipement.
@@ -8,6 +9,26 @@ class_name StatusEquipmentMenuView
 
 const ItemDatabaseScript = preload("res://scripts/items/ItemDatabase.gd")
 const EquipmentRulesScript = preload("res://scripts/equipment/EquipmentRules.gd")
+
+
+# ------------------------------------------------------------
+# CONFIGURATION — ÉCRAN ÉQUIPEMENT
+# Centralise les tailles pour éviter les chevauchements avec la police globale.
+# ------------------------------------------------------------
+
+const EQUIPMENT_WRAPPER_MIN_SIZE: Vector2 = Vector2(620, 382)
+
+const EQUIPMENT_STATS_PANEL_SIZE: Vector2 = Vector2(560, 92)
+const EQUIPMENT_SLOT_AREA_SIZE: Vector2 = Vector2(560, 198)
+const EQUIPMENT_SLOT_BUTTON_SIZE: Vector2 = Vector2(540, 31)
+const EQUIPMENT_SLOT_BUTTON_FONT_SIZE: int = 13
+const EQUIPMENT_SLOT_LIST_MARGIN: int = 6
+const EQUIPMENT_SLOT_LIST_SEPARATION: int = 4
+
+const EQUIPMENT_BACK_AREA_SIZE: Vector2 = Vector2(560, 34)
+const EQUIPMENT_BACK_BUTTON_SIZE: Vector2 = Vector2(220, 31)
+const EQUIPMENT_BACK_BUTTON_FONT_SIZE: int = 13
+
 
 static func show_status_screen(owner) -> void:
 	owner.set_menu_chrome_visible(false)
@@ -32,7 +53,11 @@ static func show_status_screen(owner) -> void:
 		var hero_frame: Panel = owner.create_status_hero_frame(hero, party_index)
 		grid.add_child(hero_frame)
 
-	var hint_label: Label = owner.create_label("Cliquez sur EQUIPEMENT pour gérer le héros. Échap : retour au jeu", 14, Color(0.70, 0.62, 0.48))
+	var hint_label: Label = owner.create_label(
+		"Cliquez sur EQUIPEMENT pour gérer le héros.\nÉchap : retour au jeu",
+		14,
+		Color(0.70, 0.62, 0.48)
+	)
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	owner.content_box.add_child(hint_label)
 
@@ -96,20 +121,28 @@ static func create_status_hero_frame(owner, hero, index: int) -> Panel:
 		var empty_stats_label: Label = owner.create_label("Aucune donnée.", 12, Color(0.72, 0.66, 0.56))
 		empty_stats_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(empty_stats_label)
+
 		return panel
 
 	var equipment_button: Button = owner.create_status_equipment_button(index)
 	box.add_child(equipment_button)
 
 	var hpmp_label: Label = owner.create_label(
-		"HP " + str(owner.get_int_property(hero, "hp", 0)) + " / " + str(owner.get_int_property(hero, "max_hp", 0)) + " | MP " + str(owner.get_int_property(hero, "mp", 0)) + " / " + str(owner.get_int_property(hero, "max_mp", 0)),
+		"HP " + str(owner.get_int_property(hero, "hp", 0))
+		+ " / " + str(owner.get_int_property(hero, "max_hp", 0))
+		+ " | MP " + str(owner.get_int_property(hero, "mp", 0))
+		+ " / " + str(owner.get_int_property(hero, "max_mp", 0)),
 		12,
 		Color(0.82, 0.76, 0.62)
 	)
 	hpmp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(hpmp_label)
 
-	var stats_label: Label = owner.create_label(owner.format_compact_stats(hero), 12, Color(0.82, 0.76, 0.62))
+	var stats_label: Label = owner.create_label(
+		owner.format_compact_stats(hero),
+		12,
+		Color(0.82, 0.76, 0.62)
+	)
 	stats_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(stats_label)
 
@@ -119,6 +152,7 @@ static func create_status_hero_frame(owner, hero, index: int) -> Panel:
 # Crée le bouton explicite qui ouvre l'équipement du héros.
 static func create_status_equipment_button(owner, hero_index: int) -> Button:
 	var button: Button = Button.new()
+
 	button.text = "EQUIPEMENT"
 	button.focus_mode = Control.FOCUS_NONE
 	button.custom_minimum_size = Vector2(0, 46)
@@ -126,6 +160,7 @@ static func create_status_equipment_button(owner, hero_index: int) -> Button:
 	button.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	button.add_theme_font_size_override("font_size", 13)
 	button.pressed.connect(Callable(owner, "show_equipment_screen").bind(hero_index))
+
 	return button
 
 
@@ -145,11 +180,11 @@ static func show_equipment_screen(owner, hero_index: int, feedback_text: String 
 		return
 
 	var wrapper: VBoxContainer = VBoxContainer.new()
-	wrapper.custom_minimum_size = Vector2(620, 360)
+	wrapper.custom_minimum_size = EQUIPMENT_WRAPPER_MIN_SIZE
 	wrapper.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	wrapper.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	wrapper.alignment = BoxContainer.ALIGNMENT_CENTER
-	wrapper.add_theme_constant_override("separation", 6)
+	wrapper.add_theme_constant_override("separation", 4)
 	owner.content_box.add_child(wrapper)
 
 	var stats_panel: Panel = owner.create_panel(
@@ -157,28 +192,28 @@ static func show_equipment_screen(owner, hero_index: int, feedback_text: String 
 		Color(0.26, 0.17, 0.08, 1.0),
 		1
 	)
-	stats_panel.custom_minimum_size = Vector2(560, 102)
+	stats_panel.custom_minimum_size = EQUIPMENT_STATS_PANEL_SIZE
 	stats_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	wrapper.add_child(stats_panel)
+
 	owner.fill_equipment_stats_panel(stats_panel, hero)
 
-	var slots_panel: Panel = owner.create_panel(
-		Color(0.060, 0.040, 0.030, 1.0),
-		Color(0.32, 0.21, 0.10, 1.0),
-		2
-	)
-	slots_panel.custom_minimum_size = Vector2(560, 165)
-	slots_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	wrapper.add_child(slots_panel)
+	# Zone invisible : les boutons d'emplacement ont déjà leur propre forme.
+	# Le cadre autour de toute la liste était inutile et pouvait gêner la lisibilité.
+	var slot_area: MarginContainer = MarginContainer.new()
+	slot_area.custom_minimum_size = EQUIPMENT_SLOT_AREA_SIZE
+	slot_area.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	slot_area.add_theme_constant_override("margin_left", EQUIPMENT_SLOT_LIST_MARGIN)
+	slot_area.add_theme_constant_override("margin_top", EQUIPMENT_SLOT_LIST_MARGIN)
+	slot_area.add_theme_constant_override("margin_right", EQUIPMENT_SLOT_LIST_MARGIN)
+	slot_area.add_theme_constant_override("margin_bottom", EQUIPMENT_SLOT_LIST_MARGIN)
+	wrapper.add_child(slot_area)
 
 	var slot_list: VBoxContainer = VBoxContainer.new()
-	slot_list.set_anchors_preset(Control.PRESET_FULL_RECT)
-	slot_list.offset_left = 14
-	slot_list.offset_top = 8
-	slot_list.offset_right = -14
-	slot_list.offset_bottom = -8
-	slot_list.add_theme_constant_override("separation", 4)
-	slots_panel.add_child(slot_list)
+	slot_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	slot_list.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	slot_list.add_theme_constant_override("separation", EQUIPMENT_SLOT_LIST_SEPARATION)
+	slot_area.add_child(slot_list)
 
 	for slot_id in EquipmentRulesScript.get_slot_order():
 		var slot_button: Button = owner.create_equipment_slot_button(hero, hero_index, slot_id)
@@ -189,40 +224,28 @@ static func show_equipment_screen(owner, hero_index: int, feedback_text: String 
 		feedback_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		wrapper.add_child(feedback_label)
 
-	var back_panel: Panel = owner.create_panel(
-		Color(0.060, 0.040, 0.030, 1.0),
-		Color(0.32, 0.21, 0.10, 1.0),
-		1
-	)
-	back_panel.custom_minimum_size = Vector2(560, 38)
-	back_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	wrapper.add_child(back_panel)
-
+	# Zone invisible : seul le bouton Retour statut reste visible.
 	var back_center: CenterContainer = CenterContainer.new()
-	back_center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	back_center.offset_left = 8
-	back_center.offset_top = 4
-	back_center.offset_right = -8
-	back_center.offset_bottom = -4
-	back_panel.add_child(back_center)
+	back_center.custom_minimum_size = EQUIPMENT_BACK_AREA_SIZE
+	back_center.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	wrapper.add_child(back_center)
 
 	var back_button: Button = owner.create_compact_menu_button("Retour statut")
+	back_button.custom_minimum_size = EQUIPMENT_BACK_BUTTON_SIZE
+	back_button.add_theme_font_size_override("font_size", EQUIPMENT_BACK_BUTTON_FONT_SIZE)
 	back_button.pressed.connect(Callable(owner, "show_status_screen"))
 	back_center.add_child(back_button)
 
-	var hint_label: Label = owner.create_label("Cliquez sur un emplacement pour modifier l'équipement. Échap : retour au jeu", 12, Color(0.70, 0.62, 0.48))
-	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	wrapper.add_child(hint_label)
 
 
 static func fill_equipment_stats_panel(owner, panel: Panel, hero) -> void:
 	var stats_box: VBoxContainer = VBoxContainer.new()
 	stats_box.set_anchors_preset(Control.PRESET_FULL_RECT)
 	stats_box.offset_left = 20
-	stats_box.offset_top = 8
+	stats_box.offset_top = 6
 	stats_box.offset_right = -20
-	stats_box.offset_bottom = -8
-	stats_box.add_theme_constant_override("separation", 3)
+	stats_box.offset_bottom = -6
+	stats_box.add_theme_constant_override("separation", 2)
 	panel.add_child(stats_box)
 
 	stats_box.add_child(owner.create_stat_line(hero, "Force", "strength"))
@@ -279,9 +302,11 @@ static func create_stat_line(owner, hero, display_name: String, stat_name: Strin
 
 static func create_equipment_slot_button(owner, hero, hero_index: int, slot_id: String) -> Button:
 	var button: Button = Button.new()
+
 	button.focus_mode = Control.FOCUS_NONE
-	button.custom_minimum_size = Vector2(520, 28)
-	button.add_theme_font_size_override("font_size", 13)
+	button.custom_minimum_size = EQUIPMENT_SLOT_BUTTON_SIZE
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.add_theme_font_size_override("font_size", EQUIPMENT_SLOT_BUTTON_FONT_SIZE)
 
 	var item_id: String = owner.get_hero_equipped_item(hero, slot_id)
 	var item_name: String = "—"
@@ -289,7 +314,7 @@ static func create_equipment_slot_button(owner, hero, hero_index: int, slot_id: 
 	if item_id != "":
 		item_name = ItemDatabaseScript.get_display_name(item_id)
 
-	button.text = EquipmentRulesScript.get_slot_display_name(slot_id) + "     |     " + item_name
+	button.text = EquipmentRulesScript.get_slot_display_name(slot_id) + " | " + item_name
 	button.pressed.connect(Callable(owner, "show_equipment_choice_screen").bind(hero_index, slot_id))
 
 	return button
@@ -329,24 +354,32 @@ static func show_equipment_choice_screen(owner, hero_index: int, slot_id: String
 	wrapper.add_child(list_panel)
 
 	var list: VBoxContainer = owner.create_scrollable_list_inside_panel(list_panel)
+
 	var current_item_id: String = owner.get_hero_equipped_item(hero, slot_id)
 
 	if current_item_id != "":
-		var remove_button: Button = owner.create_equipment_choice_button("Retirer : " + ItemDatabaseScript.get_display_name(current_item_id))
+		var remove_button: Button = owner.create_equipment_choice_button(
+			"Retirer : " + ItemDatabaseScript.get_display_name(current_item_id)
+		)
 		remove_button.pressed.connect(Callable(owner, "on_unequip_pressed").bind(hero_index, slot_id))
 		list.add_child(remove_button)
 
 	var inventory = GameSession.get_inventory()
-	var equippable_ids: Array[String] = EquipmentRulesScript.get_equippable_item_ids_for_slot(hero, slot_id, inventory)
+	var equippable_ids: Array[String] = EquipmentRulesScript.get_equippable_item_ids_for_slot(
+		hero,
+		slot_id,
+		inventory
+	)
 
 	for item_id in equippable_ids:
 		var quantity: int = GameSession.get_inventory_item_quantity(item_id)
 		var option_text: String = ItemDatabaseScript.get_display_name(item_id)
-		option_text += "     |     " + str(quantity)
+		option_text += " | " + str(quantity)
 
 		var bonus_text: String = EquipmentRulesScript.get_item_bonus_text(item_id)
+
 		if bonus_text != "":
-			option_text += "     " + bonus_text
+			option_text += " " + bonus_text
 
 		var item_button: Button = owner.create_equipment_choice_button(option_text)
 		item_button.pressed.connect(Callable(owner, "on_equip_pressed").bind(hero_index, slot_id, item_id))
@@ -368,11 +401,13 @@ static func show_equipment_choice_screen(owner, hero_index: int, slot_id: String
 
 static func create_equipment_choice_button(owner, text: String) -> Button:
 	var button: Button = Button.new()
+
 	button.text = text
 	button.custom_minimum_size = Vector2(520, 28)
 	button.focus_mode = Control.FOCUS_NONE
 	button.add_theme_font_size_override("font_size", 13)
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+
 	return button
 
 
@@ -392,4 +427,3 @@ static func on_unequip_pressed(owner, hero_index: int, slot_id: String) -> void:
 # MENU SYSTÈME
 # Gère sauvegarde, options et sortie.
 # ------------------------------------------------------------
-

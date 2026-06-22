@@ -1,7 +1,7 @@
 extends CanvasLayer
 class_name GameUI
-const UIFrameStyleScript = preload("res://scripts/ui/theme/UIFrameStyle.gd")
 
+const UIFrameStyleScript = preload("res://scripts/ui/theme/UIFrameStyle.gd")
 const ClassDatabaseScript = preload("res://scripts/characters/ClassDatabase.gd")
 const LogPanelUIScript = preload("res://scripts/ui/LogPanelUI.gd")
 const DungeonViewportUIScript = preload("res://scripts/ui/DungeonViewportUI.gd")
@@ -22,7 +22,6 @@ signal exploration_command_pressed(command_id: String)
 signal combat_command_pressed(command_index: int)
 
 var root: Control = null
-
 var main_ui_root: Control = null
 var creation_ui_root: Control = null
 
@@ -86,13 +85,13 @@ func build_dungeon_viewport() -> void:
 	dungeon_viewport.anchor_top = 0.0
 	dungeon_viewport.anchor_right = 1.0
 	dungeon_viewport.anchor_bottom = 1.0
+
 	dungeon_viewport.offset_left = OUTER_MARGIN + SIDE_WIDTH + GAP
 	dungeon_viewport.offset_top = OUTER_MARGIN
 	dungeon_viewport.offset_right = -OUTER_MARGIN - SIDE_WIDTH - GAP
 	dungeon_viewport.offset_bottom = -OUTER_MARGIN - BOTTOM_HEIGHT - GAP
 
 	main_ui_root.add_child(dungeon_viewport)
-
 	dungeon_viewport.setup_camera_source(get_parent())
 
 	if dungeon_viewport.has_signal("in_game_menu_save_requested"):
@@ -205,14 +204,14 @@ func on_dungeon_viewport_combat_command_pressed(command_index: int) -> void:
 func set_dungeon_theme(theme) -> void:
 	if dungeon_viewport != null:
 		dungeon_viewport.set_dungeon_theme(theme)
-		
+
+
 func build_bottom_area() -> void:
 	var bottom_panel: Panel = create_panel(
 		Color(0.055, 0.035, 0.025, 1.0),
 		Color(0.42, 0.27, 0.12, 1.0),
 		3
 	)
-
 	bottom_panel.name = "BottomPanel"
 	bottom_panel.anchor_left = 0.0
 	bottom_panel.anchor_top = 1.0
@@ -363,12 +362,9 @@ func show_creation(
 	current_panel.add_child(current_box)
 
 	current_box.add_child(create_label("Héros " + str(hero_number) + " / " + str(total_heroes), 20, Color(0.95, 0.78, 0.38)))
-
 	current_box.add_child(create_separator())
-
 	current_box.add_child(create_label("Classe sélectionnée : " + selected_class, 18, Color(0.95, 0.86, 0.62)))
 	current_box.add_child(create_label(class_description, 15, Color(0.82, 0.74, 0.56)))
-
 	current_box.add_child(create_separator())
 
 	if current_roll != null:
@@ -403,7 +399,12 @@ func show_exploration(
 ) -> void:
 	ensure_ui_ready()
 
-	var entering_exploration: bool = current_screen_mode != "exploration"
+	# Mémorise l'écran précédent avant de basculer en exploration.
+	# Cela permet de revenir au canal Journal après un combat,
+	# même si le dernier message reçu est détecté comme un message Combat.
+	var previous_screen_mode: String = current_screen_mode
+	var entering_exploration: bool = previous_screen_mode != "exploration"
+
 	current_screen_mode = "exploration"
 
 	creation_ui_root.visible = false
@@ -439,7 +440,10 @@ func show_exploration(
 		log_panel.add_log_message(channel, clean_log)
 
 		if entering_exploration:
-			log_panel.set_log_channel(channel)
+			if previous_screen_mode == "combat":
+				log_panel.set_log_channel(LOG_JOURNAL)
+			else:
+				log_panel.set_log_channel(channel)
 	elif entering_exploration:
 		log_panel.add_log_message(LOG_JOURNAL, "Le donjon est silencieux.")
 		log_panel.set_log_channel(LOG_JOURNAL)
@@ -510,6 +514,7 @@ func show_combat(
 			facing_name
 		)
 
+
 func create_creation_hero_line(hero, number: int) -> Control:
 	var panel: Panel = create_panel(
 		Color(0.11, 0.07, 0.04, 1.0),
@@ -527,9 +532,9 @@ func create_creation_hero_line(hero, number: int) -> Control:
 
 	var short_class: String = ClassDatabaseScript.get_short_name(hero.job)
 
-	label.text = str(number) + ". " + hero.character_name + "  [" + short_class + "]"
-	label.text += "\nHP " + str(hero.max_hp) + "  MP " + str(hero.max_mp)
-	label.text += "  NIV " + str(hero.level)
+	label.text = str(number) + ". " + hero.character_name + " [" + short_class + "]"
+	label.text += "\nHP " + str(hero.max_hp) + " MP " + str(hero.max_mp)
+	label.text += " NIV " + str(hero.level)
 
 	panel.add_child(label)
 
@@ -561,16 +566,19 @@ func create_label(
 	font_color: Color
 ) -> Label:
 	var label: Label = Label.new()
+
 	label.text = text
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", font_color)
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+
 	return label
 
 
 func create_separator() -> HSeparator:
 	var separator: HSeparator = HSeparator.new()
 	separator.custom_minimum_size = Vector2(0, 6)
+
 	return separator
 
 
@@ -597,14 +605,16 @@ func get_stats_line(stats) -> String:
 	total += stats.magic_power
 
 	var text: String = ""
+
 	text += "FOR " + str(stats.strength)
-	text += "  AGI " + str(stats.agility)
-	text += "  END " + str(stats.endurance)
-	text += "  MAG " + str(stats.magic_power)
-	text += "  TOTAL " + str(total)
+	text += " AGI " + str(stats.agility)
+	text += " END " + str(stats.endurance)
+	text += " MAG " + str(stats.magic_power)
+	text += " TOTAL " + str(total)
 
 	return text
-	
+
+
 func has_pending_damage_acknowledgement() -> bool:
 	if party_status_ui == null:
 		return false

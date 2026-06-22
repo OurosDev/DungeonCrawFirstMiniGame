@@ -50,12 +50,13 @@ func save_game_from_dungeon(dungeon) -> bool:
 		dungeon.store_current_floor_state()
 
 	var save_data: Dictionary = {}
-	save_data["version"] = 5
+	save_data["version"] = 6
 	save_data["current_floor_id"] = dungeon.current_floor_id
 	save_data["party"] = serialize_party(dungeon.party)
 	save_data["layout"] = dungeon.layout.duplicate()
 	save_data["discovered_map_cells"] = serialize_discovered_map_cells(dungeon.discovered_map_cells)
 	save_data["floor_states"] = GameSession.get_floor_states_save_data()
+	save_data["discovered_ability_ids"] = GameSession.get_discovered_ability_ids()
 	save_data["inventory"] = GameSession.get_inventory_save_data()
 	save_data["gold"] = GameSession.get_gold()
 

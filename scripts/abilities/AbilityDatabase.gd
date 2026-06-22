@@ -10,7 +10,7 @@ static func get_ability_data(ability_id: String):
 			"Étincelle",
 			"damage",
 			"enemy",
-			3,
+			6,
 			8,
 			16,
 			true,

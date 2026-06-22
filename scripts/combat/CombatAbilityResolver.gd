@@ -83,6 +83,9 @@ static func is_ability_available_for_basic_use(hero, ability) -> bool:
 
 
 static func hero_has_discovered_ability(hero, ability_id: String, discovery_id: String) -> bool:
+	if group_has_discovered_ability(ability_id, discovery_id):
+		return true
+
 	if hero == null:
 		return false
 
@@ -109,6 +112,29 @@ static func hero_has_discovered_ability(hero, ability_id: String, discovery_id: 
 			if container.has(ability_id):
 				return true
 			if container.has(discovery_id):
+				return true
+
+	return false
+
+
+static func group_has_discovered_ability(ability_id: String, discovery_id: String) -> bool:
+	# Les sorts découverts dans le donjon sont une progression de groupe.
+	# GameSession est l'autoload qui conserve cette progression entre scènes.
+	if GameSession == null:
+		return false
+
+	if GameSession.has_method("has_discovered_ability"):
+		if discovery_id != "" and GameSession.has_discovered_ability(discovery_id):
+			return true
+		if ability_id != "" and GameSession.has_discovered_ability(ability_id):
+			return true
+
+	if GameSession.has_method("get_discovered_ability_ids"):
+		var discovered_ids = GameSession.get_discovered_ability_ids()
+		if discovered_ids is Array:
+			if discovered_ids.has(discovery_id):
+				return true
+			if discovered_ids.has(ability_id):
 				return true
 
 	return false

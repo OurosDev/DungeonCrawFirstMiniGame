@@ -6,6 +6,7 @@ class_name MonsterDatabase
 # ------------------------------------------------------------
 
 const GUARDIAN_BOSS_ID: String = "gardien_boss_etage_2"
+const GUARDIAN_BOSS_BASE_HP: int = 45
 const GUARDIAN_BOSS_HP_MULTIPLIER: int = 5
 
 
@@ -133,7 +134,7 @@ static func create_zombie():
 		2,
 		4,
 		0,
-		12,
+		15,
 		0,
 		1,
 		3,
@@ -155,7 +156,7 @@ static func create_bat():
 		9,
 		2,
 		0,
-		8,
+		10,
 		0,
 		1,
 		4,
@@ -177,7 +178,7 @@ static func create_goblin():
 		6,
 		4,
 		0,
-		16,
+		20,
 		0,
 		2,
 		5,
@@ -200,7 +201,7 @@ static func create_troll():
 		3,
 		8,
 		0,
-		34,
+		43,
 		0,
 		4,
 		8,
@@ -224,7 +225,7 @@ static func create_guardian():
 		5,
 		9,
 		1,
-		45,
+		56,
 		0,
 		5,
 		10,
@@ -241,13 +242,13 @@ static func create_guardian():
 
 # ------------------------------------------------------------
 # BOSS - ÉTAGE 2
-# Réutilise le gardien normal, avec uniquement les HP multipliés.
+# Réutilise le gardien normal, mais conserve les HP de boss historiques.
+# Le boss reste donc exclu du rééquilibrage +25 % des monstres normaux.
 # ------------------------------------------------------------
 
 static func create_guardian_boss_floor_2():
 	var boss = create_guardian()
-	var base_max_hp: int = int(boss.max_hp)
-	var boss_max_hp: int = base_max_hp * GUARDIAN_BOSS_HP_MULTIPLIER
+	var boss_max_hp: int = GUARDIAN_BOSS_BASE_HP * GUARDIAN_BOSS_HP_MULTIPLIER
 
 	set_property_if_available(boss, "monster_id", GUARDIAN_BOSS_ID)
 	set_property_if_available(boss, "visual_id", "gardien")

@@ -22,6 +22,21 @@ const MAIN_MENU_SCENE_PATH: String = "res://scenes/MainMenu.tscn"
 
 
 # ------------------------------------------------------------
+# CONFIGURATION — COULEURS DES ROLLS
+# Définit les seuils visuels des caractéristiques à la création.
+# ------------------------------------------------------------
+
+const ROLL_STAT_MAX_VALUE: int = 10
+const ROLL_STAT_WEAK_VALUE: int = 4
+const ROLL_STAT_AVERAGE_VALUE: int = 5
+
+const ROLL_STAT_DEFAULT_COLOR_HEX: String = "#DBBE99"
+const ROLL_STAT_MAX_COLOR_HEX: String = "#64E070"
+const ROLL_STAT_AVERAGE_COLOR_HEX: String = "#F2D14E"
+const ROLL_STAT_WEAK_COLOR_HEX: String = "#E05A4F"
+
+
+# ------------------------------------------------------------
 # ÉTAT DE CRÉATION
 # Stocke l’avancement de la création de l’équipe.
 # ------------------------------------------------------------
@@ -46,8 +61,8 @@ var main_box: VBoxContainer = null
 
 var title_label: Label = null
 var hero_label: Label = null
-var roll_label: Label = null
-var stored_roll_label: Label = null
+var roll_label: RichTextLabel = null
+var stored_roll_label: RichTextLabel = null
 var class_description_label: Label = null
 var party_summary_label: Label = null
 
@@ -124,12 +139,12 @@ func build_ui() -> void:
 	hero_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	main_box.add_child(hero_label)
 
-	roll_label = create_label(
+	roll_label = create_rich_label(
 		"",
 		18,
-		Color(0.86, 0.78, 0.62)
+		Color(0.86, 0.78, 0.62),
+		28
 	)
-	roll_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	main_box.add_child(roll_label)
 
 	var roll_buttons_box: HBoxContainer = HBoxContainer.new()
@@ -161,12 +176,12 @@ func build_ui() -> void:
 	)
 	roll_buttons_box.add_child(restore_button)
 
-	stored_roll_label = create_label(
+	stored_roll_label = create_rich_label(
 		"",
 		15,
-		Color(0.65, 0.58, 0.46)
+		Color(0.65, 0.58, 0.46),
+		24
 	)
-	stored_roll_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	main_box.add_child(stored_roll_label)
 
 	var separator_1: HSeparator = HSeparator.new()
@@ -380,12 +395,12 @@ func update_ui() -> void:
 	hero_label.text = "HÉROS " + str(current_hero_index + 1) + " / 4"
 
 	if current_stats != null:
-		roll_label.text = stat_roller.get_roll_text(current_stats)
+		roll_label.text = build_colored_roll_text(current_stats)
 	else:
 		roll_label.text = ""
 
 	if stored_stats != null:
-		stored_roll_label.text = "Roll stocké : " + stat_roller.get_roll_text(stored_stats)
+		stored_roll_label.text = "Roll stocké : " + build_colored_roll_text(stored_stats)
 	else:
 		stored_roll_label.text = "Aucun roll stocké."
 
@@ -428,6 +443,38 @@ func update_party_summary() -> void:
 			text += hero.character_name + " - " + ClassDatabaseScript.normalize_class_name(hero.job)
 
 	party_summary_label.text = text
+
+
+# ------------------------------------------------------------
+# TEXTE COLORÉ DES ROLLS
+# Colore uniquement les valeurs des caractéristiques selon leur qualité.
+# ------------------------------------------------------------
+
+func build_colored_roll_text(stats) -> String:
+	if stats == null:
+		return ""
+
+	var text: String = ""
+	text += "FOR " + colorize_roll_stat_value(stats.strength)
+	text += " AGI " + colorize_roll_stat_value(stats.agility)
+	text += " END " + colorize_roll_stat_value(stats.endurance)
+	text += " MAG " + colorize_roll_stat_value(stats.magic_power)
+	text += " TOTAL " + str(stat_roller.get_total(stats))
+
+	return text
+
+
+func colorize_roll_stat_value(value: int) -> String:
+	var color_hex: String = ROLL_STAT_DEFAULT_COLOR_HEX
+
+	if value >= ROLL_STAT_MAX_VALUE:
+		color_hex = ROLL_STAT_MAX_COLOR_HEX
+	elif value == ROLL_STAT_AVERAGE_VALUE:
+		color_hex = ROLL_STAT_AVERAGE_COLOR_HEX
+	elif value <= ROLL_STAT_WEAK_VALUE:
+		color_hex = ROLL_STAT_WEAK_COLOR_HEX
+
+	return "[color=" + color_hex + "]" + str(value) + "[/color]"
 
 
 # ------------------------------------------------------------
@@ -528,6 +575,28 @@ func create_label(
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", font_color)
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+
+	return label
+
+
+func create_rich_label(
+	text: String,
+	font_size: int,
+	font_color: Color,
+	minimum_height: int
+) -> RichTextLabel:
+	var label: RichTextLabel = RichTextLabel.new()
+
+	label.bbcode_enabled = true
+	label.text = text
+	label.fit_content = true
+	label.scroll_active = false
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.custom_minimum_size = Vector2(0, minimum_height)
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	label.add_theme_font_size_override("normal_font_size", font_size)
+	label.add_theme_color_override("default_color", font_color)
+	label.autowrap_mode = TextServer.AUTOWRAP_OFF
 
 	return label
 
