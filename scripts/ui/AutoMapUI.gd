@@ -12,6 +12,11 @@ const FULL_MAP_FALLBACK_CELL_PIXEL_SIZE: int = 16
 const FULL_MAP_MIN_CELL_PIXEL_SIZE: int = 8
 const FULL_MAP_MAX_CELL_PIXEL_SIZE: int = 20
 const FULL_MAP_GRID_SEPARATION: int = 1
+const COORDINATE_TOOLTIP_MIN_SIZE: Vector2 = Vector2(118, 28)
+const COORDINATE_TOOLTIP_LABEL_MIN_SIZE: Vector2 = Vector2(96, 18)
+const COORDINATE_TOOLTIP_FONT_SIZE: int = 12
+const COORDINATE_TOOLTIP_MOUSE_OFFSET: Vector2 = Vector2(14, 14)
+const COORDINATE_TOOLTIP_VIEWPORT_MARGIN: float = 4.0
 
 # ------------------------------------------------------------
 # RÉFÉRENCES UI
@@ -402,7 +407,8 @@ func build_coordinate_tooltip() -> void:
 	coordinate_tooltip.visible = false
 	coordinate_tooltip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	coordinate_tooltip.z_index = 100
-	coordinate_tooltip.custom_minimum_size = Vector2(82, 26)
+	coordinate_tooltip.custom_minimum_size = COORDINATE_TOOLTIP_MIN_SIZE
+	coordinate_tooltip.size = COORDINATE_TOOLTIP_MIN_SIZE
 	coordinate_tooltip.add_theme_stylebox_override(
 		"panel",
 		create_panel_style(
@@ -421,9 +427,12 @@ func build_coordinate_tooltip() -> void:
 	margin.add_theme_constant_override("margin_bottom", 4)
 	coordinate_tooltip.add_child(margin)
 
-	coordinate_tooltip_label = create_label("", 12, Color(0.95, 0.82, 0.45))
+	coordinate_tooltip_label = create_label("", COORDINATE_TOOLTIP_FONT_SIZE, Color(0.95, 0.82, 0.45))
 	coordinate_tooltip_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	coordinate_tooltip_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	coordinate_tooltip_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	coordinate_tooltip_label.clip_text = false
+	coordinate_tooltip_label.custom_minimum_size = COORDINATE_TOOLTIP_LABEL_MIN_SIZE
 	margin.add_child(coordinate_tooltip_label)
 
 
@@ -431,20 +440,37 @@ func show_coordinate_tooltip(cell_coordinates: Vector2i) -> void:
 	if coordinate_tooltip == null or coordinate_tooltip_label == null:
 		return
 
-	coordinate_tooltip_label.text = "X " + str(cell_coordinates.x) + "  Y " + str(cell_coordinates.y)
+	# Format compact et sans retour à la ligne, plus robuste avec une police globale plus large.
+	coordinate_tooltip_label.text = "X:%d  Y:%d" % [cell_coordinates.x, cell_coordinates.y]
+	coordinate_tooltip_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	coordinate_tooltip_label.clip_text = false
+
+	coordinate_tooltip.custom_minimum_size = COORDINATE_TOOLTIP_MIN_SIZE
+	coordinate_tooltip.size = COORDINATE_TOOLTIP_MIN_SIZE
 
 	var local_mouse_position: Vector2 = get_local_mouse_position()
-	var tooltip_size: Vector2 = coordinate_tooltip.size
+	var tooltip_size: Vector2 = COORDINATE_TOOLTIP_MIN_SIZE
 
-	if tooltip_size.x <= 0 or tooltip_size.y <= 0:
-		tooltip_size = coordinate_tooltip.custom_minimum_size
+	var target_position: Vector2 = local_mouse_position + COORDINATE_TOOLTIP_MOUSE_OFFSET
+	var max_x: float = max(
+		COORDINATE_TOOLTIP_VIEWPORT_MARGIN,
+		size.x - tooltip_size.x - COORDINATE_TOOLTIP_VIEWPORT_MARGIN
+	)
+	var max_y: float = max(
+		COORDINATE_TOOLTIP_VIEWPORT_MARGIN,
+		size.y - tooltip_size.y - COORDINATE_TOOLTIP_VIEWPORT_MARGIN
+	)
 
-	var target_position: Vector2 = local_mouse_position + Vector2(14, 14)
-	var max_x: float = max(0.0, size.x - tooltip_size.x)
-	var max_y: float = max(0.0, size.y - tooltip_size.y)
-
-	target_position.x = clamp(target_position.x, 0.0, max_x)
-	target_position.y = clamp(target_position.y, 0.0, max_y)
+	target_position.x = clamp(
+		target_position.x,
+		COORDINATE_TOOLTIP_VIEWPORT_MARGIN,
+		max_x
+	)
+	target_position.y = clamp(
+		target_position.y,
+		COORDINATE_TOOLTIP_VIEWPORT_MARGIN,
+		max_y
+	)
 
 	coordinate_tooltip.position = target_position
 	coordinate_tooltip.visible = true

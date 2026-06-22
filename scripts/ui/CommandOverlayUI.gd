@@ -88,12 +88,12 @@ func show_exploration_commands() -> void:
 	visible = true
 	clear_container(commands_box)
 
-	add_exploration_command_button("Z ↑ Avancer", EXPLORATION_COMMAND_FORWARD, BUTTON_MIN_SIZE)
-	add_exploration_command_button("S ↓ Reculer", EXPLORATION_COMMAND_BACK, BUTTON_MIN_SIZE)
-	add_exploration_command_button("Q ← Tourner", EXPLORATION_COMMAND_TURN_LEFT, BUTTON_MIN_SIZE)
-	add_exploration_command_button("D → Tourner", EXPLORATION_COMMAND_TURN_RIGHT, BUTTON_MIN_SIZE)
+	add_exploration_command_button("Avancer", EXPLORATION_COMMAND_FORWARD, BUTTON_MIN_SIZE)
+	add_exploration_command_button("Reculer", EXPLORATION_COMMAND_BACK, BUTTON_MIN_SIZE)
+	add_exploration_command_button("Gauche", EXPLORATION_COMMAND_TURN_LEFT, BUTTON_MIN_SIZE)
+	add_exploration_command_button("Droite", EXPLORATION_COMMAND_TURN_RIGHT, BUTTON_MIN_SIZE)
 	add_exploration_command_button("Carte", EXPLORATION_COMMAND_MAP, MAP_BUTTON_MIN_SIZE)
-	add_exploration_command_button("E Menu", EXPLORATION_COMMAND_MENU, MENU_BUTTON_MIN_SIZE)
+	add_exploration_command_button("Menu", EXPLORATION_COMMAND_MENU, MENU_BUTTON_MIN_SIZE)
 
 
 func add_exploration_command_button(
