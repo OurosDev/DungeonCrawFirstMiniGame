@@ -1,5 +1,11 @@
 extends Panel
 class_name AutoMapUI
+
+# ------------------------------------------------------------
+# VERSION SCRIPT
+# v0.13.1-SpellSteles
+# ------------------------------------------------------------
+
 const UIFrameStyleScript = preload("res://scripts/ui/theme/UIFrameStyle.gd")
 
 const VISIBLE_RADIUS_X: int = 7
@@ -227,7 +233,7 @@ func add_map_cell_to_grid(
 
 # Crée une cellule visuelle selon le contenu de la case :
 # mur, porte, porte verrouillée, escalier, temple, boutique,
-# coffre, message, boss, joueur ou zone non découverte.
+# coffre, message, stèle de sort, boss, joueur ou zone non découverte.
 func create_map_cell(
 	tile: String,
 	is_discovered: bool,
@@ -313,6 +319,11 @@ func create_map_cell(
 		border_color = Color(0.42, 0.72, 0.80, 1.0)
 		text_color = Color(0.75, 0.95, 1.0, 1.0)
 		symbol = "M"
+	elif tile == "S":
+		background_color = Color(0.045, 0.035, 0.095, 1.0)
+		border_color = Color(0.48, 0.42, 0.95, 1.0)
+		text_color = Color(0.78, 0.72, 1.0, 1.0)
+		symbol = "S"
 	else:
 		background_color = Color(0.08, 0.055, 0.035, 1.0)
 		border_color = Color(0.12, 0.08, 0.045, 1.0)

@@ -1,5 +1,11 @@
 extends Panel
 class_name DungeonViewportUI
+
+# ------------------------------------------------------------
+# VERSION SCRIPT
+# v0.13.1-ExpandedMapCloseX
+# ------------------------------------------------------------
+
 const UIFrameStyleScript = preload("res://scripts/ui/theme/UIFrameStyle.gd")
 
 const CommandOverlayUIScript = preload("res://scripts/ui/CommandOverlayUI.gd")
@@ -32,7 +38,7 @@ var command_overlay = null
 var exploration_map_overlay_root: Control = null
 var exploration_map_overlay_panel: Panel = null
 var exploration_map_auto_map = null
-var exploration_map_return_button: Button = null
+var exploration_map_close_button: Button = null
 
 var stored_map_layout: Array[String] = []
 var stored_map_discovered_cells: Dictionary = {}
@@ -102,6 +108,7 @@ func build_in_game_menu_panel() -> void:
 
 	in_game_menu_panel.save_requested.connect(on_in_game_menu_save_requested)
 	in_game_menu_panel.quit_requested.connect(on_in_game_menu_quit_requested)
+	in_game_menu_panel.close_requested.connect(on_in_game_menu_close_requested)
 
 
 func open_in_game_menu(party: Array) -> void:
@@ -127,6 +134,22 @@ func close_in_game_menu() -> void:
 	if in_game_menu_panel != null:
 		in_game_menu_panel.close_menu()
 
+	restore_exploration_after_menu_close()
+
+
+func restore_exploration_after_menu_close() -> void:
+	if command_overlay != null:
+		command_overlay.visible = true
+
+		if command_overlay.has_method("show_exploration_commands"):
+			command_overlay.show_exploration_commands()
+
+	if view_status_panel != null:
+		view_status_panel.visible = false
+
+	if monster_display != null:
+		monster_display.visible = false
+
 
 func toggle_in_game_menu(party: Array) -> void:
 	if is_in_game_menu_open():
@@ -147,6 +170,10 @@ func show_in_game_menu_message(text: String) -> void:
 		return
 
 	in_game_menu_panel.show_message(text)
+
+
+func on_in_game_menu_close_requested() -> void:
+	close_in_game_menu()
 
 
 func on_in_game_menu_save_requested() -> void:
@@ -203,21 +230,22 @@ func build_exploration_map_overlay() -> void:
 	exploration_map_auto_map.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	margin.add_child(exploration_map_auto_map)
 
-	exploration_map_return_button = Button.new()
-	exploration_map_return_button.text = "Retour"
-	exploration_map_return_button.custom_minimum_size = Vector2(62, 22)
-	exploration_map_return_button.focus_mode = Control.FOCUS_NONE
-	exploration_map_return_button.z_index = 20
-	exploration_map_return_button.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	exploration_map_return_button.offset_left = 8
-	exploration_map_return_button.offset_top = -28
-	exploration_map_return_button.offset_right = 70
-	exploration_map_return_button.offset_bottom = -6
-	exploration_map_return_button.add_theme_font_size_override("font_size", 11)
-	exploration_map_return_button.add_theme_color_override("font_color", Color(0.90, 0.80, 0.58))
-	exploration_map_return_button.add_theme_color_override("font_hover_color", Color(1.0, 0.90, 0.55))
-	exploration_map_return_button.add_theme_color_override("font_pressed_color", Color(1.0, 0.92, 0.48))
-	exploration_map_return_button.add_theme_stylebox_override(
+	exploration_map_close_button = Button.new()
+	exploration_map_close_button.text = "X"
+	exploration_map_close_button.custom_minimum_size = Vector2(34, 34)
+	exploration_map_close_button.focus_mode = Control.FOCUS_NONE
+	exploration_map_close_button.tooltip_text = "Fermer la carte"
+	exploration_map_close_button.z_index = 20
+	exploration_map_close_button.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	exploration_map_close_button.offset_left = -46
+	exploration_map_close_button.offset_top = 8
+	exploration_map_close_button.offset_right = -12
+	exploration_map_close_button.offset_bottom = 42
+	exploration_map_close_button.add_theme_font_size_override("font_size", 14)
+	exploration_map_close_button.add_theme_color_override("font_color", Color(0.90, 0.80, 0.58))
+	exploration_map_close_button.add_theme_color_override("font_hover_color", Color(1.0, 0.90, 0.55))
+	exploration_map_close_button.add_theme_color_override("font_pressed_color", Color(1.0, 0.92, 0.48))
+	exploration_map_close_button.add_theme_stylebox_override(
 		"normal",
 		UIFrameStyleScript.create_button_style(
 			Color(0.11, 0.07, 0.04, 1.0),
@@ -225,7 +253,7 @@ func build_exploration_map_overlay() -> void:
 			1
 		)
 	)
-	exploration_map_return_button.add_theme_stylebox_override(
+	exploration_map_close_button.add_theme_stylebox_override(
 		"hover",
 		UIFrameStyleScript.create_button_style(
 			Color(0.18, 0.10, 0.05, 1.0),
@@ -233,7 +261,7 @@ func build_exploration_map_overlay() -> void:
 			1
 		)
 	)
-	exploration_map_return_button.add_theme_stylebox_override(
+	exploration_map_close_button.add_theme_stylebox_override(
 		"pressed",
 		UIFrameStyleScript.create_button_style(
 			Color(0.28, 0.16, 0.06, 1.0),
@@ -241,8 +269,8 @@ func build_exploration_map_overlay() -> void:
 			2
 		)
 	)
-	exploration_map_return_button.pressed.connect(close_exploration_map_overlay)
-	exploration_map_overlay_panel.add_child(exploration_map_return_button)
+	exploration_map_close_button.pressed.connect(close_exploration_map_overlay)
+	exploration_map_overlay_panel.add_child(exploration_map_close_button)
 
 
 func update_exploration_map_data(

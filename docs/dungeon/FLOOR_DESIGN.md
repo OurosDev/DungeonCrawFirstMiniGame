@@ -2,8 +2,7 @@
 
 Normes de conception des étages du donjon.
 
-Ce document sert de référence pour les layouts ASCII utilisés par `scripts/dungeon/FloorDatabase.gd`,
-pour la nomenclature des symboles et pour les règles de placement des lieux spéciaux.
+Ce document sert de référence pour les layouts ASCII utilisés par `scripts/dungeon/FloorDatabase.gd`, pour la nomenclature des symboles et pour les règles de placement des lieux spéciaux.
 
 ---
 
@@ -19,8 +18,7 @@ Règle fondamentale :
 
 Les layouts doivent rester faciles à relire, à comparer et à modifier.
 
-Ils ne doivent pas devenir un script caché : les comportements complexes doivent être définis dans des tables
-de données par étage + coordonnée quand c’est nécessaire.
+Ils ne doivent pas devenir un script caché : les comportements complexes doivent être définis dans des tables de données par étage + coordonnée quand c’est nécessaire.
 
 ---
 
@@ -51,8 +49,7 @@ Ne pas utiliser d’espaces dans les layouts de `FloorDatabase.gd`.
 
 Utiliser `.` pour représenter explicitement le sol.
 
-Les espaces sont réservés uniquement aux documents de visualisation, comme `FLOOR_VISUALIZER.md`,
-où ils peuvent améliorer la lisibilité.
+Les espaces sont réservés uniquement aux documents de visualisation, comme `FLOOR_VISUALIZER.md`, où ils peuvent améliorer la lisibilité.
 
 ### 2.5 Caractères ASCII simples
 
@@ -70,7 +67,7 @@ DOOR
 
 ## 3. Nomenclature officielle des symboles
 
-| Symbole | Nom | Statut v0.8 | Marchable | Rencontre aléatoire | État sauvegardé |
+| Symbole | Nom | Statut v0.13.1 | Marchable | Rencontre aléatoire | État sauvegardé |
 |---|---|---:|---:|---:|---:|
 | `#` | Mur | Utilisé | Non | Non | Non |
 | `.` | Sol / couloir | Utilisé | Oui | Oui | Non |
@@ -82,13 +79,20 @@ DOOR
 | `B` | Boutique | Utilisé | Oui | Non | Or/inventaire via systèmes dédiés |
 | `C` | Coffre | Utilisé | Oui | Non | Oui, devient `.` après ouverture |
 | `M` | Message / PNJ neutre / indication | Utilisé | Oui | Non | Non actuellement |
+| `S` | Stèle de sort | Utilisé | Oui | Non | Découverte sauvegardée via `discovered_ability_ids` |
 | `F` | Combat fixe non-boss | Réservé | Oui prévu | Non | Oui si unique |
 | `X` | Boss / rencontre majeure | Utilisé | Oui | Non | Oui, devient `.` après victoire |
 | `P` | Piège | Réservé | Oui prévu | Non recommandé | Selon design |
 | `E` | Événement | Réservé | Oui prévu | Non recommandé | Selon design |
-| `R` | Rune / sort visible | Réservé | Oui prévu | Non | Oui si unique |
 | `L` | Porte verrouillée | Utilisé | Non puis Oui | Non | Oui, devient `d` après ouverture |
-| `S` | Passage secret | Réservé | À définir | À définir | Oui |
+
+Note historique :
+
+```text
+S a été réaffecté en v0.13.1 aux stèles de sort.
+Le passage secret n'a plus de symbole officiel réservé pour le moment.
+Un futur symbole de passage secret devra être choisi seulement quand ce système sera conçu.
+```
 
 ---
 
@@ -189,8 +193,7 @@ Règles de placement :
 
 Règle d’orientation 3D :
 
-- le modèle 3D du temple doit être orienté vers la porte d’accès ;
-- à terme, `DungeonRenderer.gd` devrait déduire cette orientation depuis la porte adjacente.
+- le modèle 3D du temple doit être orienté vers la porte d’accès ou le chemin adjacent praticable.
 
 ### `B` — Boutique
 
@@ -208,13 +211,11 @@ Règles de placement :
 - doit être en bout de couloir ou dans une alcôve ;
 - ne doit pas être placée directement dans un couloir principal ;
 - doit rester un lieu sûr ;
-- ne doit pas être trop proche du temple si cela rend la zone trop sûre ;
-- sur les premiers étages, elle peut être relativement accessible pour limiter la frustration liée à l’inventaire.
+- ne doit pas être trop proche du temple si cela rend la zone trop sûre.
 
 Règle d’orientation 3D :
 
-- le modèle 3D de boutique doit être orienté vers la porte d’accès ;
-- à terme, `DungeonRenderer.gd` devrait déduire cette orientation depuis la porte adjacente.
+- le modèle 3D de boutique doit être orienté vers la porte d’accès ou le chemin adjacent praticable.
 
 ### `C` — Coffre
 
@@ -266,6 +267,38 @@ Règles :
 - multiplier les messages sans utilité ;
 - bloquer la progression sur un indice trop obscur ;
 - utiliser `M` comme déclencheur de combat.
+
+### `S` — Stèle de sort
+
+Statut : utilisé depuis `v0.13.1`.
+
+Rôle :
+
+- représente une découverte de sort visible dans le labyrinthe ;
+- case marchable ;
+- ne déclenche pas de rencontre aléatoire ;
+- reste visible après découverte ;
+- est affichée sur l’automap / carte agrandie ;
+- est rendue en 3D par une stèle magique ;
+- la découverte réelle reste définie dans `FloorDatabase.gd` par la table `discoveries`.
+
+Cas actuels :
+
+- `Vector2i(29, 13)` à l’étage 1 : `spell_ice_shard` ;
+- `Vector2i(21, 8)` à l’étage 2 : `spell_group_heal`.
+
+Règles de placement :
+
+- placer la stèle dans une impasse, une alcôve ou une zone volontairement exploratoire ;
+- éviter de la placer directement dans un couloir principal sans intention claire ;
+- ne pas superposer une stèle avec un coffre, un message, une boutique, un temple ou un boss ;
+- définir le sort dans `discoveries` avec la même coordonnée que la case `S`.
+
+Règle d’orientation 3D :
+
+- la stèle doit faire face à une case chemin `.` si possible ;
+- sinon, elle doit faire face à une case praticable non-mur ;
+- elle ne doit pas être orientée volontairement vers un mur `#` quand une case praticable adjacente existe.
 
 ### `L` — Porte verrouillée
 
@@ -323,6 +356,7 @@ Différence officielle :
 
 ```text
 M = message / PNJ neutre / indication
+S = stèle de sort
 F = combat fixe non-boss
 X = boss / rencontre majeure
 ```
@@ -347,9 +381,9 @@ Règles :
 - ne pas remplacer toutes les rencontres aléatoires par des `F` ;
 - placer un combat fixe avec un intérêt clair : récompense, protection, apprentissage, tension.
 
-### `S` — Passage secret
+### Passage secret
 
-Statut : réservé.
+Statut : prévu mais sans symbole officiel depuis `v0.13.1`.
 
 Rôle prévu :
 
@@ -360,9 +394,8 @@ Rôle prévu :
 
 Règles :
 
-- rare ;
-- lisible ;
-- ne doit pas bloquer une progression essentielle sans indice.
+- choisir un nouveau symbole seulement quand le système sera réellement conçu ;
+- ne plus utiliser `S`, désormais réservé aux stèles de sort.
 
 ### `P` — Piège
 
@@ -395,20 +428,6 @@ Règle :
 
 - les événements complexes doivent être définis par coordonnées dans une table dédiée plutôt que par le symbole seul.
 
-### `R` — Rune / sort visible
-
-Statut : réservé.
-
-Rôle possible :
-
-- découverte de sort visible directement dans le layout ;
-- alternative future aux découvertes définies par coordonnées.
-
-Règle actuelle :
-
-- les découvertes de sorts restent définies par table de coordonnées ;
-- ne pas placer de coffre ou de message sur une case déjà utilisée par une découverte de sort.
-
 ---
 
 ## 6. Lieux sûrs et rencontres aléatoires
@@ -422,6 +441,7 @@ Lieux sûrs actuels ou prévus :
 - `>` escalier descendant ;
 - `<` escalier montant ;
 - `M` message / PNJ neutre / indication ;
+- `S` stèle de sort ;
 - `C` coffre ;
 - `L` porte verrouillée ;
 - `X` boss / rencontre majeure ;
@@ -443,10 +463,9 @@ Exemples :
 - coffre ouvert ;
 - combat fixe vaincu ;
 - boss vaincu ;
-- passage secret découvert ;
+- découverte de sort ;
 - porte verrouillée ouverte ;
-- événement unique déclenché ;
-- message unique déjà lu si le design le demande.
+- événement unique déclenché.
 
 Règles :
 
@@ -553,6 +572,22 @@ Bon usage :
 - message sans utilité ;
 - message utilisé comme combat fixe.
 
+### Stèles de sort `S`
+
+Bon usage :
+
+- impasse ;
+- alcôve ;
+- zone secondaire ;
+- découverte liée à l’exploration ;
+- position avec face orientable vers un chemin.
+
+À éviter :
+
+- directement dans un couloir principal sans intention ;
+- superposée à un coffre, message, boutique, temple ou boss ;
+- orientée vers un mur alors qu’un chemin adjacent existe.
+
 ### Combats fixes `F`
 
 Bon usage :
@@ -604,26 +639,13 @@ Bon usage :
 
 ```text
 [ ] Le symbole est un seul caractère ASCII.
-[ ] Le symbole n’est pas déjà utilisé pour autre chose.
-[ ] Le comportement est défini.
-[ ] La case est marchable ou bloquante de façon claire.
-[ ] La rencontre aléatoire est autorisée ou bloquée explicitement.
-[ ] Le rendu 3D est prévu dans DungeonRenderer.gd si nécessaire.
-[ ] L’orientation 3D est définie si le modèle a une façade.
-[ ] L’affichage automap est prévu dans AutoMapUI.gd.
-[ ] La sauvegarde est prévue si l’état peut changer.
-[ ] La compatibilité avec les sauvegardes existantes est prise en compte.
-[ ] Le symbole est ajouté dans ce document.
-[ ] Le visualiseur est mis à jour dans FLOOR_VISUALIZER.md.
+[ ] Le symbole n'entre pas en conflit avec un symbole existant.
+[ ] FloorDatabase.gd est mis à jour.
+[ ] Dungeon.gd ou les contrôleurs concernés savent lire le symbole.
+[ ] DungeonRenderer.gd affiche ou ignore volontairement le symbole.
+[ ] AutoMapUI.gd affiche correctement le symbole.
+[ ] Les rencontres aléatoires sont autorisées ou bloquées explicitement.
+[ ] Les états persistants sont sauvegardés si nécessaire.
+[ ] FLOOR_VISUALIZER.md est régénéré depuis FloorDatabase.gd.
+[ ] Les règles de placement sont documentées ici si le symbole devient durable.
 ```
-
----
-
-## 11. Relation avec FLOOR_VISUALIZER
-
-`FLOOR_VISUALIZER.md` doit conserver sa présentation sous forme de tableau / grille.
-
-La première section du visualiseur doit représenter l’état réel du jeu.  
-Elle doit donc être reconstruite depuis `FloorDatabase.gd` lorsque les layouts changent.
-
-Les variantes doivent rester dans une section séparée et clairement indiquée comme non implémentée.

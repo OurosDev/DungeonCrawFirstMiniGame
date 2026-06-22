@@ -2,22 +2,32 @@ extends RefCounted
 class_name InventoryMenuView
 
 # ------------------------------------------------------------
+# VERSION SCRIPT
+# v0.13.1-InventoryLayoutFix-v3
+# ------------------------------------------------------------
+
+# ------------------------------------------------------------
 # VUE INVENTAIRE
 # Construit l'écran du sac commun du groupe.
 # ------------------------------------------------------------
 
 const ItemDatabaseScript = preload("res://scripts/items/ItemDatabase.gd")
 
+
+# ------------------------------------------------------------
+# ÉCRAN INVENTAIRE
+# Affiche l'or, la liste des objets possédés et le retour menu.
+# ------------------------------------------------------------
 static func show_inventory_screen(owner) -> void:
 	owner.set_menu_chrome_visible(false)
 	owner.clear_content()
 
 	var inventory_wrapper: VBoxContainer = VBoxContainer.new()
-	inventory_wrapper.custom_minimum_size = Vector2(580, 350)
+	inventory_wrapper.custom_minimum_size = Vector2(600, 350)
 	inventory_wrapper.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	inventory_wrapper.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	inventory_wrapper.alignment = BoxContainer.ALIGNMENT_CENTER
-	inventory_wrapper.add_theme_constant_override("separation", 6)
+	inventory_wrapper.add_theme_constant_override("separation", 5)
 	owner.content_box.add_child(inventory_wrapper)
 
 	var gold_panel: Panel = owner.create_panel(
@@ -26,20 +36,19 @@ static func show_inventory_screen(owner) -> void:
 		1
 	)
 	# Cadre compact : assez large pour afficher "Or : 9999" sans occuper toute la largeur.
-	gold_panel.custom_minimum_size = Vector2(150, 34)
+	gold_panel.custom_minimum_size = Vector2(150, 30)
 	gold_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	inventory_wrapper.add_child(gold_panel)
 
 	var gold_center: CenterContainer = CenterContainer.new()
 	gold_center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	gold_center.offset_left = 8
-	gold_center.offset_top = 3
+	gold_center.offset_top = 2
 	gold_center.offset_right = -8
-	gold_center.offset_bottom = -3
+	gold_center.offset_bottom = -2
 	gold_panel.add_child(gold_center)
 
 	var gold_amount: int = 0
-
 	if GameSession.has_method("get_gold"):
 		gold_amount = GameSession.get_gold()
 
@@ -54,13 +63,14 @@ static func show_inventory_screen(owner) -> void:
 		Color(0.32, 0.21, 0.10, 1.0),
 		2
 	)
-	list_panel.custom_minimum_size = Vector2(560, 210)
+	# Cadre principal agrandi : il utilise l'espace vertical libéré par la suppression
+	# du cadre décoratif qui entourait auparavant le bouton "Retour menu".
+	list_panel.custom_minimum_size = Vector2(580, 250)
 	list_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	list_panel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	list_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	inventory_wrapper.add_child(list_panel)
 
 	var inventory_list: VBoxContainer = owner.create_scrollable_list_inside_panel(list_panel)
-
 	var inventory = null
 	var slots: Array = []
 
@@ -88,33 +98,27 @@ static func show_inventory_screen(owner) -> void:
 	if visible_slot_count <= 0:
 		inventory_list.add_child(owner.create_empty_message_label("Inventaire vide."))
 
-	var back_panel: Panel = owner.create_panel(
-		Color(0.060, 0.040, 0.030, 1.0),
-		Color(0.32, 0.21, 0.10, 1.0),
-		1
-	)
-	back_panel.custom_minimum_size = Vector2(560, 38)
-	back_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	inventory_wrapper.add_child(back_panel)
-
+	# Le bouton possède déjà son propre cadre via le thème UI.
+	# On évite donc de l'enfermer dans un grand Panel supplémentaire.
 	var back_center: CenterContainer = CenterContainer.new()
-	back_center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	back_center.offset_left = 8
-	back_center.offset_top = 4
-	back_center.offset_right = -8
-	back_center.offset_bottom = -4
-	back_panel.add_child(back_center)
+	back_center.custom_minimum_size = Vector2(580, 38)
+	back_center.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	inventory_wrapper.add_child(back_center)
 
 	var back_button: Button = owner.create_compact_menu_button("Retour menu")
+	back_button.custom_minimum_size = Vector2(180, 32)
 	back_button.pressed.connect(Callable(owner, "show_main_screen"))
 	back_center.add_child(back_button)
 
-	var hint_label: Label = owner.create_label("Échap : retour au jeu", 12, Color(0.70, 0.62, 0.48))
-	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hint_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	inventory_wrapper.add_child(hint_label)
+	var bottom_spacer: Control = Control.new()
+	bottom_spacer.custom_minimum_size = Vector2(1, 4)
+	inventory_wrapper.add_child(bottom_spacer)
 
 
+# ------------------------------------------------------------
+# LIGNES D'OBJETS
+# Crée une ligne compacte : nom de l'objet, séparateur et quantité.
+# ------------------------------------------------------------
 static func create_inventory_row(owner, item_id: String, quantity: int) -> Control:
 	var panel: Panel = owner.create_panel(
 		Color(0.070, 0.047, 0.034, 1.0),
@@ -157,4 +161,3 @@ static func create_inventory_row(owner, item_id: String, quantity: int) -> Contr
 # BOUTIQUE
 # Permet d'acheter des objets basiques ou de vendre le contenu du sac sur une case B.
 # ------------------------------------------------------------
-

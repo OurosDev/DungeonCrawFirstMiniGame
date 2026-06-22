@@ -3,7 +3,7 @@ class_name FloorDatabase
 
 # ------------------------------------------------------------
 # VERSION SCRIPT
-# v0.13-Magicka
+# v0.13.1-SpellSteles
 # ------------------------------------------------------------
 
 
@@ -47,7 +47,7 @@ static func get_floor_1():
 		"#.#.#.#####.###.#.###########.#",
 		"#.#.#.....#.#...#...#.....#...#",
 		"#.#######.#.#...#.#.#.###.#.###",
-		"#.........#.........#...#.D.#.#",
+		"#.........#.........#...#.D.#S#",
 		"#.#################.###.###.#.#",
 		"#.#...........DB#...#...#...#.#",
 		"#.#.#####.###.###.#.#.###.#.#.#",
@@ -58,6 +58,7 @@ static func get_floor_1():
 	]
 
 	var discoveries: Dictionary = {}
+	# Stèle de sort : Éclat de givre.
 	discoveries[Vector2i(29, 13)] = "spell_ice_shard"
 
 	var chests: Dictionary = {}
@@ -109,7 +110,7 @@ static func get_floor_2():
 		"#...#.#.#.#.DB#.....#.#.#...#.#",
 		"#.###.###.#.#######.#.#.###.#.#",
 		"#...#.......#.......#.#.#C..#.#",
-		"#.#.#########.#######.#.###.#.#",
+		"#.#.#########.#######S#.###.#.#",
 		"#.#...#...#...#......#....#...#",
 		"#.#.#.#.#.###.#.###.###.#.###.#",
 		"#..M#...#...#.#...........#.#.#",
@@ -125,7 +126,7 @@ static func get_floor_2():
 	]
 
 	var discoveries: Dictionary = {}
-	# Soin de groupe : découverte au fond du couloir en x 21 / y 8.
+	# Stèle de sort : Soin de groupe, au fond du couloir en x 21 / y 8.
 	discoveries[Vector2i(21, 8)] = "spell_group_heal"
 
 	var chests: Dictionary = {}

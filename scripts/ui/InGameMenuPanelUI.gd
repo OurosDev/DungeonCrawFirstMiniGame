@@ -2,12 +2,19 @@ extends Control
 class_name InGameMenuPanelUI
 
 # ------------------------------------------------------------
+# VERSION SCRIPT
+# v0.13.1-MenuCloseFix
+# ------------------------------------------------------------
+
+
+# ------------------------------------------------------------
 # SIGNAUX
 # Informe Dungeon.gd des actions système demandées depuis le menu.
 # ------------------------------------------------------------
 
 signal save_requested
 signal quit_requested
+signal close_requested
 
 
 # ------------------------------------------------------------
@@ -48,6 +55,7 @@ var main_box: VBoxContainer = null
 var title_label: Label = null
 var content_box: VBoxContainer = null
 var message_label: Label = null
+var close_menu_button: Button = null
 
 var music_volume_label: Label = null
 var music_volume_slider: HSlider = null
@@ -112,6 +120,11 @@ func _input(event: InputEvent) -> void:
 	if combat_overlay_active:
 		if handle_combat_overlay_input(event):
 			get_viewport().set_input_as_handled()
+			return
+
+	if event.is_action_pressed("ui_cancel"):
+		request_menu_close()
+		get_viewport().set_input_as_handled()
 
 
 func build_ui() -> void:
@@ -165,6 +178,7 @@ func build_ui() -> void:
 	message_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	main_box.add_child(message_label)
 
+	create_menu_close_button()
 	create_dev_teleport_button()
 
 
@@ -180,6 +194,47 @@ func build_ui() -> void:
 # ------------------------------------------------------------
 
 # Crée le petit bouton carré "T" affiché en haut à gauche du menu.
+# ------------------------------------------------------------
+# FERMETURE SOURIS / CLAVIER
+# Le bouton X et la touche Échap utilisent le même signal de fermeture.
+# DungeonViewportUI restaure ensuite les commandes d'exploration.
+# ------------------------------------------------------------
+
+func create_menu_close_button() -> void:
+	if close_menu_button != null:
+		return
+
+	close_menu_button = create_compact_menu_button("X")
+	close_menu_button.name = "CloseMenuButton"
+	close_menu_button.focus_mode = Control.FOCUS_NONE
+	close_menu_button.tooltip_text = "Fermer le menu"
+	close_menu_button.custom_minimum_size = Vector2(34, 34)
+	close_menu_button.add_theme_font_size_override("font_size", 14)
+
+	close_menu_button.anchor_left = 1.0
+	close_menu_button.anchor_top = 0.0
+	close_menu_button.anchor_right = 1.0
+	close_menu_button.anchor_bottom = 0.0
+	close_menu_button.offset_left = -46
+	close_menu_button.offset_top = 8
+	close_menu_button.offset_right = -12
+	close_menu_button.offset_bottom = 42
+
+	close_menu_button.pressed.connect(on_menu_close_button_pressed)
+	root_panel.add_child(close_menu_button)
+
+
+func on_menu_close_button_pressed() -> void:
+	request_menu_close()
+
+
+func request_menu_close() -> void:
+	cancel_hero_frame_selection()
+	clear_combat_overlay_state()
+	visible = false
+	close_requested.emit()
+
+
 func create_dev_teleport_button() -> void:
 	if not DEV_TELEPORT_ENABLED:
 		return

@@ -2,154 +2,136 @@
 
 Date de mise à jour : 2026-06-22
 
-Base actuelle : `v0.13 — Magicka : progression magique, sorts actifs et poison`
+Base actuelle : `v0.13.1 — Correctifs UI, stèles de sort et flags de build`
 
 ## Résumé
 
-`v0.13` ajoute une vraie progression magique et introduit un premier système de statut temporaire avec le poison.
+`v0.13.1` stabilise plusieurs points apparus après `v0.13 — Magicka`.
 
-Le format de sauvegarde passe en version 7 afin de mémoriser les sorts actifs préparés hors combat.
+Elle réduit la dette autour :
 
-## Dette réduite ou stabilisée
+- des outils de développement intégrés ;
+- de la lisibilité des découvertes de sorts ;
+- de la fermeture de menus ;
+- de l'ajustement du menu inventaire.
 
-### Sorts actifs hors combat
+## Dette réduite
 
-Le grimoire hors combat peut maintenant préparer les sorts actifs.
-
-Chaîne actuelle :
-
-```text
-GrimoireMenuView.gd
--> GameSession.gd
--> SaveManager.gd
--> CombatManager.gd
-```
-
-Le grimoire de combat reste temporaire et n'écrase pas les choix sauvegardés hors combat.
-
-### Soin de groupe
-
-Le Soin de groupe ajoute un comportement distinct :
-
-```text
-cible : toute l'équipe
-sélection de cible : non
-```
-
-Cette logique doit rester séparée des soins ciblés.
-
-### Poison
+### Téléportation de développement
 
 Nouveau fichier :
 
 ```text
-scripts/combat/CombatStatusEffectResolver.gd
+scripts/core/BuildFlags.gd
 ```
 
-Ce fichier pose la base d'un système de statuts temporaires réutilisable.
+Point de contrôle unique :
 
-Pour le moment :
-
-```text
-- poison sur monstres uniquement ;
-- dégâts à la fin du tour du monstre ;
-- dissipation progressive ;
-- boss gardien immunisé.
+```gdscript
+const DEV_TELEPORT_ENABLED: bool = false
 ```
 
-## Points de vigilance actuels
+La téléportation ne dépend plus d'une suppression manuelle de scripts avant export.
 
-### 1. Sauvegarde version 7
-
-Nouveau champ :
+À surveiller :
 
 ```text
-active_ability_ids_by_party_slot
+- vérifier le flag avant export ;
+- éviter de multiplier les flags dispersés ;
+- documenter tout nouveau flag dans BuildFlags.gd.
+```
+
+### Stèles de sort
+
+Nouveau symbole :
+
+```text
+S = Stèle de sort
+```
+
+Les découvertes de sorts ne reposent plus seulement sur une logique invisible ou un marqueur plat.
+
+À surveiller :
+
+```text
+- orientation des stèles futures ;
+- lisibilité de S dans l'automap ;
+- cohérence entre FloorDatabase.gd et FLOOR_VISUALIZER.md lors d'une future mise à jour dungeon.
+```
+
+### Fermeture de menus
+
+Le menu d'aventure et la carte agrandie disposent maintenant d'un bouton `X`.
+
+Correction importante :
+
+```text
+les commandes d'exploration sont explicitement restaurées après fermeture du menu d'aventure.
 ```
 
 À surveiller :
 
 ```text
-anciennes sauvegardes
-nouveaux héros après création
-ordre des héros
-choix de sort préparé invalide après changement de règles
-découverte de sort manquante
-niveau insuffisant au chargement
+- éviter les doubles chemins de fermeture ;
+- faire passer les fermetures souris et clavier par les mêmes fonctions ;
+- vérifier que les overlays réaffichent correctement les commandes exploration.
 ```
 
-### 2. Statuts temporaires
+### Inventaire
 
-Le poison est volontairement limité.
-
-À surveiller :
+Le menu inventaire a été compacté :
 
 ```text
-timing des ticks
-dégâts sur monstres à hauts PV
-dissipation
-message de journal
-victoire causée par poison
-interaction avec la défaite du groupe
-immunité boss
-```
-
-Dette future probable :
-
-```text
-afficher visuellement les statuts
-gérer les statuts sur héros
-permettre certains monstres empoisonneurs
-centraliser les immunités
-sauvegarder des statuts si un jour les combats deviennent persistants
-```
-
-### 3. Grimoire hors combat
-
-Le grimoire contient maintenant deux usages :
-
-```text
-- préparer un sort actif ;
-- utiliser un soin hors combat.
+- suppression du cadre parasite sous Retour menu ;
+- suppression du texte d'aide superflu ;
+- réajustement vertical du bouton Retour menu ;
+- zone d'inventaire agrandie sans dépasser du cadre principal.
 ```
 
 À surveiller :
 
 ```text
-lisibilité de l'écran
-taille des boutons avec police globale
-séparation claire entre préparation et usage immédiat
-compréhension par le joueur
+- inventaire rempli ;
+- petites résolutions ;
+- cohérence avec le futur système d'équipement ;
+- lisibilité des lignes d'objets.
 ```
 
-### 4. CombatManager.gd
+## Points de vigilance persistants
 
-`CombatManager.gd` reste sensible car il orchestre :
+### 1. Scripts UI longs
+
+Certains scripts UI restent longs et sensibles :
 
 ```text
-tour des héros
-actions ennemies
-victoire / fuite / défaite
-boss
-récompenses
-sorts actifs
-grimoire de combat
-soin de groupe
-poison
-ciblage des soins
+scripts/ui/DungeonViewportUI.gd
+scripts/ui/InGameMenuPanelUI.gd
 ```
 
-Les prochaines évolutions doivent rester progressives et testées.
-
-### 5. En-têtes de version des scripts
-
-Nouvelle règle à maintenir :
+Règle :
 
 ```text
-chaque script modifié reçoit un en-tête VERSION SCRIPT correspondant au bloc de travail
+demander les versions locales si elles ont été modifiées récemment ;
+fournir des scripts complets ;
+éviter les patchs partiels.
 ```
 
-Ne pas ajouter ces en-têtes à tous les fichiers en une seule passe pour le moment.
+### 2. FloorDatabase / visualisation
+
+Les cases `S` doivent être reflétées plus tard dans les documents dungeon si ceux-ci sont mis à jour :
+
+```text
+docs/dungeon/FLOOR_DESIGN.md
+docs/dungeon/FLOOR_VISUALIZER.md
+```
+
+Ne pas modifier ces documents sans reconstruire depuis `FloorDatabase.gd`.
+
+### 3. Statuts temporaires
+
+Le poison reste le seul statut actif pour le moment.
+
+Ne pas ajouter trop vite d'autres statuts avant playtest.
 
 ## À ne pas faire pour le moment
 
@@ -162,19 +144,17 @@ Ne pas ajouter ces en-têtes à tous les fichiers en une seule passe pour le mom
 - ajouter l'étage 3 avant d'enrichir davantage la boucle actuelle ;
 - ajouter trop de statuts avant d'avoir testé le poison ;
 - changer le format de sauvegarde sans nécessité claire ;
-- préparer une grosse refactorisation générale non motivée.
+- fournir des patchs partiels au lieu de scripts complets.
 ```
 
 ## Recommandation immédiate
 
-Après `v0.13`, privilégier :
+Après `v0.13.1`, privilégier :
 
 ```text
-1. playtest 03 post-v0.13 ;
-2. vérifier les sauvegardes anciennes et nouvelles ;
-3. vérifier l'équilibrage du poison ;
-4. vérifier la lisibilité du grimoire ;
-5. vérifier la logique de soin de groupe ;
-6. corriger les éventuels débordements UI ;
-7. seulement ensuite, concevoir d'autres statuts ou sorts.
+1. playtest court post-release ;
+2. vérifier les exports avec DEV_TELEPORT_ENABLED = false ;
+3. vérifier l'orientation des stèles ;
+4. vérifier la stabilité des menus souris/clavier ;
+5. seulement ensuite, poursuivre vers magie/statuts ou polish UI ciblé.
 ```

@@ -6,21 +6,17 @@ Le projet sert aussi de terrain d'apprentissage pour la gestion d'un petit proje
 
 ## État actuel
 
-Version stable récente : `v0.13 — Magicka : progression magique, sorts actifs et poison`.
+Version stable récente : `v0.13.1 — Correctifs UI, stèles de sort et flags de build`.
 
-Cette version poursuit la base `v0.12 — Équilibrage combat, sort découvert et corrections UI` avec une étape importante autour de la magie :
+Cette version stabilise la base `v0.13 — Magicka` avec des correctifs d'interface et de workflow de build :
 
-- rééquilibrage d'`Éclat de givre` ;
-- ajout du `Soin renforcé` pour le Prêtre niveau 5 ;
-- ajout du `Soin de groupe`, découvert à l'étage 2 ;
-- ajout du sort `Poison` pour le Mage niveau 5 ;
-- ajout d'un premier système de statut temporaire réutilisable ;
-- préparation des sorts actifs hors combat depuis le grimoire ;
-- sauvegarde des sorts actifs préparés ;
-- initialisation des sorts actifs de combat depuis les choix hors combat ;
-- conservation du grimoire de combat comme outil de changement temporaire pendant un combat.
-
-Le format de sauvegarde passe en version 7 pour mémoriser les sorts actifs préparés.
+- flag central pour masquer/bloquer la téléportation de développement avant export ;
+- symbole `S` pour les stèles de sort ;
+- modèle 3D de stèle magique orienté vers le chemin ;
+- correction de la fermeture du menu d'aventure ;
+- bouton `X` de fermeture sur le menu d'aventure ;
+- polish du menu inventaire ;
+- bouton `X` de fermeture sur la carte agrandie.
 
 ## Base jouable actuelle
 
@@ -33,7 +29,7 @@ La base jouable contient notamment :
 - équipement de base ;
 - boutique ;
 - temple de guérison ;
-- coffres, messages, clé de progression et boss fixe ;
+- coffres, messages, stèles de sort, clé de progression et boss fixe ;
 - sauvegarde / chargement ;
 - commandes souris et clavier AZERTY ;
 - grimoire hors combat ;
@@ -48,63 +44,92 @@ La base jouable contient notamment :
 - image de fond du menu principal ;
 - police OpenType dédiée au titre et police globale d'interface.
 
-## Magie en v0.13
+## Symboles de donjon
 
-### Mage
+Symboles importants actuellement utilisés :
+
+```text
+# = mur
+. = chemin praticable
+D = porte
+L = porte verrouillée spéciale
+< = escalier vers l'étage précédent
+> = escalier vers l'étage suivant
+O = temple
+B = boutique
+C = coffre
+M = message / indice
+S = stèle de sort
+X = boss / marqueur spécial
+```
+
+Les stèles de sort `S` servent aux découvertes magiques, par exemple `Éclat de givre` et `Soin de groupe`.
+
+## Magie
+
+La progression magique récente comprend :
 
 ```text
 Étincelle
-- niveau : 1
-- coût : 6 PM
-- effet : dégâts 8-16 sur un ennemi
+- Mage niveau 1
+- 6 PM
+- dégâts 8-16
 
 Éclat de givre
-- niveau : 2
-- coût : 10 PM
-- effet : dégâts 12-24 sur un ennemi
-- prérequis : découverte spell_ice_shard
+- Mage niveau 2
+- 10 PM
+- dégâts 12-24
+- découverte via stèle de sort
 
 Poison
-- niveau : 5
-- coût : 10 PM
-- effet : applique le statut Poison à un monstre normal
-- dégâts : 5 à 10 % des PV max du monstre à chaque tick
-```
+- Mage niveau 5
+- 10 PM
+- applique Poison à un monstre normal
 
-Le boss gardien est immunisé au poison pour préserver l'équilibrage actuel.
-
-### Prêtre
-
-```text
 Soin léger
-- niveau : 1
-- coût : 4 PM
-- effet : soin 8-14 PV sur un allié
+- Prêtre niveau 1
+- 4 PM
+- soin 8-14 PV
 
 Soin renforcé
-- niveau : 5
-- coût : 9 PM
-- effet : soin 16-28 PV sur un allié
+- Prêtre niveau 5
+- 9 PM
+- soin 16-28 PV
 
 Soin de groupe
-- coût : 9 PM
-- effet : soin 7-13 PV sur toute l'équipe
-- prérequis : découverte spell_group_heal
-- emplacement : étage 2, x 21, y 8
+- 9 PM
+- soin 7-13 PV sur toute l'équipe
+- découverte via stèle de sort à l'étage 2, x21 y8
 ```
+
+Le boss gardien est immunisé au poison.
+
+## Flags de build
+
+La téléportation de développement est contrôlée depuis :
+
+```text
+scripts/core/BuildFlags.gd
+```
+
+Flag principal :
+
+```gdscript
+const DEV_TELEPORT_ENABLED: bool = false
+```
+
+Utilisation :
+
+```text
+true  = outil de téléportation disponible pour test local
+false = outil de téléportation masqué et bloqué pour build playtest/exécutable
+```
+
+Avant tout export public ou playtest, vérifier que le flag est à `false`.
 
 ## Renderer et affichage
 
 Le projet est actuellement configuré pour Godot 4.6 en `GL Compatibility`.
-
-```ini
-config/features=PackedStringArray("4.6", "GL Compatibility")
-window/stretch/mode="canvas_items"
-window/stretch/aspect="keep"
-window/stretch/scale=1.0
-window/stretch/scale_mode="fractional"
-renderer/rendering_method="gl_compatibility"
-```
 
 Pour les builds Windows destinées aux testeurs, utiliser `Compatibility / OpenGL` par défaut.
 
@@ -120,35 +145,7 @@ Exploration :
 - `E` : retour / équivalent `Échap`
 - Souris : boutons d'action affichés à l'écran
 
-Les boutons souris d'exploration affichent des libellés simples :
-
-```text
-Avancer
-Reculer
-Gauche
-Droite
-Carte
-Menu
-```
-
-## Interface
-
-L'interface principale utilise :
-
-```text
-assets/ui/frames/texture_cadre_ui.png
-```
-
-L'identité visuelle récente du menu principal et des textes repose sur :
-
-```text
-assets/ui/backgrounds/main_menu_background.png
-assets/ui/themes/game_theme.tres
-assets/fonts/title_medieval.otf
-assets/fonts/game_ui.otf
-```
-
-Les fichiers de police doivent être conservés uniquement si leur licence autorise leur utilisation et leur distribution dans le dépôt public.
+Les menus récents utilisent un bouton `X` en haut à droite quand une fermeture souris directe est nécessaire.
 
 ## Organisation du dépôt
 

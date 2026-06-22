@@ -1,6 +1,12 @@
 extends Node3D
 class_name DungeonRenderer
 
+# ------------------------------------------------------------
+# VERSION SCRIPT
+# v0.13.1-SpellSteles
+# ------------------------------------------------------------
+
+
 const DungeonThemeDataScript = preload("res://scripts/dungeon/DungeonThemeData.gd")
 
 # ------------------------------------------------------------
@@ -14,7 +20,7 @@ const DungeonThemeDataScript = preload("res://scripts/dungeon/DungeonThemeData.g
 # 3. sinon, choisir une case praticable non-mur ;
 # 4. sinon, conserver l'orientation naturelle.
 #
-# Modèles à façade -Z : coffres, stèles de message.
+# Modèles à façade -Z : coffres, stèles de message, stèles de sort.
 # Modèles à façade +Z : temple, boutique.
 # ------------------------------------------------------------
 
@@ -74,6 +80,9 @@ var chest_wood_material: StandardMaterial3D
 var chest_metal_material: StandardMaterial3D
 var message_stone_material: StandardMaterial3D
 var message_rune_material: StandardMaterial3D
+var spell_stele_stone_material: StandardMaterial3D
+var spell_stele_rune_material: StandardMaterial3D
+var spell_stele_glow_material: StandardMaterial3D
 
 
 # ------------------------------------------------------------
@@ -140,6 +149,8 @@ func build_dungeon(
 					create_chest_tile(cell)
 				elif tile == "M":
 					create_message_tile(cell)
+				elif tile == "S":
+					create_spell_stele_tile(cell)
 				elif tile == "X":
 					create_boss_marker_tile(cell)
 				elif tile == ">" or tile == "<":
@@ -201,6 +212,9 @@ func create_materials() -> void:
 	chest_metal_material = create_material(Color(0.78, 0.55, 0.20, 1.0))
 	message_stone_material = create_material(Color(0.30, 0.30, 0.28, 1.0))
 	message_rune_material = create_material(Color(0.35, 0.78, 0.90, 1.0))
+	spell_stele_stone_material = create_material(Color(0.24, 0.22, 0.34, 1.0))
+	spell_stele_rune_material = create_material(Color(0.60, 0.48, 1.0, 1.0))
+	spell_stele_glow_material = create_material(Color(0.35, 0.24, 0.95, 1.0))
 
 
 func create_material(color: Color) -> StandardMaterial3D:
@@ -985,6 +999,40 @@ func create_message_tile(cell: Vector2i) -> void:
 
 
 # ------------------------------------------------------------
+# STÈLES DE SORT
+# ------------------------------------------------------------
+
+# Crée une stèle magique pour une case "S".
+# Le modèle utilise la même règle d'orientation que les autres objets lisibles :
+# sa face regarde d'abord une case ".", sinon une case praticable non-mur.
+func create_spell_stele_tile(cell: Vector2i) -> void:
+	var root: Node3D = Node3D.new()
+	root.name = "SpellStele_" + str(cell.x) + "_" + str(cell.y)
+	root.position = Vector3(
+		float(cell.x) * cell_size,
+		current_theme.floor_y + 0.08,
+		float(cell.y) * cell_size
+	)
+	root.rotation.y = get_negative_z_front_special_rotation_y(cell, FACING_NORTH)
+	generated_root.add_child(root)
+
+	create_box("SpellSteleBase", Vector3(0.72, 0.14, 0.52), Vector3(0.0, 0.07, 0.0), spell_stele_stone_material, root)
+	create_box("SpellSteleStone", Vector3(0.50, 0.86, 0.14), Vector3(0.0, 0.52, -0.08), spell_stele_stone_material, root)
+	create_box("SpellSteleTop", Vector3(0.38, 0.16, 0.12), Vector3(0.0, 0.98, -0.08), spell_stele_stone_material, root)
+	create_box("SpellRuneVertical", Vector3(0.06, 0.36, 0.045), Vector3(0.0, 0.57, -0.18), spell_stele_rune_material, root)
+	create_box("SpellRuneHorizontal", Vector3(0.30, 0.05, 0.045), Vector3(0.0, 0.57, -0.19), spell_stele_rune_material, root)
+	create_box("SpellRuneCore", Vector3(0.16, 0.16, 0.05), Vector3(0.0, 0.57, -0.205), spell_stele_glow_material, root)
+
+	var glow: OmniLight3D = OmniLight3D.new()
+	glow.name = "SpellSteleGlow"
+	glow.position = Vector3(0.0, 0.72, -0.12)
+	glow.light_color = Color(0.52, 0.40, 1.0, 1.0)
+	glow.light_energy = 0.45
+	glow.omni_range = 1.8
+	root.add_child(glow)
+
+
+# ------------------------------------------------------------
 # ESCALIERS
 # ------------------------------------------------------------
 
@@ -1049,6 +1097,13 @@ func create_ability_discovery_markers(ability_discovery_locations: Dictionary) -
 
 	for cell_key in ability_discovery_locations.keys():
 		var cell: Vector2i = cell_key
+
+		# Les découvertes placées sur "S" ont maintenant un vrai modèle 3D.
+		# On conserve le marqueur plat uniquement pour d'anciennes découvertes
+		# qui ne seraient pas encore représentées par une stèle de sort.
+		if get_layout_tile(cell) == "S":
+			continue
+
 		var marker_position: Vector3 = Vector3(
 			float(cell.x) * cell_size,
 			current_theme.floor_y + 0.09,

@@ -2,12 +2,39 @@ extends RefCounted
 class_name DevTeleportMenuView
 
 # ------------------------------------------------------------
-# VUE TÉLÉPORTATION DEV
-# Construit l'outil temporaire de déplacement rapide pour les tests de layout.
+# VERSION SCRIPT
+# v0.13.1-DevFlags
 # ------------------------------------------------------------
 
+# ------------------------------------------------------------
+# VUE TÉLÉPORTATION DEV
+# Construit l'outil temporaire de déplacement rapide pour les tests de layout.
+# La disponibilité est contrôlée par scripts/core/BuildFlags.gd.
+# ------------------------------------------------------------
+
+const BuildFlagsScript = preload("res://scripts/core/BuildFlags.gd")
+
+
+# ------------------------------------------------------------
+# ÉTAT DU FLAG
+# Centralise le test pour éviter les copies de conditions.
+# ------------------------------------------------------------
+static func is_dev_teleport_enabled() -> bool:
+	return BuildFlagsScript.DEV_TELEPORT_ENABLED
+
+
+# ------------------------------------------------------------
+# BOUTON D'ACCÈS
+# Crée le petit bouton carré "T" affiché en haut à gauche du menu.
+# ------------------------------------------------------------
 static func create_dev_teleport_button(owner) -> void:
+	if not is_dev_teleport_enabled():
+		if owner.dev_teleport_button != null:
+			owner.dev_teleport_button.visible = false
+		return
+
 	if owner.dev_teleport_button != null:
+		owner.dev_teleport_button.visible = true
 		return
 
 	owner.dev_teleport_button = Button.new()
@@ -17,6 +44,7 @@ static func create_dev_teleport_button(owner) -> void:
 	owner.dev_teleport_button.custom_minimum_size = Vector2(34, 34)
 	owner.dev_teleport_button.add_theme_font_size_override("font_size", 14)
 	owner.dev_teleport_button.tooltip_text = "Téléportation de test"
+
 	owner.dev_teleport_button.anchor_left = 0.0
 	owner.dev_teleport_button.anchor_top = 0.0
 	owner.dev_teleport_button.anchor_right = 0.0
@@ -25,12 +53,19 @@ static func create_dev_teleport_button(owner) -> void:
 	owner.dev_teleport_button.offset_top = 8
 	owner.dev_teleport_button.offset_right = 42
 	owner.dev_teleport_button.offset_bottom = 42
+
 	owner.dev_teleport_button.pressed.connect(Callable(owner, "show_dev_teleport_screen"))
 	owner.root_panel.add_child(owner.dev_teleport_button)
 
 
+# ------------------------------------------------------------
+# ÉCRAN DE TÉLÉPORTATION
 # Affiche un écran simple permettant de saisir une coordonnée X/Y.
+# ------------------------------------------------------------
 static func show_dev_teleport_screen(owner) -> void:
+	if not is_dev_teleport_enabled():
+		return
+
 	owner.set_menu_chrome_visible(false)
 	owner.clear_content()
 
@@ -42,14 +77,21 @@ static func show_dev_teleport_screen(owner) -> void:
 	wrapper.add_theme_constant_override("separation", 10)
 	owner.content_box.add_child(wrapper)
 
-	var title: Label = owner.create_label("TÉLÉPORTATION TEST", 18, Color(1.0, 0.82, 0.35))
+	var title: Label = owner.create_label(
+		"TÉLÉPORTATION TEST",
+		18,
+		Color(1.0, 0.82, 0.35)
+	)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	wrapper.add_child(title)
 
 	var current_position: Vector2i = owner.get_dev_current_player_cell()
 	var current_label: Label = owner.create_label(
-		"Position actuelle : X " + str(current_position.x) + " / Y " + str(current_position.y),
+		"Position actuelle : X "
+		+ str(current_position.x)
+		+ " / Y "
+		+ str(current_position.y),
 		13,
 		Color(0.82, 0.74, 0.56)
 	)
@@ -75,10 +117,18 @@ static func show_dev_teleport_screen(owner) -> void:
 	input_box.add_theme_constant_override("separation", 8)
 	input_panel.add_child(input_box)
 
-	input_box.add_child(owner.create_dev_coordinate_row("X", true, current_position.x))
-	input_box.add_child(owner.create_dev_coordinate_row("Y", false, current_position.y))
+	input_box.add_child(
+		owner.create_dev_coordinate_row("X", true, current_position.x)
+	)
+	input_box.add_child(
+		owner.create_dev_coordinate_row("Y", false, current_position.y)
+	)
 
-	owner.dev_teleport_feedback_label = owner.create_label("Coordonnées de grille Vector2i(x, y).", 12, Color(0.70, 0.62, 0.48))
+	owner.dev_teleport_feedback_label = owner.create_label(
+		"Coordonnées de grille Vector2i(x, y).",
+		12,
+		Color(0.70, 0.62, 0.48)
+	)
 	owner.dev_teleport_feedback_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	owner.dev_teleport_feedback_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	wrapper.add_child(owner.dev_teleport_feedback_label)
@@ -93,14 +143,26 @@ static func show_dev_teleport_screen(owner) -> void:
 	back_button.pressed.connect(Callable(owner, "show_main_screen"))
 	wrapper.add_child(back_button)
 
-	var hint_label: Label = owner.create_label("Outil temporaire de développement", 11, Color(0.56, 0.50, 0.42))
+	var hint_label: Label = owner.create_label(
+		"Outil temporaire de développement",
+		11,
+		Color(0.56, 0.50, 0.42)
+	)
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	wrapper.add_child(hint_label)
 
 
+# ------------------------------------------------------------
+# SAISIE X/Y
 # Crée une ligne de saisie pour X ou Y.
-static func create_dev_coordinate_row(owner, label_text: String, is_x_input: bool, default_value: int) -> Control:
+# ------------------------------------------------------------
+static func create_dev_coordinate_row(
+	owner,
+	label_text: String,
+	is_x_input: bool,
+	default_value: int
+) -> Control:
 	var row: HBoxContainer = HBoxContainer.new()
 	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_theme_constant_override("separation", 8)
@@ -128,10 +190,15 @@ static func create_dev_coordinate_row(owner, label_text: String, is_x_input: boo
 	return row
 
 
+# ------------------------------------------------------------
+# POSITION COURANTE
 # Renvoie la position actuelle du joueur si la scène courante l'expose.
+# ------------------------------------------------------------
 static func get_dev_current_player_cell(owner) -> Vector2i:
-	var scene = owner.get_tree().current_scene
+	if not is_dev_teleport_enabled():
+		return Vector2i.ZERO
 
+	var scene = owner.get_tree().current_scene
 	if scene == null:
 		return Vector2i.ZERO
 
@@ -141,8 +208,19 @@ static func get_dev_current_player_cell(owner) -> Vector2i:
 	return scene.get_debug_player_cell()
 
 
+# ------------------------------------------------------------
+# VALIDATION
 # Valide les valeurs saisies et demande au donjon de déplacer le joueur.
+# ------------------------------------------------------------
 static func on_dev_teleport_pressed(owner) -> void:
+	if not is_dev_teleport_enabled():
+		set_dev_teleport_feedback(
+			owner,
+			"Téléportation désactivée pour cette build.",
+			true
+		)
+		return
+
 	if owner.dev_teleport_x_input == null or owner.dev_teleport_y_input == null:
 		owner.set_dev_teleport_feedback("Champs de coordonnées introuvables.", true)
 		return
@@ -158,7 +236,10 @@ static func on_dev_teleport_pressed(owner) -> void:
 	var scene = owner.get_tree().current_scene
 
 	if scene == null or not scene.has_method("debug_teleport_to_cell"):
-		owner.set_dev_teleport_feedback("La scène courante ne permet pas la téléportation.", true)
+		owner.set_dev_teleport_feedback(
+			"La scène courante ne permet pas la téléportation.",
+			true
+		)
 		return
 
 	var result: Dictionary = scene.debug_teleport_to_cell(target_cell)
@@ -172,6 +253,10 @@ static func on_dev_teleport_pressed(owner) -> void:
 	owner.set_dev_teleport_feedback(message, false)
 
 
+# ------------------------------------------------------------
+# FEEDBACK
+# Affiche le résultat de validation dans l'écran de téléportation.
+# ------------------------------------------------------------
 static func set_dev_teleport_feedback(owner, text: String, is_error: bool) -> void:
 	if owner.dev_teleport_feedback_label == null:
 		return
@@ -179,13 +264,12 @@ static func set_dev_teleport_feedback(owner, text: String, is_error: bool) -> vo
 	owner.dev_teleport_feedback_label.text = text
 
 	if is_error:
-		owner.dev_teleport_feedback_label.add_theme_color_override("font_color", Color(1.0, 0.48, 0.35))
+		owner.dev_teleport_feedback_label.add_theme_color_override(
+			"font_color",
+			Color(1.0, 0.48, 0.35)
+		)
 	else:
-		owner.dev_teleport_feedback_label.add_theme_color_override("font_color", Color(0.70, 0.90, 0.60))
-
-
-# ------------------------------------------------------------
-# OUVERTURE / FERMETURE
-# Contrôle l'état visible du menu d'aventure.
-# ------------------------------------------------------------
-
+		owner.dev_teleport_feedback_label.add_theme_color_override(
+			"font_color",
+			Color(0.70, 0.90, 0.60)
+		)

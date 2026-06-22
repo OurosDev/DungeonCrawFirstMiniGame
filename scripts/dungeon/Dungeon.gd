@@ -2,7 +2,7 @@ extends Node3D
 
 # ------------------------------------------------------------
 # VERSION SCRIPT
-# v0.13-Magicka
+# v0.13.1-SpellSteles
 # ------------------------------------------------------------
 
 
@@ -16,6 +16,7 @@ const BOSS_TILE: String = "X"
 const STAIRS_UP_TILE: String = "<"
 const CHEST_TILE: String = "C"
 const MESSAGE_TILE: String = "M"
+const SPELL_STELE_TILE: String = "S"
 const CLOSED_DOOR_TILE: String = "D"
 const OPEN_DOOR_TILE: String = "d"
 const LOCKED_DOOR_TILE: String = "L"
@@ -42,6 +43,7 @@ const ItemDatabaseScript = preload("res://scripts/items/ItemDatabase.gd")
 const DungeonMapHelperScript = preload("res://scripts/dungeon/DungeonMapHelper.gd")
 const DungeonFloorStateHelperScript = preload("res://scripts/dungeon/DungeonFloorStateHelper.gd")
 const DungeonAutoMapHelperScript = preload("res://scripts/dungeon/DungeonAutoMapHelper.gd")
+const BuildFlagsScript = preload("res://scripts/core/BuildFlags.gd")
 
 # ------------------------------------------------------------
 # RÉFÉRENCES DE NŒUDS
@@ -460,6 +462,9 @@ func setup_ability_discoveries() -> void:
 		ability_discovery_locations[cell] = discovery_id
 
 
+# Vérifie si le joueur marche sur une stèle de sort.
+# Le modèle 3D de la stèle reste visible après découverte ; seule l'entrée
+# de découverte active est retirée pour éviter de redonner le sort.
 func check_ability_discovery() -> bool:
 	var current_cell: Vector2i = player.grid_cell
 
@@ -965,12 +970,22 @@ func get_layout_tile(cell: Vector2i) -> String:
 # OUTIL TEMPORAIRE DE DÉVELOPPEMENT
 # ------------------------------------------------------------
 func get_debug_player_cell() -> Vector2i:
+	if not BuildFlagsScript.DEV_TELEPORT_ENABLED:
+		return Vector2i.ZERO
+
 	if player == null:
 		return Vector2i.ZERO
+
 	return player.grid_cell
 
 
 func debug_teleport_to_cell(target_cell: Vector2i) -> Dictionary:
+	if not BuildFlagsScript.DEV_TELEPORT_ENABLED:
+		return {
+			"success": false,
+			"message": "Téléportation désactivée pour cette build."
+		}
+
 	if combat_manager != null and combat_manager.in_combat:
 		return {
 			"success": false,
