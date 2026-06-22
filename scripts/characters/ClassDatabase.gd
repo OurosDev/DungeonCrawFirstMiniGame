@@ -2,6 +2,12 @@ extends RefCounted
 class_name ClassDatabase
 
 # ------------------------------------------------------------
+# VERSION SCRIPT
+# v0.13-Magicka
+# ------------------------------------------------------------
+
+
+# ------------------------------------------------------------
 # ClassDatabase
 # ------------------------------------------------------------
 #
@@ -18,6 +24,7 @@ class_name ClassDatabase
 # - une découverte dans le labyrinthe
 
 const ClassDataScript = preload("res://scripts/characters/ClassData.gd")
+
 
 # ------------------------------------------------------------
 # CONSTANTES
@@ -105,7 +112,7 @@ static func get_class_data(job_name: String):
 			0,
 			true,
 			["Attaquer", "Magie", "Fuir"],
-			["spark", "ice_shard", "flame", "poison_cloud"],
+			["spark", "ice_shard", "poison", "flame", "poison_cloud"],
 			["bâton", "dague"],
 			["robe"],
 			"Avantages : magie offensive, beaucoup de MP si MAG élevée.\nInconvénients : HP faibles, équipement limité."
@@ -120,7 +127,7 @@ static func get_class_data(job_name: String):
 			0,
 			true,
 			["Attaquer", "Soin", "Fuir"],
-			["light_heal", "greater_heal", "holy_light"],
+			["light_heal", "greater_heal", "group_heal", "holy_light"],
 			["masse", "bâton"],
 			["robe", "moyenne"],
 			"Avantages : soins, bonne survie, magie utile.\nInconvénients : dégâts physiques moyens."

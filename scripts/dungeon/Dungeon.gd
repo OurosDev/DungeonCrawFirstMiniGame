@@ -1,6 +1,12 @@
 extends Node3D
 
 # ------------------------------------------------------------
+# VERSION SCRIPT
+# v0.13-Magicka
+# ------------------------------------------------------------
+
+
+# ------------------------------------------------------------
 # CONSTANTES
 # ------------------------------------------------------------
 const CELL_SIZE: float = 2.0
@@ -528,6 +534,8 @@ func get_ability_discovery_message(discovery_id: String) -> String:
 		return "Vous trouvez un grimoire brûlant.\nLe groupe découvre le sort : Flamme.\nUn Mage de niveau 3 pourra l'utiliser."
 	if discovery_id == "spell_greater_heal":
 		return "Vous trouvez un symbole sacré ancien.\nLe groupe découvre le sort : Soin majeur.\nUne Prêtresse de niveau 4 pourra l'utiliser."
+	if discovery_id == "spell_group_heal":
+		return "Une ancienne prière de guérison est gravée dans la pierre.\nLe groupe découvre le sort : Soin de groupe.\nUn Prêtre pourra soigner toute l'équipe."
 	return "Le groupe découvre un savoir magique oublié."
 
 # ------------------------------------------------------------

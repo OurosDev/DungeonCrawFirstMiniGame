@@ -1,7 +1,18 @@
 extends RefCounted
 
+# ------------------------------------------------------------
+# VERSION SCRIPT
+# v0.13-Magicka
+# ------------------------------------------------------------
+
+
 const AbilityDataScript = preload("res://scripts/abilities/AbilityData.gd")
 
+
+# ------------------------------------------------------------
+# SORTS / CAPACITÉS
+# Centralise les données d'équilibrage des capacités.
+# ------------------------------------------------------------
 
 static func get_ability_data(ability_id: String):
 	if ability_id == "spark":
@@ -26,14 +37,30 @@ static func get_ability_data(ability_id: String):
 			"Éclat de givre",
 			"damage",
 			"enemy",
-			5,
 			10,
-			20,
+			12,
+			24,
 			true,
 			2,
 			true,
 			"spell_ice_shard",
-			"Un sort de glace découvert dans le donjon."
+			"Un sort de glace découvert dans le donjon. Plus coûteux qu'Étincelle, mais nettement plus puissant."
+		)
+
+	if ability_id == "poison":
+		return AbilityDataScript.new(
+			"poison",
+			"Poison",
+			"damage",
+			"enemy_poison",
+			10,
+			5,
+			10,
+			false,
+			5,
+			false,
+			"",
+			"Empoisonne un ennemi. Le poison inflige 5 à 10 % des PV max du monstre à la fin de son tour."
 		)
 
 	if ability_id == "flame":
@@ -87,17 +114,33 @@ static func get_ability_data(ability_id: String):
 	if ability_id == "greater_heal":
 		return AbilityDataScript.new(
 			"greater_heal",
-			"Soin majeur",
+			"Soin renforcé",
 			"heal",
 			"ally",
-			8,
-			18,
-			32,
+			9,
+			16,
+			28,
 			true,
-			4,
+			5,
+			false,
+			"",
+			"Un soin avancé appris par les prêtres expérimentés. Il soigne le double du soin léger."
+		)
+
+	if ability_id == "group_heal":
+		return AbilityDataScript.new(
+			"group_heal",
+			"Soin de groupe",
+			"heal",
+			"all_allies",
+			9,
+			7,
+			13,
 			true,
-			"spell_greater_heal",
-			"Un sort de soin avancé qui doit être découvert dans le labyrinthe."
+			1,
+			true,
+			"spell_group_heal",
+			"Une ancienne prière qui soigne toute l'équipe, mais moins fortement qu'un soin ciblé."
 		)
 
 	if ability_id == "holy_light":
@@ -118,6 +161,11 @@ static func get_ability_data(ability_id: String):
 
 	return AbilityDataScript.new()
 
+
+# ------------------------------------------------------------
+# DISPONIBILITÉ
+# Vérifie les prérequis de niveau et de découverte.
+# ------------------------------------------------------------
 
 static func is_ability_available_for_hero(
 	ability_id: String,

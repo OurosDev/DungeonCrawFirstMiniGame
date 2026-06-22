@@ -1,6 +1,12 @@
 extends Node
 
 # ------------------------------------------------------------
+# VERSION SCRIPT
+# v0.13-Magicka
+# ------------------------------------------------------------
+
+
+# ------------------------------------------------------------
 # DÉPENDANCES
 # Charge les données nécessaires à l'inventaire, à l'équipement et aux helpers de session.
 # ------------------------------------------------------------
@@ -22,6 +28,7 @@ var is_loading_save: bool = false
 var pending_save_data: Dictionary = {}
 var floor_states: Dictionary = {}
 var discovered_ability_ids: Array[String] = []
+var active_ability_ids_by_party_slot: Dictionary = {}
 var inventory = null
 var gold: int = 0
 var shop_available: bool = false
@@ -37,6 +44,7 @@ func prepare_new_game() -> void:
 	pending_save_data.clear()
 	floor_states.clear()
 	discovered_ability_ids.clear()
+	active_ability_ids_by_party_slot.clear()
 	reset_inventory()
 	set_gold(0)
 	set_shop_available(false)
@@ -50,6 +58,8 @@ func set_party(p_party: Array) -> void:
 	for hero in p_party:
 		prepare_hero_equipment(hero)
 		party.append(hero)
+
+	sanitize_active_ability_ids_for_party()
 
 
 func get_party() -> Array:
@@ -86,6 +96,7 @@ func prepare_loaded_game(save_data: Dictionary) -> void:
 		current_floor_id = int(pending_save_data["current_floor_id"])
 	load_floor_states_from_save_data(pending_save_data)
 	load_discovered_ability_ids_from_save_data(pending_save_data.get("discovered_ability_ids", []))
+	load_active_ability_ids_from_save_data(pending_save_data.get("active_ability_ids_by_party_slot", {}))
 	load_inventory_from_save_data(pending_save_data.get("inventory", []))
 	set_gold(int(pending_save_data.get("gold", 0)))
 	set_shop_available(false)
@@ -188,6 +199,149 @@ func load_discovered_ability_ids_from_save_data(serialized_discoveries) -> void:
 
 		discovered_ability_ids.append(discovery_id)
 
+
+
+# ------------------------------------------------------------
+# SORTS ACTIFS HORS COMBAT
+# Conserve les sorts préparés par emplacement de héros.
+# Le combat lit ces choix au démarrage, puis peut les modifier
+# temporairement avec le grimoire de combat.
+# ------------------------------------------------------------
+func get_party_slot_key(hero_index: int) -> String:
+	return str(max(0, hero_index))
+
+
+func get_active_ability_ids_for_party_slot(hero_index: int) -> Dictionary:
+	var slot_key: String = get_party_slot_key(hero_index)
+
+	if not active_ability_ids_by_party_slot.has(slot_key):
+		return {}
+
+	var slot_data = active_ability_ids_by_party_slot.get(slot_key, {})
+	if slot_data is Dictionary:
+		return slot_data.duplicate(true)
+
+	return {}
+
+
+func get_active_ability_id_for_party_slot(hero_index: int, ability_kind: String) -> String:
+	var normalized_kind: String = ability_kind.strip_edges().to_lower()
+	if normalized_kind == "":
+		return ""
+
+	var slot_data: Dictionary = get_active_ability_ids_for_party_slot(hero_index)
+	return str(slot_data.get(normalized_kind, ""))
+
+
+func set_active_ability_id_for_party_slot(
+	hero_index: int,
+	ability_kind: String,
+	ability_id: String
+) -> bool:
+	if hero_index < 0:
+		return false
+	if hero_index >= party.size():
+		return false
+
+	var normalized_kind: String = ability_kind.strip_edges().to_lower()
+	var normalized_ability_id: String = ability_id.strip_edges().to_lower()
+
+	if normalized_kind != "damage" and normalized_kind != "heal":
+		return false
+	if normalized_ability_id == "":
+		return false
+
+	var slot_key: String = get_party_slot_key(hero_index)
+	var slot_data: Dictionary = get_active_ability_ids_for_party_slot(hero_index)
+
+	slot_data[normalized_kind] = normalized_ability_id
+	active_ability_ids_by_party_slot[slot_key] = slot_data
+
+	return true
+
+
+func clear_active_ability_id_for_party_slot(hero_index: int, ability_kind: String) -> void:
+	var normalized_kind: String = ability_kind.strip_edges().to_lower()
+	var slot_key: String = get_party_slot_key(hero_index)
+
+	if not active_ability_ids_by_party_slot.has(slot_key):
+		return
+
+	var slot_data = active_ability_ids_by_party_slot.get(slot_key, {})
+	if not (slot_data is Dictionary):
+		active_ability_ids_by_party_slot.erase(slot_key)
+		return
+
+	slot_data.erase(normalized_kind)
+
+	if slot_data.is_empty():
+		active_ability_ids_by_party_slot.erase(slot_key)
+	else:
+		active_ability_ids_by_party_slot[slot_key] = slot_data
+
+
+func clear_active_ability_ids() -> void:
+	active_ability_ids_by_party_slot.clear()
+
+
+func sanitize_active_ability_ids_for_party() -> void:
+	var sanitized_data: Dictionary = {}
+
+	for hero_index in range(party.size()):
+		var slot_key: String = get_party_slot_key(hero_index)
+		if not active_ability_ids_by_party_slot.has(slot_key):
+			continue
+
+		var slot_data = active_ability_ids_by_party_slot.get(slot_key, {})
+		if not (slot_data is Dictionary):
+			continue
+
+		var sanitized_slot_data: Dictionary = {}
+
+		for ability_kind in ["damage", "heal"]:
+			var ability_id: String = str(slot_data.get(ability_kind, "")).strip_edges().to_lower()
+			if ability_id == "":
+				continue
+			sanitized_slot_data[ability_kind] = ability_id
+
+		if not sanitized_slot_data.is_empty():
+			sanitized_data[slot_key] = sanitized_slot_data
+
+	active_ability_ids_by_party_slot = sanitized_data
+
+
+func get_active_ability_ids_save_data() -> Dictionary:
+	sanitize_active_ability_ids_for_party()
+	return active_ability_ids_by_party_slot.duplicate(true)
+
+
+func load_active_ability_ids_from_save_data(serialized_active_abilities) -> void:
+	active_ability_ids_by_party_slot.clear()
+
+	if not serialized_active_abilities is Dictionary:
+		return
+
+	for raw_slot_key in serialized_active_abilities.keys():
+		var slot_key: String = str(raw_slot_key).strip_edges()
+		if slot_key == "":
+			continue
+
+		var raw_slot_data = serialized_active_abilities.get(raw_slot_key, {})
+		if not (raw_slot_data is Dictionary):
+			continue
+
+		var slot_data: Dictionary = {}
+
+		for ability_kind in ["damage", "heal"]:
+			var ability_id: String = str(raw_slot_data.get(ability_kind, "")).strip_edges().to_lower()
+			if ability_id == "":
+				continue
+			slot_data[ability_kind] = ability_id
+
+		if not slot_data.is_empty():
+			active_ability_ids_by_party_slot[slot_key] = slot_data
+
+	sanitize_active_ability_ids_for_party()
 
 # ------------------------------------------------------------
 # INVENTAIRE

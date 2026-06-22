@@ -2,6 +2,12 @@ extends RefCounted
 class_name CombatGrimoireMenuView
 
 # ------------------------------------------------------------
+# VERSION SCRIPT
+# v0.13-Magicka
+# ------------------------------------------------------------
+
+
+# ------------------------------------------------------------
 # GRIMOIRE DE COMBAT
 # Vue dédiée aux sorts actifs temporaires du héros actif.
 # Le choix d'un sort différent consomme l'action du tour.
@@ -68,6 +74,7 @@ static func show_combat_grimoire_screen(owner, feedback_text: String = "") -> vo
 
 	var spell_list: VBoxContainer = owner.create_scrollable_list_inside_panel(spell_panel)
 	var added_count: int = add_combat_spell_rows(owner, spell_list, combat_manager, active_hero)
+
 	if added_count <= 0:
 		spell_list.add_child(owner.create_empty_message_label("Aucun sort disponible."))
 
@@ -77,10 +84,12 @@ static func show_combat_grimoire_screen(owner, feedback_text: String = "") -> vo
 
 static func add_combat_spell_rows(owner, spell_list: VBoxContainer, combat_manager, active_hero) -> int:
 	var added_count: int = 0
+
 	if not combat_manager.has_method("get_available_combat_abilities"):
 		return added_count
 
 	var abilities: Array = combat_manager.get_available_combat_abilities(active_hero)
+
 	for ability in abilities:
 		var ability_id: String = get_string_property(ability, "ability_id", "")
 		if ability_id == "":
@@ -105,6 +114,7 @@ static func create_combat_spell_button(owner, combat_manager, active_hero, abili
 	var ability_id: String = get_string_property(ability, "ability_id", "")
 	var ability_name: String = get_ability_name(ability)
 	var is_active: bool = false
+
 	if combat_manager.has_method("is_active_combat_spell_id"):
 		is_active = combat_manager.is_active_combat_spell_id(active_hero, ability_id)
 
@@ -115,11 +125,13 @@ static func create_combat_spell_button(owner, combat_manager, active_hero, abili
 
 	button.text = base_text
 	button.set_meta("base_text", base_text)
+
 	return button
 
 
 static func on_combat_grimoire_ability_pressed(owner, ability_id: String) -> void:
 	var combat_manager = owner.combat_manager_ref
+
 	if combat_manager == null or not combat_manager.in_combat:
 		owner.close_combat_overlay()
 		return
@@ -163,12 +175,19 @@ static func show_combat_heal_target_screen(owner, feedback_text: String = "") ->
 	var ability = null
 	if combat_manager.has_method("get_active_combat_ability"):
 		ability = combat_manager.get_active_combat_ability(caster, "heal")
+
 	if ability == null:
 		show_combat_log_message_and_close(owner, get_hero_name(caster) + " n'a aucun soin actif.")
 		return
 
 	if not combat_manager.hero_can_pay_ability_cost(caster, ability):
 		show_combat_log_message_and_close(owner, get_hero_name(caster) + " n'a pas assez de magie.")
+		return
+
+	if get_string_property(ability, "target_kind", "") == "all_allies":
+		if combat_manager.has_method("hero_use_active_group_heal"):
+			combat_manager.hero_use_active_group_heal()
+		owner.close_combat_overlay()
 		return
 
 	var caster_index: int = combat_manager.get_party_index_for_hero(caster)
@@ -189,6 +208,7 @@ static func show_combat_heal_target_screen(owner, feedback_text: String = "") ->
 
 static func on_combat_heal_target_confirmed(owner, target_index: int) -> void:
 	var combat_manager = owner.combat_manager_ref
+
 	if combat_manager == null or not combat_manager.in_combat:
 		owner.close_combat_overlay()
 		return
@@ -207,8 +227,12 @@ static func on_combat_heal_target_confirmed(owner, target_index: int) -> void:
 		return
 
 	owner.finish_hero_frame_selection()
+
 	if combat_manager.has_method("hero_use_active_heal_on_target_index"):
-		combat_manager.hero_use_active_heal_on_target_index(target_index, owner.pending_combat_heal_amount)
+		combat_manager.hero_use_active_heal_on_target_index(
+			target_index,
+			owner.pending_combat_heal_amount
+		)
 
 	owner.play_hero_frame_selection_confirm_flash(target_index)
 	owner.close_combat_overlay()
@@ -216,13 +240,16 @@ static func on_combat_heal_target_confirmed(owner, target_index: int) -> void:
 
 static func build_heal_preview_by_index(owner, heal_amount: int) -> Dictionary:
 	var preview_by_index: Dictionary = {}
+
 	for target_index in range(owner.current_party.size()):
 		var target = owner.current_party[target_index]
 		if target == null:
 			continue
+
 		var hp: int = get_int_property(target, "hp", 0)
 		var max_hp: int = get_int_property(target, "max_hp", hp)
 		preview_by_index[target_index] = clamp(heal_amount, 0, max(0, max_hp - hp))
+
 	return preview_by_index
 
 
@@ -230,6 +257,7 @@ static func show_combat_log_message_and_close(owner, message: String) -> void:
 	var combat_manager = owner.combat_manager_ref
 	if combat_manager != null:
 		combat_manager.battle_log = message
+
 	owner.close_combat_overlay()
 
 
@@ -263,9 +291,11 @@ static func add_close_button(owner, wrapper: VBoxContainer) -> void:
 static func get_hero_name(hero) -> String:
 	if hero == null:
 		return "Héros"
+
 	var hero_name: String = get_string_property(hero, "character_name", "")
 	if hero_name != "":
 		return hero_name
+
 	return "Héros"
 
 
@@ -273,9 +303,11 @@ static func get_ability_name(ability) -> String:
 	var display_name: String = get_string_property(ability, "display_name", "")
 	if display_name != "":
 		return display_name
+
 	var ability_name: String = get_string_property(ability, "ability_name", "")
 	if ability_name != "":
 		return ability_name
+
 	return "Sort"
 
 

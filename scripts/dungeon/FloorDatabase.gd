@@ -1,25 +1,29 @@
 extends RefCounted
 class_name FloorDatabase
 
+# ------------------------------------------------------------
+# VERSION SCRIPT
+# v0.13-Magicka
+# ------------------------------------------------------------
+
+
 const FloorDataScript = preload("res://scripts/dungeon/FloorData.gd")
+
 
 # ------------------------------------------------------------
 # ACCÈS AUX ÉTAGES
 # ------------------------------------------------------------
 
-# Retourne les données de l'étage demandé.
-# Tout identifiant inconnu renvoie l'étage 1 par sécurité.
 static func get_floor_data(floor_id: int):
 	if floor_id == 1:
 		return get_floor_1()
+
 	if floor_id == 2:
 		return get_floor_2()
 
 	return get_floor_1()
 
 
-# Indique si un étage existe réellement.
-# Utilisé pour éviter d'activer un escalier descendant vers un étage non créé.
 static func has_floor(floor_id: int) -> bool:
 	return floor_id == 1 or floor_id == 2
 
@@ -28,7 +32,6 @@ static func has_floor(floor_id: int) -> bool:
 # ÉTAGE 1
 # ------------------------------------------------------------
 
-# Définit le premier étage du donjon.
 static func get_floor_1():
 	var layout: Array[String] = [
 		"###############################",
@@ -96,9 +99,6 @@ static func get_floor_1():
 # ÉTAGE 2
 # ------------------------------------------------------------
 
-# Définit le deuxième étage du donjon.
-# Le point de départ est l'escalier montant, placé aux mêmes coordonnées
-# que l'escalier descendant de l'étage 1.
 static func get_floor_2():
 	var layout: Array[String] = [
 		"###############################",
@@ -125,6 +125,8 @@ static func get_floor_2():
 	]
 
 	var discoveries: Dictionary = {}
+	# Soin de groupe : découverte au fond du couloir en x 21 / y 8.
+	discoveries[Vector2i(21, 8)] = "spell_group_heal"
 
 	var chests: Dictionary = {}
 	chests[Vector2i(1, 13)] = {

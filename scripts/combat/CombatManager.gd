@@ -1,6 +1,12 @@
 extends Node
 class_name CombatManager
 
+# ------------------------------------------------------------
+# VERSION SCRIPT
+# v0.13-Magicka
+# ------------------------------------------------------------
+
+
 signal battle_finished(result_status: String, enemy)
 
 # ------------------------------------------------------------
@@ -18,6 +24,7 @@ const CombatDamageResolverScript = preload("res://scripts/combat/CombatDamageRes
 const CombatAbilityResolverScript = preload("res://scripts/combat/CombatAbilityResolver.gd")
 const CombatTargetSelectorScript = preload("res://scripts/combat/CombatTargetSelector.gd")
 const CombatLogHelperScript = preload("res://scripts/combat/CombatLogHelper.gd")
+const CombatStatusEffectResolverScript = preload("res://scripts/combat/CombatStatusEffectResolver.gd")
 
 # ------------------------------------------------------------
 # ÉTAT GLOBAL DU COMBAT
@@ -226,6 +233,17 @@ func register_pending_damage_acknowledgement(hero, damage: int) -> void:
 
 
 func handle_after_enemy_action(log_parts: Array[String]) -> void:
+	# Le poison se résout à la fin du tour du monstre, après son action.
+	# Si le groupe vient d'être vaincu, on ne laisse pas le poison inverser le résultat.
+	if not is_party_defeated():
+		var status_log_lines: Array[String] = resolve_enemy_end_turn_status_effects()
+		for status_line in status_log_lines:
+			log_parts.append(status_line)
+
+		if is_enemy_defeated():
+			end_battle_victory(log_parts)
+			return
+
 	if is_party_defeated():
 		if waiting_for_damage_acknowledgement:
 			pending_damage_should_end_defeat = true
@@ -242,6 +260,10 @@ func handle_after_enemy_action(log_parts: Array[String]) -> void:
 
 	advance_to_next_living_hero()
 	battle_log = join_log(log_parts)
+
+
+func resolve_enemy_end_turn_status_effects() -> Array[String]:
+	return CombatStatusEffectResolverScript.resolve_monster_end_turn_status_effects(current_enemy)
 
 
 # ------------------------------------------------------------
@@ -313,20 +335,22 @@ func is_battle_active() -> bool:
 
 
 # ------------------------------------------------------------
-# GRIMOIRE DE COMBAT / SORTS ACTIFS TEMPORAIRES
-# Les sorts actifs sont réinitialisés à chaque entrée en combat.
-# Aucun choix n'est sauvegardé pour le moment.
+# GRIMOIRE DE COMBAT / SORTS ACTIFS
+# Les sorts actifs sont initialisés depuis les choix préparés hors combat.
+# Le grimoire de combat peut ensuite les modifier temporairement pendant le combat.
 # ------------------------------------------------------------
 
 func reset_active_combat_spells() -> void:
 	active_combat_spell_ids_by_party_index.clear()
+
 	for hero_index in range(party.size()):
 		var hero = party[hero_index]
 		if hero == null:
 			continue
+
 		active_combat_spell_ids_by_party_index[hero_index] = {
-			"damage": get_default_combat_ability_id(hero, "damage"),
-			"heal": get_default_combat_ability_id(hero, "heal")
+			"damage": get_prepared_or_default_combat_ability_id(hero_index, hero, "damage"),
+			"heal": get_prepared_or_default_combat_ability_id(hero_index, hero, "heal")
 		}
 
 
@@ -335,6 +359,53 @@ func get_default_combat_ability_id(hero, requested_kind: String) -> String:
 	if ability == null:
 		return ""
 	return get_string_property(ability, "ability_id", "")
+
+
+func get_prepared_or_default_combat_ability_id(
+	hero_index: int,
+	hero,
+	requested_kind: String
+) -> String:
+	var default_ability_id: String = get_default_combat_ability_id(hero, requested_kind)
+
+	if GameSession == null:
+		return default_ability_id
+
+	if not GameSession.has_method("get_active_ability_id_for_party_slot"):
+		return default_ability_id
+
+	var prepared_ability_id: String = GameSession.get_active_ability_id_for_party_slot(
+		hero_index,
+		requested_kind
+	)
+
+	if is_valid_prepared_combat_ability_id(hero, prepared_ability_id, requested_kind):
+		return prepared_ability_id
+
+	return default_ability_id
+
+
+func is_valid_prepared_combat_ability_id(
+	hero,
+	ability_id: String,
+	requested_kind: String
+) -> bool:
+	if hero == null:
+		return false
+
+	var normalized_ability_id: String = ability_id.strip_edges().to_lower()
+	if normalized_ability_id == "":
+		return false
+
+	var ability = AbilityDatabaseScript.get_ability_data(normalized_ability_id)
+	if ability == null:
+		return false
+
+	var ability_kind: String = get_string_property(ability, "ability_kind", "")
+	if ability_kind != requested_kind:
+		return false
+
+	return is_ability_available_for_basic_use(hero, ability)
 
 
 func can_hero_use_combat_grimoire(hero) -> bool:
@@ -386,10 +457,11 @@ func ensure_active_combat_spell_entry(hero) -> void:
 	var hero_index: int = get_party_index_for_hero(hero)
 	if hero_index < 0:
 		return
+
 	if not active_combat_spell_ids_by_party_index.has(hero_index):
 		active_combat_spell_ids_by_party_index[hero_index] = {
-			"damage": get_default_combat_ability_id(hero, "damage"),
-			"heal": get_default_combat_ability_id(hero, "heal")
+			"damage": get_prepared_or_default_combat_ability_id(hero_index, hero, "damage"),
+			"heal": get_prepared_or_default_combat_ability_id(hero_index, hero, "heal")
 		}
 
 
@@ -410,7 +482,7 @@ func get_active_combat_spell_id(hero, requested_kind: String) -> String:
 			if is_ability_available_for_basic_use(hero, ability):
 				return ability_id
 
-	ability_id = get_default_combat_ability_id(hero, requested_kind)
+	ability_id = get_prepared_or_default_combat_ability_id(hero_index, hero, requested_kind)
 	spell_data[requested_kind] = ability_id
 	active_combat_spell_ids_by_party_index[hero_index] = spell_data
 	return ability_id
@@ -571,6 +643,11 @@ func hero_use_active_magic() -> void:
 		battle_log = get_hero_name(active_hero) + " n'a pas assez de magie."
 		return
 
+	var target_kind: String = get_string_property(ability, "target_kind", "")
+	if target_kind == "enemy_poison":
+		hero_use_active_poison(active_hero, ability)
+		return
+
 	hero_pay_ability_cost(active_hero, ability)
 
 	var log_parts: Array[String] = []
@@ -603,8 +680,48 @@ func hero_use_active_magic() -> void:
 
 	handle_after_enemy_action(log_parts)
 
+
+func hero_use_active_poison(active_hero, ability) -> void:
+	hero_pay_ability_cost(active_hero, ability)
+
+	AudioManager.play_sfx("spell")
+
+	var min_percent: int = get_int_property(ability, "power_min", 5)
+	var max_percent: int = get_int_property(ability, "power_max", 10)
+	var poison_result: Dictionary = CombatStatusEffectResolverScript.apply_poison_to_monster(
+		current_enemy,
+		min_percent,
+		max_percent
+	)
+
+	var log_parts: Array[String] = []
+	log_parts.append(
+		get_hero_name(active_hero)
+		+ " lance "
+		+ get_ability_name(ability)
+		+ " sur "
+		+ get_enemy_name()
+		+ "."
+	)
+
+	var poison_message: String = str(poison_result.get("message", ""))
+	if poison_message != "":
+		log_parts.append(poison_message)
+
+	var counter_log: String = enemy_attack()
+	if counter_log != "":
+		log_parts.append(counter_log)
+
+	handle_after_enemy_action(log_parts)
+
 func hero_use_first_available_heal() -> void:
 	if not can_hero_act():
+		return
+
+	var active_hero = get_active_hero()
+	var ability = get_active_combat_ability(active_hero, "heal")
+	if ability != null and get_string_property(ability, "target_kind", "") == "all_allies":
+		hero_use_active_group_heal()
 		return
 
 	var heal_target = get_most_wounded_living_hero()
@@ -616,6 +733,78 @@ func hero_use_first_available_heal() -> void:
 	hero_use_active_heal_on_target_index(target_index)
 
 
+
+func hero_use_active_group_heal(forced_heal_amount: int = -1) -> void:
+	if not can_hero_act():
+		return
+
+	var active_hero = get_active_hero()
+	var ability = get_active_combat_ability(active_hero, "heal")
+	if ability == null:
+		battle_log = get_hero_name(active_hero) + " ne connaît aucun soin utilisable."
+		return
+
+	if get_string_property(ability, "target_kind", "") != "all_allies":
+		battle_log = get_ability_name(ability) + " n'est pas un soin de groupe."
+		return
+
+	if not hero_can_pay_ability_cost(active_hero, ability):
+		battle_log = get_hero_name(active_hero) + " n'a pas assez de magie."
+		return
+
+	var wounded_targets: Array = []
+	for hero in party:
+		if hero == null:
+			continue
+		if not is_hero_alive(hero):
+			continue
+
+		var hp: int = get_int_property(hero, "hp", 0)
+		var max_hp: int = get_int_property(hero, "max_hp", hp)
+		if hp < max_hp:
+			wounded_targets.append(hero)
+
+	if wounded_targets.is_empty():
+		battle_log = "Aucun héros ne peut être soigné."
+		return
+
+	hero_pay_ability_cost(active_hero, ability)
+
+	var heal_amount: int = forced_heal_amount
+	if heal_amount <= 0:
+		heal_amount = roll_hero_spell_power(active_hero, ability)
+
+	AudioManager.play_sfx("heal")
+
+	var total_heal: int = 0
+	var healed_count: int = 0
+	for target in wounded_targets:
+		var before_hp: int = get_int_property(target, "hp", 0)
+		apply_heal_to_hero(target, heal_amount)
+		var after_hp: int = get_int_property(target, "hp", before_hp)
+		var actual_heal: int = max(0, after_hp - before_hp)
+		if actual_heal > 0:
+			total_heal += actual_heal
+			healed_count += 1
+
+	var log_parts: Array[String] = []
+	log_parts.append(
+		get_hero_name(active_hero)
+		+ " lance "
+		+ get_ability_name(ability)
+		+ ". "
+		+ str(healed_count)
+		+ " héros récupèrent "
+		+ str(total_heal)
+		+ " PV au total."
+	)
+
+	var counter_log: String = enemy_attack()
+	if counter_log != "":
+		log_parts.append(counter_log)
+
+	handle_after_enemy_action(log_parts)
+
 func hero_use_active_heal_on_target_index(target_index: int, forced_heal_amount: int = -1) -> void:
 	if not can_hero_act():
 		return
@@ -624,6 +813,10 @@ func hero_use_active_heal_on_target_index(target_index: int, forced_heal_amount:
 	var ability = get_active_combat_ability(active_hero, "heal")
 	if ability == null:
 		battle_log = get_hero_name(active_hero) + " ne connaît aucun soin utilisable."
+		return
+
+	if get_string_property(ability, "target_kind", "") == "all_allies":
+		hero_use_active_group_heal(forced_heal_amount)
 		return
 
 	if not hero_can_pay_ability_cost(active_hero, ability):
