@@ -1,8 +1,8 @@
 # ROADMAP — DungeonCrawFirstMiniGame
 
-Date de mise à jour : 2026-06-19
+Date de mise à jour : 2026-06-22
 
-Version stable actuelle : `v0.11.2 — Polish menus et orientation des modèles 3D`
+Version stable actuelle : `v0.11.3 — Fond de menu, polices et lisibilité UI`
 
 ## Vision
 
@@ -20,6 +20,7 @@ La priorité actuelle n'est pas de multiplier trop vite le contenu brut. Le proj
 - Les modèles lisibles ou interactifs ne doivent pas faire face à un mur si un chemin adjacent existe.
 - Ne pas viser l'étage 3 comme priorité immédiate.
 - Enrichir d'abord les systèmes autour de la boucle déjà complète.
+- Vérifier la lisibilité des écrans après chaque changement de police ou de thème global.
 ```
 
 ## Versions récentes
@@ -29,22 +30,27 @@ v0.10 — Grimoire de combat et ciblage des soins
 v0.11-Polish — Cadres UI NineSlice et correction Prêtre
 v0.11.1 — Carte agrandie et automap améliorée
 v0.11.2 — Polish menus et orientation des modèles 3D
+v0.11.3 — Fond de menu, polices et lisibilité UI
 ```
 
 ## Prochaines phases proposées
 
-### Phase 1 — Playtest 02 post-v0.11.2
+### Phase 1 — Playtest 02 post-v0.11.3
 
 À tester :
+
 ```text
-menu principal
+menu principal avec image de fond
 Options
 Nouvelle partie
+Charger
 création d'équipe
-tooltips Relancer / Stocker / Reprendre
-validation des quatre héros
+police globale dans les écrans denses
+boutons d'exploration simplifiés
+raccourcis clavier Z/Q/S/D/E
 carte agrandie
 automap compacte
+tooltip coordonnées X/Y à deux chiffres
 orientation du premier M
 coffres et messages réorientés
 temples et boutiques
@@ -58,24 +64,28 @@ sauvegarde / chargement
 ```
 
 Sortie attendue :
+
 ```text
-playtests/PLAYTEST_02_v0.11.2.md
+playtests/PLAYTEST_02_v0.11.3.md
 ```
 
-### Phase 2 — Finition UI post-menus
+### Phase 2 — Finition UI post-polices
 
 Pistes :
+
 ```text
-- créer une texture dédiée aux boutons ;
+- vérifier les écrans qui contiennent beaucoup de texte ;
 - vérifier les états hover / pressed / disabled ;
 - améliorer les cadres actifs, dégâts, soin et sélection ;
 - harmoniser les marges internes des panneaux ;
-- vérifier les tooltips en basse résolution.
+- vérifier les tooltips en basse résolution ;
+- créer une texture dédiée aux boutons si la texture de cadre principale reste trop générique.
 ```
 
 ### Phase 3 — Progression magique plus riche
 
 Pistes :
+
 ```text
 - nouveaux sorts offensifs simples ;
 - nouveaux sorts de soin ;

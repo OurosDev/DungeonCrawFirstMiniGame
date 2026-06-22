@@ -1,12 +1,14 @@
 # IDEAS — DungeonCrawFirstMiniGame
 
-Date de mise à jour : 2026-06-19
+Date de mise à jour : 2026-06-22
 
-Base de référence : `v0.11.2 — Polish menus et orientation des modèles 3D`
+Base de référence : `v0.11.3 — Fond de menu, polices et lisibilité UI`
 
 ## Rôle du document
 
-Ce fichier sert de boîte à idées longue durée. Ne jamais supprimer une idée par simple nettoyage.
+Ce fichier sert de boîte à idées longue durée.
+
+Ne jamais supprimer une idée par simple nettoyage.
 
 ## Interface et identité visuelle
 
@@ -15,7 +17,10 @@ Ce fichier sert de boîte à idées longue durée. Ne jamais supprimer une idée
 - Créer ou intégrer un ninesheet / atlas de cadres texturés.
 - Harmoniser finement les marges des menus.
 - Améliorer les tooltips si la carte ou la création d'équipe deviennent plus utilisées.
-- Revenir éventuellement plus tard sur une image de fond du menu principal, mais ce n'est pas engagé.
+- Conserver la possibilité de variantes futures pour l'image de fond du menu principal.
+- Vérifier l'usage de la police globale sur les écrans denses : inventaire, équipement, boutique, combat, grimoire.
+- Ajouter si besoin des overrides locaux de taille de police dans les écrans qui débordent.
+- Étudier plus tard une version image/logo du titre principal si la police dédiée ne suffit pas.
 ```
 
 ## Modèles 3D et lisibilité du donjon
@@ -55,6 +60,6 @@ Ce fichier sert de boîte à idées longue durée. Ne jamais supprimer une idée
 - Journal de quête.
 - Moniteur d'objectif.
 - Étage 3 immédiat.
-- Image de fond du menu principal.
+- Variantes supplémentaires du fond du menu principal.
 - Passage rapide à v1.0.
 ```

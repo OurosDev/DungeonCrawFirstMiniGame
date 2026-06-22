@@ -6,20 +6,21 @@ Le projet sert aussi de terrain d'apprentissage pour la gestion d'un petit proje
 
 ## État actuel
 
-Version stable récente : `v0.11.2 — Polish menus et orientation des modèles 3D`.
+Version stable récente : `v0.11.3 — Fond de menu, polices et lisibilité UI`.
 
-Cette version conserve la base `v0.11.1 — Carte agrandie et automap améliorée` et ajoute un polish ciblé :
-- boutons du menu principal texturés ;
-- grand cadre autour de `DONJON DES SERPENTS` retiré ;
-- panneau Options texturé ;
-- création d'équipe harmonisée avec cadres et boutons texturés ;
-- tooltips d'aide au survol de `Relancer`, `Stocker` et `Reprendre` ;
-- orientation automatique des modèles spéciaux `M/C/O/B` pour éviter qu'ils fassent face à un mur quand une case chemin ou praticable existe.
+Cette version conserve la base `v0.11.2 — Polish menus et orientation des modèles 3D` et ajoute une passe d'identité visuelle et de lisibilité :
 
-Aucun gameplay, layout ou format de sauvegarde n'est modifié.
+- image de fond dédiée pour le menu principal ;
+- placement réglable des éléments du menu principal par constantes de layout ;
+- police OpenType dédiée au titre du menu principal ;
+- thème de police global pour l'interface du jeu ;
+- libellés des boutons d'exploration simplifiés pour rester lisibles avec la nouvelle police ;
+- tooltip de coordonnées de carte / automap corrigé pour éviter les retours à la ligne quand `X` ou `Y` dépassent 10.
 
+Aucun gameplay, layout de donjon, règle de combat ou format de sauvegarde n'est modifié.
 
 La base jouable contient notamment :
+
 - création d'un groupe de quatre héros ;
 - exploration case par case sur deux étages ;
 - combats au tour par tour ;
@@ -56,6 +57,7 @@ Pour les builds Windows destinées aux testeurs, utiliser `Compatibility / OpenG
 ## Contrôles
 
 Exploration :
+
 - `Z` : avancer
 - `S` : reculer
 - `Q` : tourner à gauche
@@ -63,6 +65,19 @@ Exploration :
 - `A` : valider / équivalent `Entrée` ou `Espace`
 - `E` : retour / équivalent `Échap`
 - Souris : boutons d'action affichés à l'écran
+
+Depuis `v0.11.3`, les boutons souris d'exploration affichent des libellés plus courts et plus lisibles :
+
+```text
+Avancer
+Reculer
+Gauche
+Droite
+Carte
+Menu
+```
+
+Les raccourcis clavier restent inchangés.
 
 La commande `Carte` ouvre une carte agrandie de l'étage découvert dans le viewport. `Retour`, `E` ou `Échap` ferment la carte et reviennent à l'exploration.
 
@@ -76,35 +91,48 @@ assets/ui/frames/texture_cadre_ui.png
 
 Depuis `v0.11.2`, le menu principal et l'écran de création d'équipe sont aussi alignés avec ce style.
 
+Depuis `v0.11.3`, l'identité visuelle du menu principal et des textes est enrichie par :
+
+```text
+assets/ui/backgrounds/main_menu_background.png
+assets/ui/themes/game_theme.tres
+assets/fonts/title_medieval.otf
+assets/fonts/game_ui.otf
+```
+
+Les fichiers de police doivent être conservés uniquement si leur licence autorise leur utilisation et leur distribution dans le dépôt public.
+
 ## Donjon et modèles 3D spéciaux
 
 Règle d'orientation des modèles spéciaux :
+
 1. conserver l'orientation naturelle si elle regarde déjà une case `.`;
 2. sinon, chercher une case `.` adjacente ;
 3. sinon, chercher une case praticable non-mur ;
 4. sinon, conserver l'orientation naturelle.
 
 Modèles concernés :
+
 - `M` = message / stèle ;
 - `C` = coffre ;
 - `O` = temple ;
 - `B` = boutique.
 
-
 ## Organisation du dépôt
 
 ```text
-CHANGELOG/                 Historique des versions
-audits/                    Audits d'état du dépôt
-docs/dungeon/              Documents de conception et visualisation des étages
-docs/informations/         Roadmap, idées et dette technique
-playtests/                 Synthèses propres des sessions de test
-scenes/                    Scènes Godot
-scripts/                   Scripts GDScript organisés par domaine
-assets/                    Images, sons, musiques et sprites
+CHANGELOG/          Historique des versions
+audits/             Audits d'état du dépôt
+docs/dungeon/       Documents de conception et visualisation des étages
+docs/informations/  Roadmap, idées et dette technique
+playtests/          Synthèses propres des sessions de test
+scenes/             Scènes Godot
+scripts/            Scripts GDScript organisés par domaine
+assets/             Images, sons, musiques, polices et sprites
 ```
 
 Ne pas pousser :
+
 - builds exportées ;
 - cache Godot `.godot/` ;
 - logs bruts complets ;
