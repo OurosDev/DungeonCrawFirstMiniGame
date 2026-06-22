@@ -2,77 +2,107 @@
 
 Date de mise à jour : 2026-06-22
 
-Base actuelle : `v0.11.3 — Fond de menu, polices et lisibilité UI`
+Base actuelle : `v0.12 — Équilibrage combat, sort découvert et corrections UI`
 
 ## Résumé
 
-La dette technique principale du projet a été réduite par la série de refactorisations `v0.8.2`, puis la base a été enrichie par les grimoires, le polish UI, la carte agrandie, l'automap améliorée et l'identité visuelle du menu principal.
+La base récente ajoute une progression magique sauvegardée et plusieurs corrections d'interface post-police globale.
 
-`v0.11.3` ajoute une police globale et une image de fond de menu sans nouveau format de sauvegarde.
+`v0.12` modifie le format de sauvegarde pour mémoriser les sorts découverts, tout en conservant la compatibilité avec les sauvegardes plus anciennes.
 
-## Dette résolue ou fortement réduite
+## Dette réduite ou stabilisée
 
-### Refactorisations internes v0.8.2
+### Sort découvert utilisable en combat
 
-```text
-InGameMenuPanelUI.gd -> scripts/ui/menu/*
-CombatManager.gd -> scripts/combat/Combat*Resolver/Helper/Access/Selector
-Dungeon.gd -> DungeonMapHelper / DungeonFloorStateHelper / DungeonAutoMapHelper
-GameSession.gd -> scripts/core/session/*
-PartyCreationUI.gd -> scripts/ui/party_creation/*
-```
+Le sort `Éclat de givre` n'est plus seulement découvert dans le donjon : il est relié au grimoire de combat via la progression du groupe.
 
-### UI NineSlice v0.11
-
-Base de rendu texturé centralisée dans :
+Chaîne actuelle :
 
 ```text
-scripts/ui/theme/UIFrameStyle.gd
+Dungeon.gd
+-> GameSession.gd
+-> SaveManager.gd
+-> CombatAbilityResolver.gd
 ```
 
-Asset principal :
+### Sauvegarde des sorts découverts
+
+Nouveau champ :
 
 ```text
-assets/ui/frames/texture_cadre_ui.png
+discovered_ability_ids
 ```
 
-### Carte agrandie v0.11.1
-
-La carte agrandie reste une extension de l'automap :
+Compatibilité :
 
 ```text
-layout
-discovered_map_cells
-player.grid_cell
-player.get_facing_name()
+sauvegardes anciennes : champ absent = liste vide
 ```
 
-Aucun nouvel état persistant n'est ajouté.
+### Boss gardien exclu de la hausse de PV
 
-### Menu principal et police globale v0.11.3
+Le boss utilise une base séparée pour éviter toute augmentation indirecte quand le gardien normal est rééquilibré.
 
-Le menu principal est maintenant plus configurable :
+### Création d'équipe
+
+Les valeurs de roll sont plus lisibles grâce à la couleur :
 
 ```text
-scripts/ui/MainMenu.gd
-assets/ui/backgrounds/main_menu_background.png
-assets/ui/themes/game_theme.tres
-assets/fonts/title_medieval.otf
-assets/fonts/game_ui.otf
+10 vert
+5 jaune
+4 ou moins rouge
 ```
 
-Points stabilisés :
+### Équipement
 
-```text
-titre avec police dédiée
-placement du menu par constantes Rect2
-libellés d'exploration simplifiés
-tooltip coordonnées sans retour à la ligne
-```
+L'écran `Statut > Équipement` a été compacté pour mieux supporter la police globale et éviter les chevauchements.
+
+### Journal / Combat
+
+Le canal affiché revient automatiquement sur `Journal` en sortie de combat.
 
 ## Points de vigilance actuels
 
-### 1. Police globale
+### 1. Progression magique
+
+Le système commence à stocker des découvertes de sorts au niveau groupe.
+
+À surveiller :
+
+```text
+cohérence entre sorts de classe et sorts découverts
+compatibilité anciennes sauvegardes
+sorts visibles mais non utilisables
+niveau requis
+coût PM
+grimoire hors combat individuel futur
+```
+
+Dette future probable :
+
+```text
+système de sorts connus / découverts plus formel
+choix persistant des sorts actifs
+UI pour afficher les sorts découverts mais verrouillés
+```
+
+### 2. Équilibrage combat
+
+La hausse de PV des monstres normaux et le coût augmenté du sort de base du Mage doivent être validés par playtest.
+
+À surveiller :
+
+```text
+durée moyenne des combats
+consommation de PM du Mage
+intérêt réel d'Éclat de givre
+difficulté étage 1
+difficulté étage 2
+boss gardien
+récompenses après combat
+```
+
+### 3. Police globale
 
 À surveiller :
 
@@ -96,21 +126,7 @@ corriger localement les libellés ou tailles minimales
 ajouter des overrides par écran si besoin
 ```
 
-### 2. Carte agrandie et automap
-
-À surveiller :
-
-```text
-redimensionnement de fenêtre
-position du tooltip
-clarté des coordonnées
-absence de tooltip sur murs
-absence de tooltip sur cases non découvertes
-alignement du bouton Retour
-lisibilité sur étage 1 et étage 2
-```
-
-### 3. Texture dédiée aux boutons
+### 4. Texture dédiée aux boutons
 
 Les boutons utilisent actuellement la même texture que les panneaux, avec des marges NineSlice réduites.
 
@@ -120,20 +136,6 @@ Piste future :
 
 ```text
 assets/ui/frames/texture_bouton_ui.png
-```
-
-### 4. UI texturée et états visuels
-
-L'application du NineSlice et de la police globale ne doit pas masquer les feedbacks importants :
-
-```text
-héros actif
-sélection verte
-prévisualisation PV/PM
-dégâts reçus
-soins
-boutons désactivés
-tooltips carte
 ```
 
 ### 5. CombatManager.gd
@@ -153,42 +155,6 @@ ciblage des soins
 
 Les prochaines évolutions de magie doivent rester progressives et testables.
 
-### 6. Sorts actifs
-
-Pour le moment :
-
-```text
-sorts actifs = temporaires
-réinitialisation = début de combat
-sauvegarde = aucune persistance volontaire
-```
-
-Dette future probable : quand plusieurs sorts seront réellement disponibles, il faudra probablement créer :
-
-```text
-système de sorts connus / découverts
-grimoire hors combat individuel par héros
-choix persistant des sorts actifs
-compatibilité anciennes sauvegardes
-```
-
-### 7. Journal Combat
-
-`LogPanelUI.gd` colore certaines lignes de combat selon leur texte.
-
-Risque : si les messages de combat deviennent plus variés, l'analyse textuelle peut devenir fragile.
-
-Solution future possible : passer à des messages typés, par exemple :
-
-```text
-combat_player_damage
-combat_enemy_damage
-combat_heal
-system_warning
-key_item
-message_tile
-```
-
 ## À ne pas faire pour le moment
 
 ```text
@@ -204,15 +170,14 @@ message_tile
 
 ## Recommandation immédiate
 
-Après `v0.11.3`, privilégier :
+Après `v0.12`, privilégier :
 
 ```text
-1. playtest 02 post-v0.11.3 ;
-2. vérifier la lisibilité de la police globale dans tous les écrans ;
-3. tester étage 1 et étage 2 ;
-4. vérifier l'automap compacte et la carte agrandie ;
-5. vérifier les tooltips coordonnées ;
-6. tester la boucle complète avec Mage + Prêtre ;
-7. créer une texture dédiée aux boutons si le besoin visuel reste confirmé ;
-8. ensuite seulement, concevoir les prochains sorts.
+1. playtest 02 post-v0.12 ;
+2. vérifier la durée des combats ;
+3. vérifier l'intérêt d'Éclat de givre ;
+4. vérifier la sauvegarde / recharge des sorts découverts ;
+5. vérifier la lisibilité de tous les écrans avec la police globale ;
+6. corriger les derniers débordements UI si nécessaire ;
+7. ensuite seulement, concevoir les prochains sorts.
 ```

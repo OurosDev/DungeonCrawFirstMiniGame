@@ -6,18 +6,20 @@ Le projet sert aussi de terrain d'apprentissage pour la gestion d'un petit proje
 
 ## État actuel
 
-Version stable récente : `v0.11.3 — Fond de menu, polices et lisibilité UI`.
+Version stable récente : `v0.12 — Équilibrage combat, sort découvert et corrections UI`.
 
-Cette version conserve la base `v0.11.2 — Polish menus et orientation des modèles 3D` et ajoute une passe d'identité visuelle et de lisibilité :
+Cette version conserve la base `v0.11.3 — Fond de menu, polices et lisibilité UI` et ajoute une passe de progression / équilibrage :
 
-- image de fond dédiée pour le menu principal ;
-- placement réglable des éléments du menu principal par constantes de layout ;
-- police OpenType dédiée au titre du menu principal ;
-- thème de police global pour l'interface du jeu ;
-- libellés des boutons d'exploration simplifiés pour rester lisibles avec la nouvelle police ;
-- tooltip de coordonnées de carte / automap corrigé pour éviter les retours à la ligne quand `X` ou `Y` dépassent 10.
+- le sort de base du Mage coûte désormais plus cher en mana ;
+- le sort `Éclat de givre`, découvert à l'étage 1, devient utilisable en combat par un Mage compatible ;
+- la découverte du sort est sauvegardée dans la progression du groupe ;
+- les points de vie des monstres normaux sont augmentés de 25 % ;
+- le boss gardien est explicitement exclu de cette hausse et conserve ses PV prévus ;
+- les valeurs de rolls de création d'équipe sont colorées selon leur qualité ;
+- l'écran d'équipement du menu Statut est ajusté pour éviter les chevauchements ;
+- le canal de messages revient automatiquement sur `Journal` après un combat.
 
-Aucun gameplay, layout de donjon, règle de combat ou format de sauvegarde n'est modifié.
+Le format de sauvegarde est mis à jour pour mémoriser les sorts découverts. Les anciennes sauvegardes restent compatibles : en absence du nouveau champ, la liste de sorts découverts est vide.
 
 La base jouable contient notamment :
 
@@ -37,7 +39,9 @@ La base jouable contient notamment :
 - soin en combat avec ciblage direct par cadres ;
 - journal Combat coloré ;
 - UI NineSlice ;
-- carte agrandie et automap améliorée.
+- carte agrandie et automap améliorée ;
+- image de fond du menu principal ;
+- police OpenType dédiée au titre et police globale d'interface.
 
 ## Renderer et affichage
 
@@ -66,7 +70,7 @@ Exploration :
 - `E` : retour / équivalent `Échap`
 - Souris : boutons d'action affichés à l'écran
 
-Depuis `v0.11.3`, les boutons souris d'exploration affichent des libellés plus courts et plus lisibles :
+Les boutons souris d'exploration affichent des libellés simples :
 
 ```text
 Avancer
@@ -89,9 +93,7 @@ L'interface principale utilise :
 assets/ui/frames/texture_cadre_ui.png
 ```
 
-Depuis `v0.11.2`, le menu principal et l'écran de création d'équipe sont aussi alignés avec ce style.
-
-Depuis `v0.11.3`, l'identité visuelle du menu principal et des textes est enrichie par :
+L'identité visuelle récente du menu principal et des textes repose sur :
 
 ```text
 assets/ui/backgrounds/main_menu_background.png

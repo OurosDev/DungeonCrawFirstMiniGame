@@ -2,7 +2,7 @@
 
 Date de mise à jour : 2026-06-22
 
-Version stable actuelle : `v0.11.3 — Fond de menu, polices et lisibilité UI`
+Version stable actuelle : `v0.12 — Équilibrage combat, sort découvert et corrections UI`
 
 ## Vision
 
@@ -21,6 +21,7 @@ La priorité actuelle n'est pas de multiplier trop vite le contenu brut. Le proj
 - Ne pas viser l'étage 3 comme priorité immédiate.
 - Enrichir d'abord les systèmes autour de la boucle déjà complète.
 - Vérifier la lisibilité des écrans après chaque changement de police ou de thème global.
+- Sauvegarder toute progression durable.
 ```
 
 ## Versions récentes
@@ -31,11 +32,12 @@ v0.11-Polish — Cadres UI NineSlice et correction Prêtre
 v0.11.1 — Carte agrandie et automap améliorée
 v0.11.2 — Polish menus et orientation des modèles 3D
 v0.11.3 — Fond de menu, polices et lisibilité UI
+v0.12 — Équilibrage combat, sort découvert et corrections UI
 ```
 
 ## Prochaines phases proposées
 
-### Phase 1 — Playtest 02 post-v0.11.3
+### Phase 1 — Playtest 02 post-v0.12
 
 À tester :
 
@@ -43,33 +45,48 @@ v0.11.3 — Fond de menu, polices et lisibilité UI
 menu principal avec image de fond
 Options
 Nouvelle partie
-Charger
 création d'équipe
-police globale dans les écrans denses
-boutons d'exploration simplifiés
-raccourcis clavier Z/Q/S/D/E
+couleurs des rolls
+validation des quatre héros
+progression jusqu'à découverte d'Éclat de givre
+Mage niveau 1 / niveau 2
+grimoire de combat
+coût d'Étincelle
+coût d'Éclat de givre
+sauvegarde / chargement après découverte
+PV des monstres normaux
+boss gardien
+écran équipement
 carte agrandie
 automap compacte
-tooltip coordonnées X/Y à deux chiffres
-orientation du premier M
-coffres et messages réorientés
-temples et boutiques
+journal / combat / retour journal
+boutique
+temple
 grimoire hors combat
-grimoire de combat
 soins hors combat
 soins en combat
-journal Combat coloré
-boss gardien
-sauvegarde / chargement
 ```
 
 Sortie attendue :
 
 ```text
-playtests/PLAYTEST_02_v0.11.3.md
+playtests/PLAYTEST_02_v0.12.md
 ```
 
-### Phase 2 — Finition UI post-polices
+### Phase 2 — Progression magique plus riche
+
+Pistes :
+
+```text
+- nouveaux sorts offensifs simples ;
+- nouveaux sorts de soin ;
+- premiers sorts utilitaires hors combat ;
+- grimoire hors combat individuel par héros ;
+- choix de sorts actifs avant combat quand il y aura assez de sorts ;
+- découvertes de sorts supplémentaires liées à l'exploration.
+```
+
+### Phase 3 — Finition UI post-polices
 
 Pistes :
 
@@ -80,18 +97,6 @@ Pistes :
 - harmoniser les marges internes des panneaux ;
 - vérifier les tooltips en basse résolution ;
 - créer une texture dédiée aux boutons si la texture de cadre principale reste trop générique.
-```
-
-### Phase 3 — Progression magique plus riche
-
-Pistes :
-
-```text
-- nouveaux sorts offensifs simples ;
-- nouveaux sorts de soin ;
-- premiers sorts utilitaires hors combat ;
-- grimoire hors combat individuel par héros ;
-- choix de sorts actifs avant combat quand il y aura assez de sorts.
 ```
 
 ## Éléments volontairement non prioritaires

@@ -2,7 +2,7 @@
 
 Date de mise à jour : 2026-06-22
 
-Base de référence : `v0.11.3 — Fond de menu, polices et lisibilité UI`
+Base de référence : `v0.12 — Équilibrage combat, sort découvert et corrections UI`
 
 ## Rôle du document
 
@@ -21,6 +21,17 @@ Ne jamais supprimer une idée par simple nettoyage.
 - Vérifier l'usage de la police globale sur les écrans denses : inventaire, équipement, boutique, combat, grimoire.
 - Ajouter si besoin des overrides locaux de taille de police dans les écrans qui débordent.
 - Étudier plus tard une version image/logo du titre principal si la police dédiée ne suffit pas.
+- Ajouter éventuellement d'autres feedbacks de couleur dans la création d'équipe.
+```
+
+## Combat et équilibrage
+
+```text
+- Ajuster progressivement les coûts de mana après playtest.
+- Ajuster les PV des monstres selon la durée réelle des combats.
+- Ajouter plus tard des résistances ou faiblesses, seulement si cela reste lisible.
+- Ajouter des comportements spéciaux simples pour certains monstres.
+- Prévoir un futur équilibrage des récompenses si les combats deviennent plus longs.
 ```
 
 ## Modèles 3D et lisibilité du donjon
@@ -36,6 +47,7 @@ Ne jamais supprimer une idée par simple nettoyage.
 ## Création d'équipe et aide utilisateur
 
 ```text
+- Vérifier si les couleurs de roll suffisent à rendre les bons / mauvais tirages lisibles.
 - Vérifier si les tooltips Relancer / Stocker / Reprendre suffisent aux nouveaux joueurs.
 - Ajouter éventuellement une aide plus discrète si un prochain playtest montre encore une incompréhension.
 - Garder l'aide légère, sans tutoriel lourd.
@@ -50,6 +62,7 @@ Ne jamais supprimer une idée par simple nettoyage.
 - Sorts offensifs supplémentaires pour le Mage.
 - Sorts de soin supplémentaires pour le Prêtre.
 - Sorts utilitaires hors combat.
+- Nouvelles découvertes de sorts liées à des messages, coffres ou événements fixes.
 ```
 
 ## Idées explicitement reportées pour le moment

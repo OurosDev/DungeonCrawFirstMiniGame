@@ -2,7 +2,7 @@
 
 Date de mise à jour : 2026-06-22
 
-Version de référence : `v0.11.3 — Fond de menu, polices et lisibilité UI`
+Version de référence : `v0.12 — Équilibrage combat, sort découvert et corrections UI`
 
 ## 1. Règle de démarrage d'une conversation
 
@@ -19,8 +19,8 @@ Documents à vérifier selon le besoin :
 ```text
 README.md
 CHANGELOG/README.md
-CHANGELOG/v0.11.3.md
-audits/STATE_AUDITv0.11.3.md
+CHANGELOG/v0.12.md
+audits/STATE_AUDITv0.12.md
 docs/informations/ROADMAP.md
 docs/informations/IDEAS.md
 docs/informations/TECHNICAL_DEBT.md
@@ -83,66 +83,68 @@ orientation des modèles 3D spéciaux
 5. séparer clairement nouveaux fichiers / fichiers mis à jour / fichiers à ne pas pousser ;
 6. attendre les tests locaux avant de préparer une release.
 
-## 6. Base actuelle v0.11.3
+## 6. Base actuelle v0.12
 
-Version stable récente : `v0.11.3 — Fond de menu, polices et lisibilité UI`.
+Version stable récente : `v0.12 — Équilibrage combat, sort découvert et corrections UI`.
 
-Cette version conserve la base `v0.11.2 — Polish menus et orientation des modèles 3D` et ajoute :
+Cette version conserve la base `v0.11.3 — Fond de menu, polices et lisibilité UI` et ajoute :
 
-- image de fond dédiée au menu principal ;
-- constantes de layout réglables dans `MainMenu.gd` ;
-- police OpenType dédiée au titre du menu principal ;
-- thème de police global pour l'interface ;
-- libellés des boutons d'exploration simplifiés ;
-- correction du tooltip de coordonnées de carte / automap avec une police plus large.
+- coût de mana du sort de base du Mage doublé ;
+- utilisation en combat du sort `Éclat de givre` découvert à l'étage 1 ;
+- sauvegarde des sorts découverts via `discovered_ability_ids` ;
+- PV des monstres normaux augmentés de 25 % ;
+- boss gardien explicitement exclu de cette hausse ;
+- coloration des valeurs de rolls dans la création d'équipe ;
+- corrections de layout dans l'écran `Statut > Équipement` ;
+- retour automatique du canal `Journal` après un combat.
 
-Aucun gameplay, layout de donjon, règle de combat ou format de sauvegarde n'est modifié.
-
-Scripts concernés par `v0.11.3` :
+Scripts concernés par `v0.12` :
 
 ```text
-scripts/ui/MainMenu.gd
-scripts/ui/CommandOverlayUI.gd
-scripts/ui/AutoMapUI.gd
+scripts/abilities/AbilityDatabase.gd
+scripts/monsters/MonsterDatabase.gd
+scripts/combat/CombatAbilityResolver.gd
+scripts/dungeon/Dungeon.gd
+scripts/core/GameSession.gd
+scripts/core/SaveManager.gd
+scripts/ui/PartyCreationUI.gd
+scripts/ui/menu/StatusEquipmentMenuView.gd
+scripts/ui/GameUI.gd
 ```
 
-Assets / configuration UI concernés :
+Point sensible :
 
 ```text
-assets/ui/backgrounds/main_menu_background.png
-assets/ui/themes/game_theme.tres
-assets/fonts/title_medieval.otf
-assets/fonts/game_ui.otf
-project.godot
+SaveManager passe en version 6 pour sauvegarder discovered_ability_ids.
+Anciennes sauvegardes compatibles : champ absent = liste vide.
 ```
 
-Les fichiers de police ne doivent être poussés que si leur licence autorise leur usage et leur distribution dans le dépôt public.
-
-## 7. Tests recommandés v0.11.3
+## 7. Tests recommandés v0.12
 
 ```text
-menu principal avec image de fond
-titre du menu principal avec police dédiée
-Options / Retour
-Nouvelle partie
-Charger
-création d'équipe
-lisibilité police globale
-exploration boutons souris
-raccourcis clavier Z/Q/S/D/E
-carte agrandie
-automap compacte
-tooltip coordonnées X/Y à deux chiffres
-tooltip coordonnées près des bords
+Étincelle coûte 6 PM
+Éclat de givre découvert à l'étage 1
+Mage niveau 1 : Éclat de givre indisponible
+Mage niveau 2 : Éclat de givre disponible en combat
+sauvegarde / chargement après découverte
+PV des monstres normaux augmentés
+boss gardien conservé à 225 PV
+création d'équipe : stats 10 vertes
+création d'équipe : stats 5 jaunes
+création d'équipe : stats 4 ou moins rouges
+écran équipement : Accessoire visible
+écran équipement : pas de cadres inutiles autour des slots
+écran équipement : Retour statut dans le cadre
+entrée combat : canal Combat
+sortie combat : canal Journal
 inventaire
-équipement
 boutique
 temple
+carte
+automap
 grimoire hors combat
 grimoire de combat
-journal Combat coloré
 boss gardien
-sauvegarde / chargement
 ```
 
 ## 8. Renderer et builds de test
@@ -161,5 +163,6 @@ ne pas révéler d'informations non découvertes sur la carte
 ne pas placer volontairement des modèles lisibles face à un mur
 ne pas viser l'étage 3 comme priorité immédiate
 éviter les contours blancs et halos clairs sur les assets
-vérifier la lisibilité avant d'étendre la police globale
+vérifier la lisibilité après toute modification de police globale
+sauvegarder toute nouvelle progression durable
 ```
